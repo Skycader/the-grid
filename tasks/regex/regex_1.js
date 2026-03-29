@@ -1,0 +1,16 @@
+/*
+ * Ex 1
+ * Remove all words `cat`
+ * ★ Difficulty: ★★☆☆☆☆☆☆☆☆ (2/10)
+ */
+
+const r = /TODO/;
+
+const f = (text) => {
+  // write your solution here
+  const r = /cat/gi;
+  return text.replace(r, "");
+};
+
+module.exports = f;
+

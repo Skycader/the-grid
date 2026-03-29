@@ -1,0 +1,2191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GRID::RUNNER</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000810'/%3E%3Cline x1='4' y1='16' x2='28' y2='16' stroke='%2300ffff' stroke-width='1' opacity='.4'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%2300ffff' stroke-width='1' opacity='.4'/%3E%3Crect x='2' y='2' width='28' height='28' rx='1' stroke='%2300ffff' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='16' cy='16' r='5' stroke='%2300ffff' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ffff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --c: #00ffff;
+        --cd: #00aaaa;
+        --cm: #004455;
+        --bg: #000810;
+        --bg2: #000d1a;
+        --bd: rgba(0, 255, 255, 0.2);
+        --tx: #b0dce0;
+        --txd: #2a6070;
+        --glow: 0 0 10px rgba(0, 255, 255, 0.45);
+        --glowb:
+          0 0 20px rgba(0, 255, 255, 0.8), 0 0 45px rgba(0, 255, 255, 0.3);
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        background: var(--bg);
+        color: var(--tx);
+        font-family: "Exo 2", sans-serif;
+        overflow: hidden;
+        cursor: crosshair;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.04) 2px,
+          rgba(0, 0, 0, 0.04) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+      }
+      #bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+      }
+      #app {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+      }
+      .view {
+        display: none;
+        flex: 1;
+        flex-direction: column;
+        overflow: hidden;
+        animation: fadeIn 0.22s ease;
+      }
+      .view.active {
+        display: flex;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── BOOT ── */
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+        transition: opacity 0.6s;
+      }
+      #boot.done {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .boot-line {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.73rem;
+        color: var(--cd);
+        letter-spacing: 0.11em;
+        opacity: 0;
+        animation: btIn 0.1s forwards;
+      }
+      @keyframes btIn {
+        to {
+          opacity: 1;
+        }
+      }
+      #boot-logo {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: var(--c);
+        text-shadow: var(--glowb);
+        letter-spacing: 0.2em;
+        margin-bottom: 14px;
+        opacity: 0;
+      }
+
+      /* ── HOME ── */
+      #view-home {
+        align-items: center;
+        justify-content: center;
+        padding: 8px 10px 14px;
+        gap: 12px;
+        overflow-y: auto;
+      }
+      .home-hdr {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+      }
+      .logo {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(1.5rem, 3.6vw, 2.9rem);
+        font-weight: 900;
+        color: var(--c);
+        text-shadow: var(--glowb);
+        letter-spacing: 0.16em;
+        animation: pulse 3s ease-in-out infinite;
+        text-align: center;
+        white-space: nowrap;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          text-shadow:
+            0 0 18px rgba(0, 255, 255, 0.8),
+            0 0 40px rgba(0, 255, 255, 0.28);
+        }
+        50% {
+          text-shadow:
+            0 0 32px #0ff,
+            0 0 65px rgba(0, 255, 255, 0.45),
+            0 0 85px rgba(0, 255, 255, 0.12);
+        }
+      }
+      .logo-sub {
+        font-family: "Share Tech Mono", monospace;
+        color: var(--cd);
+        font-size: clamp(0.48rem, 0.75vw, 0.72rem);
+        letter-spacing: 0.16em;
+        opacity: 0.6;
+        text-align: center;
+      }
+      .vtag {
+        border: 1px solid var(--cm);
+        padding: 1px 10px;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--cm);
+        letter-spacing: 0.18em;
+      }
+
+      /* search */
+      .search-wrap {
+        width: 100%;
+        max-width: 460px;
+        position: relative;
+        flex-shrink: 0;
+      }
+      .search-wrap::before {
+        content: "⌕";
+        position: absolute;
+        left: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--cd);
+        font-size: 1rem;
+        pointer-events: none;
+        z-index: 1;
+      }
+      #srch {
+        width: 100%;
+        background: rgba(0, 18, 32, 0.9);
+        border: 1px solid var(--bd);
+        color: var(--c);
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.85rem;
+        padding: 9px 12px 9px 34px;
+        outline: none;
+        letter-spacing: 0.09em;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        backdrop-filter: blur(12px);
+      }
+      #srch:focus {
+        border-color: var(--c);
+        box-shadow:
+          var(--glow),
+          inset 0 0 16px rgba(0, 255, 255, 0.03);
+      }
+      #srch::placeholder {
+        color: var(--txd);
+        letter-spacing: 0.13em;
+      }
+
+      /* search results */
+      #srch-results {
+        width: 100%;
+        max-width: 620px;
+        display: none;
+        flex-direction: column;
+        gap: 3px;
+      }
+      #srch-results.show {
+        display: flex;
+      }
+      .srch-lbl {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.64rem;
+        color: var(--txd);
+        letter-spacing: 0.16em;
+        padding-left: 3px;
+      }
+      .srch-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        background: rgba(0, 12, 22, 0.88);
+        border: 1px solid var(--bd);
+        cursor: pointer;
+        transition: all 0.14s;
+        min-width: 0;
+      }
+      .srch-row:hover {
+        border-color: var(--c);
+        box-shadow: var(--glow);
+        padding-left: 18px;
+      }
+      .srch-cat {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.62rem;
+        color: var(--cd);
+        border: 1px solid var(--cm);
+        padding: 1px 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .srch-id {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.8rem;
+        color: var(--tx);
+        white-space: nowrap;
+      }
+      .srch-desc {
+        font-size: 0.68rem;
+        color: var(--txd);
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .srch-st {
+        font-size: 0.64rem;
+        letter-spacing: -1px;
+        flex-shrink: 0;
+      }
+
+      /* cat grid */
+      .cat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        width: 100%;
+        max-width: 620px;
+        flex-shrink: 0;
+      }
+      .cat-card {
+        background: rgba(0, 12, 22, 0.88);
+        border: 1px solid var(--bd);
+        padding: 22px 16px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(12px);
+      }
+      .cat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--c);
+        box-shadow: 0 0 10px var(--c);
+        transform: scaleX(0);
+        transition: transform 0.3s;
+      }
+      .cat-card::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--cm), transparent);
+      }
+      .cat-card:hover::before {
+        transform: scaleX(1);
+      }
+      .cat-card:hover {
+        border-color: var(--c);
+        box-shadow:
+          var(--glow),
+          inset 0 0 28px rgba(0, 255, 255, 0.04);
+        transform: translateY(-2px);
+      }
+      .cat-icon {
+        width: 42px;
+        height: 42px;
+        color: var(--c);
+        filter: drop-shadow(0 0 7px rgba(0, 255, 255, 0.5));
+      }
+      .cat-name {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--c);
+        letter-spacing: 0.22em;
+      }
+      .cat-meta {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--txd);
+      }
+
+      /* ── CATEGORY ── */
+      #view-category {
+        background: rgba(0, 5, 12, 0.62);
+        backdrop-filter: blur(4px);
+      }
+      .panel-hdr {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--bd);
+        background: rgba(0, 7, 16, 0.94);
+        backdrop-filter: blur(20px);
+        flex-shrink: 0;
+      }
+      .bk {
+        font-family: "Share Tech Mono", monospace;
+        color: var(--cd);
+        cursor: pointer;
+        padding: 4px 11px;
+        border: 1px solid var(--bd);
+        font-size: 0.75rem;
+        letter-spacing: 0.13em;
+        transition: all 0.2s;
+        user-select: none;
+        flex-shrink: 0;
+      }
+      .bk:hover {
+        color: var(--c);
+        border-color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .panel-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--c);
+        text-shadow: var(--glow);
+        letter-spacing: 0.14em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .task-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .task-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .task-list::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      .task-list::-webkit-scrollbar-thumb {
+        background: var(--cd);
+      }
+      .task-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: rgba(0, 12, 22, 0.72);
+        border: 1px solid var(--bd);
+        cursor: pointer;
+        transition: all 0.18s;
+        backdrop-filter: blur(4px);
+        position: relative;
+      }
+      .task-row::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--c);
+        transform: scaleY(0);
+        transition: transform 0.18s;
+      }
+      .task-row:hover::before {
+        transform: scaleY(1);
+      }
+      .task-row:hover {
+        border-color: var(--c);
+        box-shadow: var(--glow);
+        background: rgba(0, 24, 36, 0.72);
+        padding-left: 22px;
+      }
+      .trow-l {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .t-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--txd);
+        flex-shrink: 0;
+      }
+      .t-dot.ok {
+        background: #00ff88;
+        box-shadow: 0 0 5px #00ff88;
+      }
+      .t-dot.ng {
+        background: #ff4040;
+        box-shadow: 0 0 5px #ff4040;
+      }
+      .t-num {
+        font-family: "Share Tech Mono", monospace;
+        color: var(--txd);
+        font-size: 0.7rem;
+        min-width: 22px;
+      }
+      .t-id {
+        font-family: "Share Tech Mono", monospace;
+        color: var(--tx);
+        font-size: 0.85rem;
+      }
+      .t-desc {
+        font-size: 0.7rem;
+        color: var(--txd);
+        margin-top: 2px;
+      }
+      .stars-wrap {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .stars {
+        font-size: 0.7rem;
+        letter-spacing: -1px;
+      }
+      .d12 {
+        color: #00ff88;
+        text-shadow: 0 0 5px #00ff88;
+      }
+      .d34 {
+        color: #00ddff;
+        text-shadow: 0 0 5px #00ddff;
+      }
+      .d56 {
+        color: #ffaa00;
+        text-shadow: 0 0 5px #ffaa00;
+      }
+      .d78 {
+        color: #ff5500;
+        text-shadow: 0 0 5px #ff5500;
+      }
+      .d910 {
+        color: #ff0044;
+        text-shadow: 0 0 5px #ff0044;
+      }
+      .d-lbl {
+        font-family: "Share Tech Mono", monospace;
+        color: var(--txd);
+        font-size: 0.65rem;
+      }
+
+      /* ── TASK VIEW ── */
+      #view-task {
+        background: var(--bg);
+      }
+      .task-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        background: rgba(0, 5, 12, 0.98);
+        border-bottom: 1px solid var(--bd);
+        flex-shrink: 0;
+        backdrop-filter: blur(20px);
+      }
+      .breadc {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.71rem;
+        color: var(--txd);
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        letter-spacing: 0.04em;
+        min-width: 0;
+      }
+      .breadc .act {
+        color: var(--c);
+      }
+      .tab-grp {
+        display: flex;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+      .tab {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.68rem;
+        padding: 4px 9px;
+        border: 1px solid var(--bd);
+        background: transparent;
+        color: var(--txd);
+        cursor: pointer;
+        letter-spacing: 0.09em;
+        transition: all 0.14s;
+        white-space: nowrap;
+      }
+      .tab.on {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: var(--c);
+        color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .tab.sol-tab {
+        border-color: rgba(255, 160, 0, 0.28);
+        color: rgba(255, 160, 0, 0.55);
+      }
+      .tab.sol-tab:hover,
+      .tab.sol-tab.on {
+        background: rgba(255, 160, 0, 0.08);
+        border-color: #ffa000;
+        color: #ffa000;
+        box-shadow: 0 0 7px rgba(255, 160, 0, 0.32);
+      }
+      .mem-grp {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--txd);
+        flex-shrink: 0;
+      }
+      .mem-grp input {
+        width: 40px;
+        background: var(--bg2);
+        border: 1px solid var(--bd);
+        color: var(--c);
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.68rem;
+        padding: 2px 4px;
+        text-align: center;
+        outline: none;
+      }
+      .run-btn {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 5px 13px;
+        background: rgba(0, 255, 255, 0.08);
+        border: 1px solid var(--c);
+        color: var(--c);
+        cursor: pointer;
+        letter-spacing: 0.18em;
+        transition: all 0.14s;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .run-btn:hover {
+        background: rgba(0, 255, 255, 0.16);
+        box-shadow: var(--glow);
+      }
+      .run-btn.go {
+        animation: blk 0.38s ease-in-out infinite alternate;
+      }
+      @keyframes blk {
+        from {
+          opacity: 0.38;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .editor-area {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+      }
+      .ed-panel {
+        flex: 3;
+        position: relative;
+        border-right: 1px solid var(--bd);
+      }
+      #monaco {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* solutions overlay */
+      .sol-overlay {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        z-index: 10;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .sol-overlay.show {
+        display: flex;
+      }
+      .sol-inner {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 20px;
+      }
+      .sol-inner::-webkit-scrollbar {
+        width: 3px;
+      }
+      .sol-inner::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      .sol-inner::-webkit-scrollbar-thumb {
+        background: #7a5000;
+      }
+      .sol-banner {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.7rem;
+        color: rgba(255, 160, 0, 0.65);
+        letter-spacing: 0.18em;
+        margin-bottom: 12px;
+        border-left: 3px solid #ffa000;
+        padding-left: 8px;
+      }
+      .sol-code {
+        background: rgba(0, 12, 22, 0.92);
+        border: 1px solid rgba(255, 160, 0, 0.18);
+        border-left: 3px solid rgba(255, 160, 0, 0.4);
+        padding: 16px;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.8rem;
+        color: #b8e0e8;
+        white-space: pre-wrap;
+        word-break: break-all;
+        line-height: 1.6;
+      }
+      .sol-note {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.66rem;
+        color: rgba(255, 160, 0, 0.35);
+        margin-top: 12px;
+        text-align: center;
+        letter-spacing: 0.1em;
+      }
+
+      /* results */
+      .res-panel {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        background: rgba(0, 4, 10, 0.98);
+      }
+      .res-hdr {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.7rem;
+        padding: 6px 12px;
+        border-bottom: 1px solid var(--bd);
+        color: var(--txd);
+        letter-spacing: 0.13em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .res-sum {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+      }
+      .bp {
+        color: #00ff88;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.7rem;
+      }
+      .bf {
+        color: #ff4040;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.7rem;
+      }
+      .bt {
+        color: var(--txd);
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.66rem;
+      }
+      #res-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 12px;
+      }
+      #res-body::-webkit-scrollbar {
+        width: 3px;
+      }
+      #res-body::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      #res-body::-webkit-scrollbar-thumb {
+        background: var(--cd);
+      }
+      .r-suite {
+        margin-bottom: 12px;
+      }
+      .r-suite-nm {
+        font-family: "Share Tech Mono", monospace;
+        color: var(--cd);
+        font-size: 0.7rem;
+        letter-spacing: 0.13em;
+        margin-bottom: 4px;
+        padding-left: 3px;
+        border-left: 2px solid var(--cd);
+      }
+      .r-item {
+        padding: 5px 8px;
+        margin-bottom: 2px;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.74rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .r-item.pass {
+        background: rgba(0, 255, 136, 0.04);
+        border-left: 2px solid #00ff88;
+      }
+      .r-item.fail {
+        background: rgba(255, 64, 64, 0.04);
+        border-left: 2px solid #ff4040;
+      }
+      .r-item.error {
+        background: rgba(255, 160, 0, 0.04);
+        border-left: 2px solid #ffa000;
+      }
+      .r-nr {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .r-ico {
+        font-size: 0.82rem;
+      }
+      .pass .r-ico {
+        color: #00ff88;
+      }
+      .fail .r-ico {
+        color: #ff4040;
+      }
+      .error .r-ico {
+        color: #ffa000;
+      }
+      .r-nm {
+        color: var(--tx);
+        flex: 1;
+      }
+      .r-ms {
+        color: var(--txd);
+        font-size: 0.66rem;
+      }
+      .r-mem {
+        color: var(--txd);
+        font-size: 0.63rem;
+      }
+      .r-err {
+        color: #ff6060;
+        font-size: 0.71rem;
+        padding: 2px 0 2px 20px;
+        background: rgba(255, 0, 0, 0.03);
+        word-break: break-all;
+        white-space: pre-wrap;
+      }
+      .res-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--txd);
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.76rem;
+        text-align: center;
+        gap: 9px;
+      }
+      .res-empty .ico {
+        font-size: 1.8rem;
+        opacity: 0.2;
+      }
+      .statusbar {
+        padding: 2px 12px;
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.66rem;
+        color: var(--txd);
+        border-top: 1px solid var(--bd);
+        background: rgba(0, 3, 7, 0.98);
+        min-height: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .statusbar.ok {
+        color: #00ff88;
+      }
+      .statusbar.err {
+        color: #ff6060;
+      }
+
+      /* ── MODAL ── */
+      .modal-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 800;
+        background: rgba(0, 3, 9, 0.86);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.14s ease;
+      }
+      .modal-bg.hide {
+        display: none;
+      }
+      .modal {
+        background: var(--bg2);
+        border: 1px solid rgba(255, 160, 0, 0.4);
+        max-width: 380px;
+        width: 90%;
+        padding: 26px;
+        position: relative;
+        box-shadow:
+          0 0 36px rgba(255, 160, 0, 0.1),
+          0 0 70px rgba(0, 0, 0, 0.5);
+      }
+      .modal::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ffa000, transparent);
+      }
+      .m-ico {
+        font-size: 1.6rem;
+        text-align: center;
+        margin-bottom: 8px;
+        color: #ffa000;
+        text-shadow: 0 0 16px rgba(255, 160, 0, 0.6);
+      }
+      .m-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #ffa000;
+        letter-spacing: 0.16em;
+        text-align: center;
+        margin-bottom: 9px;
+      }
+      .m-body {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.74rem;
+        color: var(--tx);
+        line-height: 1.65;
+        text-align: center;
+        margin-bottom: 20px;
+        opacity: 0.8;
+      }
+      .m-acts {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      .m-btn {
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.74rem;
+        padding: 6px 18px;
+        border: 1px solid;
+        cursor: pointer;
+        letter-spacing: 0.13em;
+        transition: all 0.14s;
+      }
+      .m-btn.cancel {
+        border-color: var(--bd);
+        color: var(--txd);
+        background: transparent;
+      }
+      .m-btn.cancel:hover {
+        border-color: var(--c);
+        color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .m-btn.go {
+        border-color: #ffa000;
+        color: #ffa000;
+        background: rgba(255, 160, 0, 0.05);
+      }
+      .m-btn.go:hover {
+        background: rgba(255, 160, 0, 0.12);
+        box-shadow: 0 0 9px rgba(255, 160, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="boot">
+      <div id="boot-logo">GRID::RUNNER</div>
+      <div id="boot-lines"></div>
+    </div>
+
+    <canvas id="bg"></canvas>
+
+    <div id="app">
+      <!-- HOME -->
+      <div id="view-home" class="view active">
+        <div class="home-hdr">
+          <div class="logo">GRID::RUNNER</div>
+          <div class="logo-sub">
+            // JAVASCRIPT ALGORITHM TESTING ENVIRONMENT //
+          </div>
+          <div class="vtag">v1.2.0 — CYBERNETIC BUILD</div>
+        </div>
+        <div class="search-wrap">
+          <input
+            id="srch"
+            type="text"
+            placeholder="SEARCH_PROTOCOL..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <div id="srch-results"></div>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
+
+      <!-- CATEGORY -->
+      <div id="view-category" class="view">
+        <div class="panel-hdr">
+          <div class="bk" id="bk-cat">← BACK</div>
+          <div class="panel-title" id="cat-lbl">CATEGORY</div>
+          <div style="flex: 1"></div>
+          <div
+            style="
+              font-family: &quot;Share Tech Mono&quot;, monospace;
+              font-size: 0.68rem;
+              color: var(--txd);
+            "
+            id="cat-cnt"
+          ></div>
+        </div>
+        <div class="task-list" id="task-list"></div>
+      </div>
+
+      <!-- TASK -->
+      <div id="view-task" class="view">
+        <div class="task-bar">
+          <div class="bk" id="bk-task">← BACK</div>
+          <div class="breadc" id="breadc"></div>
+          <div class="tab-grp">
+            <button class="tab on" id="tab-ed" onclick="switchTab('ed')">
+              EDITOR
+            </button>
+            <button class="tab" id="tab-sp" onclick="switchTab('sp')">
+              SPEC
+            </button>
+            <button
+              class="tab sol-tab"
+              id="tab-sol"
+              onclick="requestSolutions()"
+            >
+              SOLUTIONS
+            </button>
+          </div>
+          <div class="mem-grp">
+            <span>MEM:</span>
+            <input
+              type="number"
+              id="memlim"
+              value="128"
+              min="1"
+              max="2048"
+              title="Memory limit MB"
+            />
+            <span>MB</span>
+          </div>
+          <button class="run-btn" id="run-btn" onclick="formatAndRun()">
+            ▶ RUN
+          </button>
+        </div>
+        <div class="editor-area">
+          <div class="ed-panel">
+            <div id="monaco"></div>
+            <div class="sol-overlay" id="sol-overlay">
+              <div class="sol-inner">
+                <div class="sol-banner">⚑ REFERENCE SOLUTION</div>
+                <div class="sol-code" id="sol-code"></div>
+                <div class="sol-note" id="sol-note"></div>
+              </div>
+            </div>
+          </div>
+          <div class="res-panel">
+            <div class="res-hdr">
+              <span>TEST RESULTS</span>
+              <div class="res-sum" id="res-sum"></div>
+            </div>
+            <div id="res-body">
+              <div class="res-empty">
+                <div class="ico">⬡</div>
+                <div>AWAITING EXECUTION</div>
+                <div style="opacity: 0.38; font-size: 0.68rem; margin-top: 4px">
+                  Click ▶ RUN to execute
+                </div>
+              </div>
+            </div>
+            <div class="statusbar" id="statusbar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLUTIONS MODAL -->
+    <div class="modal-bg hide" id="modal">
+      <div class="modal">
+        <div class="m-ico">📋</div>
+        <div class="m-title">SHOW SOLUTION?</div>
+        <div class="m-body">
+          Reference solution for this task will be displayed.
+        </div>
+        <div class="m-acts">
+          <button class="m-btn cancel" onclick="closeModal()">CANCEL</button>
+          <button class="m-btn go" onclick="doShowSolution()">SHOW</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKER -->
+    <script id="wk" type="x/worker">
+      const suites={};let curSuite='__root__';
+      function describe(n,fn){curSuite=n;if(!suites[n])suites[n]=[];try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null});}}
+      function it(name,fn){
+        const s=curSuite;if(!suites[s])suites[s]=[];
+        const mb=(self.performance&&self.performance.memory)?self.performance.memory.usedJSHeapSize:-1;
+        const t0=self.performance.now();
+        try{fn();const dt=self.performance.now()-t0;
+          const ma=(self.performance&&self.performance.memory)?self.performance.memory.usedJSHeapSize:-1;
+          suites[s].push({name,status:'pass',time:dt,mem:ma>=0?ma-mb:null});}
+        catch(e){suites[s].push({name,status:'fail',error:e.message,time:self.performance.now()-t0,mem:null});}
+      }
+      const test=it;
+      function expect(v){
+        function a(ok,msg){if(!ok)throw new Error(msg);}
+        const m={
+          toBe:(e)=>a(Object.is(v,e),'Expected '+JSON.stringify(e)+' but got '+JSON.stringify(v)),
+          toEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'exp '+JSON.stringify(e)+' got '+JSON.stringify(v)),
+          toStrictEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'toStrictEqual failed'),
+          toMatch:(r)=>{const re=typeof r==='string'?new RegExp(r):r;a(re.test(String(v)),'toMatch failed');},
+          toBeTruthy:()=>a(!!v,'Expected truthy, got '+JSON.stringify(v)),
+          toBeFalsy:()=>a(!v,'Expected falsy, got '+JSON.stringify(v)),
+          toBeNull:()=>a(v===null,'Expected null'),
+          toBeUndefined:()=>a(v===undefined,'Expected undefined'),
+          toBeDefined:()=>a(v!==undefined,'Expected defined'),
+          toContain:(i)=>a(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'Expected to contain '+JSON.stringify(i)),
+          toHaveLength:(n)=>a(v!=null&&v.length===n,'Expected length '+n+', got '+(v?v.length:'N/A')),
+          toBeGreaterThan:(n)=>a(v>n,v+' > '+n+' failed'),
+          toBeLessThan:(n)=>a(v<n,v+' < '+n+' failed'),
+          toBeGreaterThanOrEqual:(n)=>a(v>=n,v+' >= '+n+' failed'),
+          toBeLessThanOrEqual:(n)=>a(v<=n,v+' <= '+n+' failed'),
+          toThrow:()=>{try{v();a(false,'Expected to throw');}catch(e){}}
+        };
+        m.not={};Object.keys(m).forEach(k=>{if(k==='not')return;
+          m.not[k]=(...args)=>{let ok=false;try{m[k](...args);}catch(e){ok=true;}
+            if(!ok)throw new Error('Expected NOT to: '+k);};});
+        return m;
+      }
+      self.onmessage=function(e){
+        const{sol,spec}=e.data,t0=self.performance.now();let ex;
+        try{const mod={exports:{}};new Function('module','exports','require',sol)(mod,mod.exports,()=>mod.exports);ex=mod.exports;}
+        catch(err){self.postMessage({error:'SYNTAX/RUNTIME:\n'+err.message,suites:{},total:0});return;}
+        try{new Function('describe','it','test','expect','f','require',spec)(describe,it,test,expect,ex,()=>ex);}
+        catch(err){if(!suites['__root__'])suites['__root__']=[];suites['__root__'].push({name:'spec error',status:'error',error:err.message,time:0,mem:null});}
+        self.postMessage({suites,total:self.performance.now()-t0});
+      };
+    </script>
+
+    <script>
+      // ═══════════ TASK REGISTRY ═══════════
+      // Files live in: grid/{folder}/{file}.js  .spec.js  .sol.js
+      // Icons live in: grid/{folder}/icon.svg
+
+      const CATS = [
+        {
+          id: "regex",
+          name: "REGEX",
+          desc: "Pattern Matching Protocols",
+          folder: "regex",
+          icon: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="42" height="42" rx="2" stroke="currentColor" stroke-width="1.5"/>
+      <text x="7" y="27" font-family="monospace" font-size="18" fill="currentColor" font-weight="bold">.*</text>
+      <line x1="3" y1="32" x2="45" y2="32" stroke="currentColor" stroke-width="1" opacity=".35"/>
+      <text x="7" y="41" font-family="monospace" font-size="7" fill="currentColor" opacity=".5" letter-spacing="2">REGEX ENGINE</text>
+    </svg>`,
+          tasks: [
+            {
+              id: "regex_1",
+              title: 'Remove "cat"',
+              diff: 2,
+              desc: 'Remove all occurrences of the word "cat" (case-insensitive)',
+              file: "regex_1",
+            },
+            {
+              id: "regex_2",
+              title: "Extract Emails",
+              diff: 4,
+              desc: "Extract all email addresses from a string into an array",
+              file: "regex_2",
+            },
+            {
+              id: "regex_3",
+              title: "Replace Numbers",
+              diff: 3,
+              desc: "Replace every sequence of digits with the # symbol",
+              file: "regex_3",
+            },
+            {
+              id: "regex_4",
+              title: "camelCase → snake_case",
+              diff: 5,
+              desc: "Convert camelCase identifiers to snake_case",
+              file: "regex_4",
+            },
+            {
+              id: "regex_5",
+              title: "Trim Extra Spaces",
+              diff: 3,
+              desc: "Collapse multiple whitespace to single space and trim",
+              file: "regex_5",
+            },
+          ],
+        },
+        {
+          id: "algo",
+          name: "ALGO",
+          desc: "Core Algorithm Protocols",
+          folder: "algo",
+          icon: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="4,40 14,18 24,28 34,8 44,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="14" cy="18" r="3" fill="currentColor" opacity=".8"/>
+      <circle cx="24" cy="28" r="3" fill="currentColor" opacity=".8"/>
+      <circle cx="34" cy="8"  r="3" fill="currentColor" opacity=".8"/>
+      <line x1="4" y1="44" x2="44" y2="44" stroke="currentColor" stroke-width="1" opacity=".3"/>
+      <line x1="4" y1="44" x2="4"  y2="4"  stroke="currentColor" stroke-width="1" opacity=".3"/>
+    </svg>`,
+          tasks: [
+            {
+              id: "algo_1",
+              title: "Two Sum",
+              diff: 3,
+              desc: "Find two indices whose values sum to target",
+              file: "algo_1",
+            },
+            {
+              id: "algo_2",
+              title: "Fibonacci",
+              diff: 4,
+              desc: "Return the Nth Fibonacci number (O(n) solution)",
+              file: "algo_2",
+            },
+            {
+              id: "algo_3",
+              title: "Valid Palindrome",
+              diff: 2,
+              desc: "Is the string a palindrome? (alphanumeric only)",
+              file: "algo_3",
+            },
+            {
+              id: "algo_4",
+              title: "Max Subarray",
+              diff: 6,
+              desc: "Kadane's algorithm — max sum contiguous subarray",
+              file: "algo_4",
+            },
+            {
+              id: "algo_5",
+              title: "Binary Search",
+              diff: 4,
+              desc: "Return index of target in sorted array, -1 if not found",
+              file: "algo_5",
+            },
+            {
+              id: "algo_6",
+              title: "Valid Brackets",
+              diff: 5,
+              desc: "Check if bracket string is valid — (), [], {}",
+              file: "algo_6",
+            },
+          ],
+        },
+      ];
+
+      // ═══════════ IN-MEMORY STATE (no localStorage) ═══════════
+
+      const STATUS = {}; // { 'cat/taskId': 'ok'|'ng' }
+      const CODE = {}; // { 'cat/taskId': string }  — user edits this session
+      const FILE_CACHE = {}; // { 'cat/taskId': {code,spec,sol} }
+
+      // ═══════════ AUDIO ═══════════
+
+      let _ac = null;
+      function ac() {
+        if (!_ac)
+          _ac = new (window.AudioContext || window.webkitAudioContext)();
+        if (_ac.state === "suspended") _ac.resume();
+        return _ac;
+      }
+      function snd(fn) {
+        try {
+          fn(ac());
+        } catch (e) {}
+      }
+
+      const playClick = () =>
+        snd((c) => {
+          const o = c.createOscillator(),
+            g = c.createGain();
+          o.connect(g);
+          g.connect(c.destination);
+          o.type = "square";
+          o.frequency.value = 1050;
+          g.gain.setValueAtTime(0.052, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.06);
+          o.start();
+          o.stop(c.currentTime + 0.06);
+        });
+      const playNav = () =>
+        snd((c) => {
+          [270, 450].forEach((fr, i) => {
+            const o = c.createOscillator(),
+              g = c.createGain();
+            o.connect(g);
+            g.connect(c.destination);
+            o.type = "sine";
+            o.frequency.value = fr;
+            const t = c.currentTime + i * 0.05;
+            g.gain.setValueAtTime(0.048, t);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+            o.start(t);
+            o.stop(t + 0.14);
+          });
+        });
+      const playRunStart = () =>
+        snd((c) => {
+          const o = c.createOscillator(),
+            g = c.createGain();
+          o.connect(g);
+          g.connect(c.destination);
+          o.type = "sawtooth";
+          o.frequency.setValueAtTime(155, c.currentTime);
+          o.frequency.exponentialRampToValueAtTime(800, c.currentTime + 0.26);
+          g.gain.setValueAtTime(0.062, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.3);
+          o.start();
+          o.stop(c.currentTime + 0.3);
+        });
+      const playAllPass = () =>
+        snd((c) => {
+          [440, 554, 659, 880].forEach((fr, i) => {
+            const o = c.createOscillator(),
+              g = c.createGain();
+            o.connect(g);
+            g.connect(c.destination);
+            o.type = "sine";
+            o.frequency.value = fr;
+            const t = c.currentTime + i * 0.07;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(0.058, t + 0.03);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+            o.start(t);
+            o.stop(t + 0.36);
+          });
+        });
+      const playFail = () =>
+        snd((c) => {
+          const o = c.createOscillator(),
+            g = c.createGain();
+          o.connect(g);
+          g.connect(c.destination);
+          o.type = "sawtooth";
+          o.frequency.setValueAtTime(410, c.currentTime);
+          o.frequency.exponentialRampToValueAtTime(160, c.currentTime + 0.36);
+          g.gain.setValueAtTime(0.075, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.4);
+          o.start();
+          o.stop(c.currentTime + 0.4);
+        });
+      const playError = () =>
+        snd((c) => {
+          [305, 285, 265].forEach((fr, i) => {
+            const o = c.createOscillator(),
+              g = c.createGain();
+            o.connect(g);
+            g.connect(c.destination);
+            o.type = "square";
+            o.frequency.value = fr;
+            const t = c.currentTime + i * 0.08;
+            g.gain.setValueAtTime(0.062, t);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+            o.start(t);
+            o.stop(t + 0.12);
+          });
+        });
+      let _lt = 0;
+      const playType = () => {
+        const n = Date.now();
+        if (n - _lt < 36) return;
+        _lt = n;
+        snd((c) => {
+          const buf = c.createBuffer(
+            1,
+            Math.floor(c.sampleRate * 0.022),
+            c.sampleRate,
+          );
+          const d = buf.getChannelData(0);
+          for (let i = 0; i < d.length; i++)
+            d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) * 0.8;
+          const src = c.createBufferSource(),
+            filt = c.createBiquadFilter(),
+            g = c.createGain();
+          filt.type = "bandpass";
+          filt.frequency.value = 2650;
+          filt.Q.value = 2.1;
+          src.buffer = buf;
+          src.connect(filt);
+          filt.connect(g);
+          g.connect(c.destination);
+          g.gain.value = 0.016;
+          src.start();
+        });
+      };
+
+      // ═══════════ BACKGROUND ═══════════
+
+      const cv = document.getElementById("bg"),
+        cx = cv.getContext("2d");
+      let T = 0,
+        lightnings = [];
+      function resize() {
+        cv.width = innerWidth;
+        cv.height = innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      function drawBg(t) {
+        const W = cv.width,
+          H = cv.height;
+        // Sky gradient
+        const sky = cx.createLinearGradient(0, 0, 0, H * 0.56);
+        sky.addColorStop(0, "#000005");
+        sky.addColorStop(0.75, "#000512");
+        sky.addColorStop(1, "#001420");
+        cx.fillStyle = sky;
+        cx.fillRect(0, 0, W, H);
+        // Ground gradient
+        const gnd = cx.createLinearGradient(0, H * 0.5, 0, H);
+        gnd.addColorStop(0, "#000d18");
+        gnd.addColorStop(1, "#000208");
+        cx.fillStyle = gnd;
+        cx.fillRect(0, H * 0.5, W, H * 0.5);
+        // Horizon glow band
+        const hg = cx.createLinearGradient(0, H * 0.43, 0, H * 0.62);
+        hg.addColorStop(0, "rgba(0,80,140,0)");
+        hg.addColorStop(0.5, "rgba(0,180,220,.1)");
+        hg.addColorStop(1, "rgba(0,80,140,0)");
+        cx.fillStyle = hg;
+        cx.fillRect(0, H * 0.43, W, H * 0.22);
+        // Stars
+        cx.save();
+        for (let i = 0; i < 90; i++) {
+          const sx = (i * 137.5 + 11) % W,
+            sy = (i * 91.3 + 5) % (H * 0.44);
+          const fl = 0.35 + 0.65 * Math.abs(Math.sin(t * 0.38 + i * 0.7));
+          cx.fillStyle = `rgba(160,220,255,${fl * 0.52})`;
+          cx.fillRect(sx, sy, i % 4 === 0 ? 1.5 : 1, i % 4 === 0 ? 1.5 : 1);
+        }
+        cx.restore();
+        drawGrid(W, H, t);
+        // Lightning
+        if (Math.random() < 0.004) lightnings.push(mkLightning(W, H));
+        cx.save();
+        lightnings = lightnings.filter((l) => l.a > 0.01);
+        lightnings.forEach((l) => {
+          l.a -= l.dk;
+          drawLP(l.pts, 1.5, l.a * 0.9);
+          l.br.forEach((b) => drawLP(b, 0.75, l.a * 0.4));
+          if (l.a > 0.65) {
+            cx.fillStyle = `rgba(100,170,255,${(l.a - 0.65) * 0.07})`;
+            cx.fillRect(0, 0, W, H);
+          }
+        });
+        cx.restore();
+      }
+
+      // ─── FIXED GRID: full-coverage perspective grid ───────────────────────────
+      function drawGrid(W, H, t) {
+        const hz = H * 0.5; // horizon y
+        const vp = W * 0.5; // vanishing point x
+        const NV = 18; // vertical line divisions (edge-to-edge)
+        const dz = 1.0; // world z spacing between horizontal lines
+        const spd = 0.55; // camera speed (z-units/sec)
+        const scroll = (t * spd) % dz;
+        const maxN = 28;
+
+        cx.save();
+
+        // ── Vertical lines ──────────────────────────────────────────
+        // Fan from (vp, hz) to evenly-spaced points along the bottom edge.
+        // i=0 → x=0 (left corner), i=NV → x=W (right corner): FULL COVERAGE.
+        for (let i = 0; i <= NV; i++) {
+          const bx = (i / NV) * W;
+          const isMid = i === NV / 2;
+          cx.beginPath();
+          cx.moveTo(vp, hz);
+          cx.lineTo(bx, H + 2);
+          cx.strokeStyle = `rgba(0,200,255,${isMid ? 0.52 : 0.18})`;
+          cx.lineWidth = isMid ? 1.4 : 0.65;
+          cx.stroke();
+        }
+
+        // ── Horizontal lines ─────────────────────────────────────────
+        // Perspective formula: y = hz + C/wz  where C = (H-hz)*dz
+        // At wz=dz (n=1,scroll=0): y = H (bottom). As wz→∞: y→hz (horizon).
+        // Scrolling: wz = n*dz - scroll  →  lines rush toward camera (y increases).
+        const C = (H - hz) * dz;
+
+        for (let n = 1; n <= maxN; n++) {
+          const wz = n * dz - scroll;
+          if (wz <= 0.015) continue;
+          const y = hz + C / wz;
+          if (y <= hz + 0.5 || y > H + 3) continue;
+
+          // X extents from boundary lines:
+          //  left  boundary: (vp,hz)→(0,H)  → x = vp*(1-frac)
+          //  right boundary: (vp,hz)→(W,H)  → x = vp+(W-vp)*frac
+          const frac = (y - hz) / (H - hz);
+          const lx = vp * (1 - frac);
+          const rx = vp + (W - vp) * frac;
+          const alpha = Math.min(0.44, frac * frac * 1.8);
+
+          cx.beginPath();
+          cx.moveTo(lx, y);
+          cx.lineTo(rx, y);
+          cx.strokeStyle = `rgba(0,200,255,${alpha})`;
+          cx.lineWidth = 0.65;
+          cx.stroke();
+        }
+
+        // Horizon line glow
+        const hgl = cx.createLinearGradient(0, hz - 2, 0, hz + 6);
+        hgl.addColorStop(0, "rgba(0,200,255,0)");
+        hgl.addColorStop(0.5, "rgba(0,200,255,.16)");
+        hgl.addColorStop(1, "rgba(0,200,255,0)");
+        cx.fillStyle = hgl;
+        cx.fillRect(0, hz - 2, W, 8);
+
+        cx.restore();
+      }
+
+      function mkLightning(W, H) {
+        const x = Math.random() * W,
+          y0 = Math.random() * H * 0.22,
+          y1 = y0 + 55 + Math.random() * 105;
+        const pts = [{ x, y: y0 }];
+        let cx2 = x,
+          cy = y0;
+        while (cy < y1) {
+          cy += 7 + Math.random() * 14;
+          cx2 += (Math.random() - 0.5) * 36;
+          pts.push({ x: cx2, y: cy });
+        }
+        const br = [];
+        if (pts.length > 2 && Math.random() > 0.5) {
+          const bi = Math.floor(pts.length * 0.4);
+          let bx = pts[bi].x,
+            by = pts[bi].y;
+          const bp = [{ x: bx, y: by }];
+          for (let i = 0; i < 3 + Math.floor(Math.random() * 4); i++) {
+            by += 6 + Math.random() * 10;
+            bx += (Math.random() - 0.5) * 26;
+            bp.push({ x: bx, y: by });
+          }
+          br.push(bp);
+        }
+        return { pts, br, a: 1, dk: 0.048 + Math.random() * 0.052 };
+      }
+      function drawLP(pts, w, a) {
+        if (pts.length < 2) return;
+        cx.beginPath();
+        cx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) cx.lineTo(pts[i].x, pts[i].y);
+        cx.strokeStyle = `rgba(160,210,255,${a})`;
+        cx.lineWidth = w;
+        cx.shadowBlur = 12;
+        cx.shadowColor = "#55aaff";
+        cx.stroke();
+        cx.shadowBlur = 0;
+      }
+      function loop(ts) {
+        T = ts / 1000;
+        resize();
+        drawBg(T);
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+
+      // ═══════════ BOOT ═══════════
+
+      (function () {
+        const bootL = [
+          "INITIALIZING GRID RUNTIME v1.2.0...",
+          "LOADING MONACO EDITOR ENGINE...",
+          "MOUNTING PRETTIER FORMATTER v2.8.8...",
+          "SPAWNING WORKER SANDBOX...",
+          "LOADING TASK REGISTRY...",
+          "ALL SYSTEMS NOMINAL — WELCOME TO THE GRID",
+        ];
+        const logo = document.getElementById("boot-logo"),
+          lines = document.getElementById("boot-lines");
+        setTimeout(() => {
+          logo.style.opacity = "1";
+          logo.style.transition = "opacity .5s";
+        }, 100);
+        bootL.forEach((t, i) =>
+          setTimeout(
+            () => {
+              const d = document.createElement("div");
+              d.className = "boot-line";
+              d.textContent = "> " + t;
+              lines.appendChild(d);
+            },
+            200 + i * 190,
+          ),
+        );
+        setTimeout(
+          () => {
+            document.getElementById("boot").classList.add("done");
+            setTimeout(() => document.getElementById("boot").remove(), 700);
+          },
+          200 + bootL.length * 190 + 300,
+        );
+      })();
+
+      // ═══════════ STATE ═══════════
+
+      let view = "home",
+        curCat = null,
+        curTask = null,
+        curTab = "ed";
+      let editor = null,
+        solCode = "",
+        wkBlob = null;
+
+      function showView(id) {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById("view-" + id).classList.add("active");
+        view = id;
+      }
+
+      // ═══════════ ICON PRELOAD ═══════════
+
+      (async function preloadIcons() {
+        for (const cat of CATS) {
+          try {
+            const svg = await fetch(`grid/${cat.folder}/icon.svg`).then((r) => {
+              if (!r.ok) throw 0;
+              return r.text();
+            });
+            cat._icon = svg;
+          } catch (e) {
+            cat._icon = cat.icon;
+          }
+        }
+        renderCats(document.getElementById("srch").value);
+      })();
+
+      // ═══════════ FILE LOADING ═══════════
+
+      async function loadTask(cat, task) {
+        const key = `${cat.id}/${task.id}`;
+        if (FILE_CACHE[key]) return FILE_CACHE[key];
+        const base = `grid/${cat.folder}/${task.file}`;
+        const load = (url) =>
+          fetch(url).then((r) => {
+            if (!r.ok) throw 0;
+            return r.text();
+          });
+        try {
+          const [code, spec, sol] = await Promise.all([
+            load(`${base}.js`),
+            load(`${base}.spec.js`),
+            load(`${base}.sol.js`).catch(() => null),
+          ]);
+          FILE_CACHE[key] = { code, spec, sol };
+        } catch (e) {
+          FILE_CACHE[key] = {
+            code: `// ⚠ Could not load ${task.file}.js\n// Run build.sh and serve via HTTP:\n//   python3 -m http.server 8080\n//   open http://localhost:8080/grid-runner.html\n`,
+            spec: `// ⚠ Could not load ${task.file}.spec.js`,
+            sol: null,
+          };
+        }
+        return FILE_CACHE[key];
+      }
+
+      // ═══════════ HOME ═══════════
+
+      function renderCats(q = "") {
+        const g = document.getElementById("cat-grid");
+        const sr = document.getElementById("srch-results");
+        g.innerHTML = "";
+        sr.innerHTML = "";
+        sr.classList.remove("show");
+        if (q) {
+          const ql = q.toLowerCase(),
+            matches = [];
+          CATS.forEach((cat) =>
+            cat.tasks.forEach((t) => {
+              if (
+                t.id.toLowerCase().includes(ql) ||
+                t.title.toLowerCase().includes(ql) ||
+                t.desc.toLowerCase().includes(ql)
+              )
+                matches.push({ cat, task: t });
+            }),
+          );
+          if (matches.length) {
+            const lbl = document.createElement("div");
+            lbl.className = "srch-lbl";
+            lbl.textContent = `// ${matches.length} MATCH${matches.length > 1 ? "ES" : ""} //`;
+            sr.appendChild(lbl);
+            matches.forEach(({ cat, task }) => {
+              const el = document.createElement("div");
+              el.className = "srch-row";
+              el.innerHTML = `<span class="srch-cat">${cat.name}</span>
+          <span class="srch-id">${task.id.toUpperCase()}</span>
+          <span class="srch-desc">— ${task.desc}</span>
+          <span class="srch-st ${diffCls(task.diff)}">${mkStars(task.diff)}</span>`;
+              el.onclick = () => {
+                playNav();
+                openTask(cat, task);
+              };
+              sr.appendChild(el);
+            });
+            sr.classList.add("show");
+          }
+          CATS.forEach((cat) => {
+            const cm =
+              cat.name.toLowerCase().includes(ql) ||
+              cat.desc.toLowerCase().includes(ql);
+            const tm = cat.tasks.some(
+              (t) =>
+                t.id.toLowerCase().includes(ql) ||
+                t.title.toLowerCase().includes(ql) ||
+                t.desc.toLowerCase().includes(ql),
+            );
+            if (!cm && !tm) return;
+            addCatCard(g, cat);
+          });
+          return;
+        }
+        CATS.forEach((cat) => addCatCard(g, cat));
+      }
+
+      function addCatCard(g, cat) {
+        const el = document.createElement("div");
+        el.className = "cat-card";
+        el.innerHTML = `<div class="cat-icon">${cat._icon || cat.icon}</div>
+    <div class="cat-name">${cat.name}</div>
+    <div class="cat-meta">${cat.tasks.length} PROTOCOLS</div>`;
+        el.onclick = () => {
+          playNav();
+          openCat(cat);
+        };
+        g.appendChild(el);
+      }
+
+      document
+        .getElementById("srch")
+        .addEventListener("input", (e) => renderCats(e.target.value));
+      document
+        .getElementById("srch")
+        .addEventListener("keydown", () => playType());
+      renderCats();
+
+      // ═══════════ CATEGORY ═══════════
+
+      function openCat(cat) {
+        curCat = cat;
+        document.getElementById("cat-lbl").textContent =
+          cat.name + " // " + cat.desc;
+        document.getElementById("cat-cnt").textContent =
+          cat.tasks.length + " TASKS";
+        renderTaskList(cat);
+        showView("category");
+      }
+      function renderTaskList(cat) {
+        const el = document.getElementById("task-list");
+        el.innerHTML = "";
+        cat.tasks.forEach((t, i) => {
+          const st = STATUS[`${cat.id}/${t.id}`] || "";
+          const dc = diffCls(t.diff);
+          const row = document.createElement("div");
+          row.className = "task-row";
+          row.innerHTML = `<div class="trow-l">
+      <div class="t-dot${st === "ok" ? " ok" : st === "ng" ? " ng" : ""}"></div>
+      <div class="t-num">${String(i + 1).padStart(2, "0")}.</div>
+      <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
+    </div>
+    <div class="stars-wrap"><span class="stars ${dc}">${mkStars(t.diff)}</span><span class="d-lbl">(${t.diff}/10)</span></div>`;
+          row.onclick = () => {
+            playNav();
+            openTask(cat, t);
+          };
+          el.appendChild(row);
+        });
+      }
+      function mkStars(d) {
+        let s = "";
+        for (let i = 1; i <= 10; i++) s += i <= d ? "★" : "☆";
+        return s;
+      }
+      function diffCls(d) {
+        return d <= 2
+          ? "d12"
+          : d <= 4
+            ? "d34"
+            : d <= 6
+              ? "d56"
+              : d <= 8
+                ? "d78"
+                : "d910";
+      }
+      document.getElementById("bk-cat").onclick = () => {
+        playClick();
+        showView("home");
+      };
+
+      // ═══════════ TASK ═══════════
+
+      async function openTask(cat, task) {
+        curCat = cat;
+        curTask = task;
+        curTab = "ed";
+        document.getElementById("breadc").innerHTML =
+          `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span> <span style="color:var(--txd)">— ${task.desc}</span>`;
+        setTabs("ed");
+        hideSolOverlay();
+        clearResults();
+        setStatus("");
+        showView("task");
+
+        // Show loading placeholder
+        if (editor) {
+          editor.setValue("// Loading…");
+          editor.updateOptions({ readOnly: true });
+        }
+
+        const files = await loadTask(cat, task);
+        const key = `${cat.id}/${task.id}`;
+        solCode = CODE[key] !== undefined ? CODE[key] : files.code;
+
+        if (editor) {
+          editor.setValue(solCode);
+          editor.updateOptions({ readOnly: false });
+          editor.focus();
+        }
+      }
+
+      function setTabs(t) {
+        document.getElementById("tab-ed").classList.toggle("on", t === "ed");
+        document.getElementById("tab-sp").classList.toggle("on", t === "sp");
+        document.getElementById("tab-sol").classList.toggle("on", t === "sol");
+      }
+      function switchTab(t) {
+        playClick();
+        curTab = t;
+        setTabs(t);
+        hideSolOverlay();
+        if (!editor || !curTask) return;
+        const key = `${curCat.id}/${curTask.id}`;
+        const files = FILE_CACHE[key];
+        if (t === "ed") {
+          editor.setValue(solCode);
+          editor.updateOptions({ readOnly: false });
+          editor.focus();
+        } else if (files) {
+          editor.setValue(files.spec || "// spec not loaded");
+          editor.updateOptions({ readOnly: true });
+        }
+      }
+      function hideSolOverlay() {
+        document.getElementById("sol-overlay").classList.remove("show");
+      }
+
+      function requestSolutions() {
+        playClick();
+        if (!curTask) return;
+        document.getElementById("modal").classList.remove("hide");
+      }
+      function closeModal() {
+        playClick();
+        document.getElementById("modal").classList.add("hide");
+      }
+      function doShowSolution() {
+        playClick();
+        closeModal();
+        const key = `${curCat.id}/${curTask.id}`;
+        const files = FILE_CACHE[key];
+        const sol = (files && files.sol) || null;
+        setTabs("sol");
+        document.getElementById("sol-code").textContent =
+          sol ||
+          "// No reference solution available.\n// Run build.sh to set up task files.";
+        document.getElementById("sol-note").textContent = sol
+          ? "// grid/" + curCat.folder + "/" + curTask.file + ".sol.js //"
+          : "";
+        document.getElementById("sol-overlay").classList.add("show");
+      }
+
+      document.getElementById("bk-task").onclick = () => {
+        playClick();
+        if (editor && curTask) {
+          solCode = editor.getValue();
+          CODE[`${curCat.id}/${curTask.id}`] = solCode;
+        }
+        hideSolOverlay();
+        showView("category");
+      };
+
+      document.getElementById("modal").addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
+
+      // ═══════════ MONACO ═══════════
+
+      require.config({
+        paths: {
+          vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs",
+        },
+      });
+      require(["vs/editor/editor.main"], function () {
+        monaco.editor.defineTheme("tron", {
+          base: "vs-dark",
+          inherit: true,
+          rules: [
+            { token: "keyword", foreground: "00ccff", fontStyle: "bold" },
+            { token: "string", foreground: "00ff88" },
+            { token: "comment", foreground: "1a5544", fontStyle: "italic" },
+            { token: "number", foreground: "ff55ff" },
+            { token: "regexp", foreground: "ffaa00" },
+            { token: "delimiter", foreground: "007788" },
+          ],
+          colors: {
+            "editor.background": "#000810",
+            "editor.foreground": "#b0dce0",
+            "editorCursor.foreground": "#00ffff",
+            "editor.lineHighlightBackground": "#001420",
+            "editorLineNumber.foreground": "#003b4a",
+            "editorLineNumber.activeForeground": "#00aacc",
+            "editor.selectionBackground": "#003344",
+            "editorGutter.background": "#000610",
+            "editorWidget.background": "#000d1a",
+            "editorWidget.border": "#004455",
+            "editorSuggestWidget.background": "#000d1a",
+            "editorSuggestWidget.border": "#004455",
+            "editorSuggestWidget.selectedBackground": "#001a2a",
+            "list.hoverBackground": "#001420",
+            "list.activeSelectionBackground": "#002233",
+            "scrollbarSlider.background": "rgba(0,150,180,.18)",
+            "scrollbarSlider.hoverBackground": "rgba(0,200,255,.28)",
+            "editor.findMatchBackground": "rgba(255,200,0,.28)",
+          },
+        });
+        editor = monaco.editor.create(document.getElementById("monaco"), {
+          value: "",
+          language: "javascript",
+          theme: "tron",
+          fontSize: 14,
+          fontFamily: '"Share Tech Mono","Fira Code","Cascadia Code",monospace',
+          fontLigatures: true,
+          lineNumbers: "on",
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          tabSize: 2,
+          renderWhitespace: "selection",
+          cursorBlinking: "smooth", // smooth blinking
+          cursorStyle: "line", // I-beam
+          cursorWidth: 2,
+          smoothScrolling: true,
+          padding: { top: 14, bottom: 14 },
+          wordWrap: "on",
+          contextmenu: true,
+          fixedOverflowWidgets: true,
+        });
+        editor.onDidChangeModelContent(() => {
+          if (curTab === "ed" && curTask) {
+            solCode = editor.getValue();
+            CODE[`${curCat.id}/${curTask.id}`] = solCode;
+          }
+          playType();
+        });
+        if (curTask) {
+          editor.setValue(solCode);
+          editor.updateOptions({ readOnly: false });
+        }
+      });
+
+      // ═══════════ PRETTIER ═══════════
+
+      function fmt(code) {
+        try {
+          if (typeof prettier === "undefined")
+            return { ok: false, err: "prettier not loaded" };
+          const plugins = [];
+          if (typeof prettierPlugins !== "undefined" && prettierPlugins.babel)
+            plugins.push(prettierPlugins.babel);
+          if (!plugins.length)
+            return { ok: false, err: "babel plugin missing" };
+          return {
+            ok: true,
+            code: prettier.format(code, {
+              parser: "babel",
+              plugins,
+              printWidth: 80,
+              tabWidth: 2,
+              singleQuote: true,
+              trailingComma: "es5",
+              semi: true,
+            }),
+          };
+        } catch (e) {
+          return { ok: false, err: e.message };
+        }
+      }
+
+      // ═══════════ WORKER ═══════════
+
+      function getWkUrl() {
+        if (!wkBlob) {
+          const src = document.getElementById("wk").textContent;
+          wkBlob = URL.createObjectURL(
+            new Blob([src], { type: "application/javascript" }),
+          );
+        }
+        return wkBlob;
+      }
+      function runWorker(sol, spec) {
+        return new Promise((res) => {
+          const w = new Worker(getWkUrl());
+          const tid = setTimeout(() => {
+            w.terminate();
+            res({ error: "TIMEOUT (10s)", suites: {}, total: 10000 });
+          }, 10000);
+          w.onmessage = (e) => {
+            clearTimeout(tid);
+            w.terminate();
+            res(e.data);
+          };
+          w.onerror = (e) => {
+            clearTimeout(tid);
+            w.terminate();
+            res({ error: "Worker: " + e.message, suites: {}, total: 0 });
+          };
+          w.postMessage({ sol, spec });
+        });
+      }
+
+      // ═══════════ FORMAT & RUN ═══════════
+
+      async function formatAndRun() {
+        if (!curTask || view !== "task") return;
+        const key = `${curCat.id}/${curTask.id}`;
+        const files = FILE_CACHE[key];
+        if (!files) {
+          setStatus("⚠ Task files not loaded", "err");
+          return;
+        }
+
+        playRunStart();
+        if (curTab !== "ed") switchTab("ed");
+        const btn = document.getElementById("run-btn");
+        btn.classList.add("go");
+        btn.textContent = "⟳ RUNNING";
+        let code = editor ? editor.getValue() : solCode;
+
+        setStatus("⟳ Formatting...");
+        const f = fmt(code);
+        if (f.ok) {
+          code = f.code;
+          solCode = code;
+          CODE[key] = code;
+          if (editor) {
+            const pos = editor.getPosition();
+            editor.setValue(code);
+            if (pos) editor.setPosition(pos);
+          }
+          setStatus("✓ Formatted", "ok");
+        } else {
+          setStatus("⚠ Format skipped: " + f.err.split("\n")[0], "err");
+        }
+
+        document.getElementById("res-body").innerHTML =
+          `<div class="res-empty"><div style="font-size:1.3rem;animation:blk .38s infinite alternate">⟳</div><div>EXECUTING...</div></div>`;
+        document.getElementById("res-sum").innerHTML = "";
+
+        const r = await runWorker(code, files.spec);
+        btn.classList.remove("go");
+        btn.textContent = "▶ RUN";
+        renderResults(r);
+
+        if (!r.error) {
+          const all = Object.values(r.suites).flat();
+          const st =
+            all.length > 0 && all.every((t) => t.status === "pass")
+              ? "ok"
+              : all.some((t) => t.status !== "pass")
+                ? "ng"
+                : "";
+          if (st) {
+            STATUS[key] = st;
+          }
+          if (st === "ok") playAllPass();
+          else if (st === "ng") playFail();
+        } else playError();
+      }
+
+      // ═══════════ RENDER ═══════════
+
+      function renderResults(r) {
+        const body = document.getElementById("res-body"),
+          sum = document.getElementById("res-sum");
+        if (r.error) {
+          body.innerHTML = `<div style="padding:12px"><div style="color:#ff4040;font-family:'Share Tech Mono',monospace;font-size:.76rem;border-left:2px solid #ff4040;padding-left:10px"><div style="margin-bottom:4px;color:#ff6060">⚠ ERROR</div><div style="white-space:pre-wrap;color:#cc3030">${esc(r.error)}</div></div></div>`;
+          sum.innerHTML = `<span class="bf">✗ ERROR</span>`;
+          return;
+        }
+        const suites = r.suites || {};
+        const all = Object.values(suites).flat();
+        const pass = all.filter((t) => t.status === "pass").length;
+        const fail = all.filter((t) => t.status !== "pass").length;
+        sum.innerHTML = `<span class="bp">✓ ${pass}</span>${fail ? `<span class="bf"> ✗ ${fail}</span>` : ""}<span class="bt">${(r.total || 0).toFixed(2)}ms</span>`;
+        if (!all.length) {
+          body.innerHTML = `<div class="res-empty"><div>NO TESTS FOUND</div></div>`;
+          return;
+        }
+        let h = "";
+        Object.entries(suites).forEach(([sn, tests]) => {
+          if (!tests || !tests.length) return;
+          h += `<div class="r-suite">`;
+          if (sn !== "__root__")
+            h += `<div class="r-suite-nm">${esc(sn)}</div>`;
+          tests.forEach((t) => {
+            const mem =
+              t.mem != null ? (t.mem >= 0 ? "+" : "") + fmtB(t.mem) : "";
+            h += `<div class="r-item ${t.status}">
+        <div class="r-nr"><span class="r-ico">${t.status === "pass" ? "●" : "✗"}</span><span class="r-nm">${esc(t.name)}</span>
+        <span class="r-ms">${t.time.toFixed(2)}ms</span>${mem ? `<span class="r-mem">${mem}</span>` : ""}</div>
+        ${t.error ? `<div class="r-err">${esc(t.error)}</div>` : ""}
+      </div>`;
+          });
+          h += `</div>`;
+        });
+        body.innerHTML = h;
+      }
+      function clearResults() {
+        document.getElementById("res-body").innerHTML =
+          `<div class="res-empty"><div class="ico">⬡</div><div>AWAITING EXECUTION</div><div style="opacity:.35;font-size:.66rem;margin-top:4px">Click ▶ RUN</div></div>`;
+        document.getElementById("res-sum").innerHTML = "";
+      }
+      function setStatus(msg, cls = "") {
+        const el = document.getElementById("statusbar");
+        el.textContent = msg;
+        el.className = "statusbar" + (cls ? " " + cls : "");
+      }
+      function esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function fmtB(b) {
+        if (Math.abs(b) < 1024) return b + "B";
+        if (Math.abs(b) < 1048576) return (b / 1024).toFixed(1) + "KB";
+        return (b / 1048576).toFixed(1) + "MB";
+      }
+
+      // ═══════════ KEYBOARD ═══════════
+
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "s") e.preventDefault(); // block browser save, no run
+        if (e.key === "Escape") {
+          if (!document.getElementById("modal").classList.contains("hide")) {
+            closeModal();
+            return;
+          }
+          if (view === "task") {
+            playClick();
+            document.getElementById("bk-task").click();
+          } else if (view === "category") {
+            playClick();
+            showView("home");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
