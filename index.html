@@ -139,24 +139,39 @@
       }
 
       /* ── HOME ── */
-      /* overflow-y on the view; margin:auto on content for vertical centering.
-   When content < viewport → auto margins split space → true center.
-   When content > viewport (search results) → margins collapse → scrollable from top. */
+      /* Two-zone layout: header is vertically centered in top half, grid scrolls below */
       #view-home {
+        flex-direction: column;
         align-items: center;
-        overflow-y: auto;
+        overflow: hidden;
         padding: 0;
       }
-      .home-content {
+      .home-top {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 11px;
+        justify-content: center;
+        gap: 10px;
+        flex-shrink: 0;
         width: 100%;
         max-width: 720px;
-        padding: 14px 10px 18px;
-        margin-top: auto;
-        margin-bottom: auto;
+        padding: 12px 10px 10px;
+        /* stays ~40% of screen height → never shifts on pagination */
+        min-height: min(44vh, 280px);
+      }
+      .home-grid-area {
+        flex: 1;
+        overflow-y: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 0 10px 14px;
+        min-height: 0;
+      }
+      .home-grid-area::-webkit-scrollbar {
+        width: 3px;
       }
 
       .home-hdr {
@@ -164,7 +179,6 @@
         flex-direction: column;
         align-items: center;
         gap: 5px;
-        flex-shrink: 0;
         width: 100%;
       }
       .logo {
@@ -1095,9 +1109,9 @@
         }
 
         /* Home: tighter */
-        .home-content {
-          gap: 8px;
-          padding: 10px 8px 14px;
+        .home-top {
+          min-height: auto;
+          padding: 8px 8px 6px;
         }
         .logo {
           font-size: clamp(1.2rem, 6vw, 2rem);
@@ -1120,6 +1134,83 @@
           padding: 2px 6px;
         }
       }
+
+      /* ── STRICT MODE TOGGLE ── */
+      .strict-grp {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.63rem;
+        color: var(--txd);
+        cursor: pointer;
+        user-select: none;
+        padding: 3px 7px;
+        border: 1px solid var(--bd);
+        transition: all 0.14s;
+        white-space: nowrap;
+      }
+      .strict-grp:hover {
+        border-color: var(--c);
+        color: var(--c);
+      }
+      .strict-grp.strict-on {
+        border-color: #b58900;
+        color: #b58900;
+        background: rgba(181, 137, 0, 0.07);
+      }
+      .strict-grp.strict-locked {
+        opacity: 0.75;
+        cursor: not-allowed;
+      }
+      .strict-chk {
+        width: 11px;
+        height: 11px;
+        border: 1px solid currentColor;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.55rem;
+      }
+
+      /* ── FONT SIZE CONTROL ── */
+      .fz-grp {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+      .fz-btn {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--bd);
+        background: transparent;
+        color: var(--txd);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.12s;
+        line-height: 1;
+        padding: 0;
+      }
+      .fz-btn:hover {
+        border-color: var(--c);
+        color: var(--c);
+      }
+      .fz-val {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        color: var(--txd);
+        min-width: 22px;
+        text-align: center;
+        pointer-events: none;
+      }
+
       #hud {
         position: fixed;
         bottom: 10px;
@@ -1266,7 +1357,8 @@
     <div id="app">
       <!-- HOME -->
       <div id="view-home" class="view active">
-        <div class="home-content">
+        <!-- Top zone: logo + search. Height is fixed, never shifts. -->
+        <div class="home-top">
           <div class="home-hdr">
             <div class="logo">GRID::RUNNER</div>
             <div class="logo-sub">
@@ -1283,8 +1375,11 @@
               spellcheck="false"
             />
           </div>
-          <div id="srch-results"></div>
-          <div class="cat-grid-wrap">
+        </div>
+        <!-- Bottom zone: search results + grid + pager. Scrolls independently. -->
+        <div class="home-grid-area" id="home-grid-area">
+          <div id="srch-results" style="width: 100%; max-width: 720px"></div>
+          <div class="cat-grid-wrap" style="width: 100%; max-width: 720px">
             <div class="cat-grid" id="cat-grid"></div>
           </div>
           <div class="cat-pager" id="cat-pager" style="display: none">
@@ -1341,6 +1436,26 @@
             >
               SOLUTIONS
             </button>
+          </div>
+          <!-- font size -->
+          <div
+            class="fz-grp"
+            id="fz-grp"
+            title="Editor font size (Ctrl+Scroll)"
+          >
+            <button class="fz-btn" onclick="changeFZ(-1)">−</button>
+            <span class="fz-val" id="fz-val">14</span>
+            <button class="fz-btn" onclick="changeFZ(+1)">+</button>
+          </div>
+          <!-- strict mode -->
+          <div
+            class="strict-grp strict-on"
+            id="strict-grp"
+            onclick="toggleStrict()"
+            title="STRICT MODE: compare speed vs reference solution"
+          >
+            <div class="strict-chk" id="strict-chk">✓</div>
+            <span>STRICT</span>
           </div>
           <div class="mem-grp">
             <span>MEM:</span>
@@ -1464,6 +1579,11 @@
       // ════════════════════════════════════════════════
       const TEST_ON_SAVE = true; // Ctrl+S triggers format + run
 
+      // Strict mode: user time must not exceed reference solution time × STRICT_FACTOR.
+      // 1.0 = exact parity, 1.5 = 50% slower allowed (default), 2.0 = 2× allowed.
+      const STRICT_FACTOR = 1.5;
+      const STRICT_DEFAULT = true; // strict mode on by default
+
       const MENU = [
         {
           id: "regex",
@@ -1473,160 +1593,222 @@
           tasks: [
             {
               id: "regex_1",
-              title: 'Remove "cat"',
+              title: "Remove all words `cat`",
               diff: 2,
-              desc: 'Remove all occurrences of "cat" (case-insensitive)',
-              file: "regex_1",
+              desc: "Remove all occurrences of 'cat' (case-insensitive)",
+              file: "ex1",
             },
             {
               id: "regex_2",
-              title: "Extract Emails",
-              diff: 4,
-              desc: "Extract all email addresses into an array",
-              file: "regex_2",
+              title: "Remove Mr. and Mrs.",
+              diff: 3,
+              desc: "Remove all Mr. and Mrs. from text",
+              file: "ex2",
             },
             {
               id: "regex_3",
-              title: "Replace Numbers",
-              diff: 3,
-              desc: "Replace every digit sequence with #",
-              file: "regex_3",
+              title: "Replace Google variations",
+              diff: 4,
+              desc: "Replace Google, Goooogle, etc. with Yandex",
+              file: "ex3",
             },
             {
               id: "regex_4",
-              title: "camelCase → snake_case",
-              diff: 5,
-              desc: "Convert camelCase identifiers to snake_case",
-              file: "regex_4",
+              title: "Mask mid letter",
+              diff: 4,
+              desc: "Change lel. lil. to l*l. (with dots)",
+              file: "ex4",
             },
             {
               id: "regex_5",
-              title: "Trim Extra Spaces",
-              diff: 3,
-              desc: "Collapse multiple whitespace to single space",
-              file: "regex_5",
-            },
-          ],
-        },
-        {
-          id: "algo",
-          name: "ALGO",
-          desc: "Core Algorithms",
-          folder: "algo",
-          tasks: [
-            {
-              id: "algo_1",
-              title: "Two Sum",
-              diff: 3,
-              desc: "Find two indices whose values sum to target",
-              file: "algo_1",
-            },
-            {
-              id: "algo_2",
-              title: "Fibonacci",
-              diff: 4,
-              desc: "Return the Nth Fibonacci number (O(n) solution)",
-              file: "algo_2",
-            },
-            {
-              id: "algo_3",
-              title: "Valid Palindrome",
-              diff: 2,
-              desc: "Is the string a palindrome? (alphanumeric only)",
-              file: "algo_3",
-            },
-            {
-              id: "algo_4",
-              title: "Max Subarray",
-              diff: 6,
-              desc: "Kadane's algorithm — max sum contiguous subarray",
-              file: "algo_4",
-            },
-            {
-              id: "algo_5",
-              title: "Binary Search",
-              diff: 4,
-              desc: "Return index of target in sorted array, -1 if none",
-              file: "algo_5",
-            },
-            {
-              id: "algo_6",
-              title: "Valid Brackets",
+              title: "4-letter owners",
               diff: 5,
-              desc: "Check if bracket string is valid — (), [], {}",
-              file: "algo_6",
+              desc: "Find 4-letter names of rat/cat owners",
+              file: "ex5",
+            },
+            {
+              id: "regex_6",
+              title: "Remove 0-5 and Capitals",
+              diff: 4,
+              desc: "Remove digits 0-5 and uppercase letters",
+              file: "ex6",
+            },
+            {
+              id: "regex_7",
+              title: "Replace 'the' with 'a'",
+              diff: 3,
+              desc: "Replace all 'the' and 'The' with 'a'",
+              file: "ex7",
+            },
+            {
+              id: "regex_8",
+              title: "Validate 'xo' count",
+              diff: 5,
+              desc: "Check if message contains 'xo' 2 or 3 times",
+              file: "ex8",
+            },
+            {
+              id: "regex_9",
+              title: "Lines starting with 'The'",
+              diff: 4,
+              desc: "Count how many lines start with 'The'",
+              file: "ex9",
+            },
+            {
+              id: "regex_10",
+              title: "Format lol-like words",
+              diff: 6,
+              desc: "Change lel, lil to l*l, but keep lol",
+              file: "ex10",
+            },
+            {
+              id: "regex_11",
+              title: "Bills >= $100",
+              diff: 6,
+              desc: "Count bills that are more than or equal to $100",
+              file: "ex11",
+            },
+            {
+              id: "regex_12",
+              title: "Bills < $100",
+              diff: 6,
+              desc: "Count bills that are less than $100",
+              file: "ex12",
+            },
+            {
+              id: "regex_13",
+              title: "Bills in range",
+              diff: 6,
+              desc: "Count bills between $100 and $9999",
+              file: "ex13",
+            },
+            {
+              id: "regex_14",
+              title: "URL to Link",
+              diff: 8,
+              desc: "Transform social media URLs into HTML anchors",
+              file: "ex14",
+            },
+            {
+              id: "regex_15",
+              title: "Valid HTML",
+              diff: 6,
+              desc: "Check if the text is a single valid HTML document",
+              file: "ex15",
+            },
+            {
+              id: "regex_16",
+              title: "Count JS Comments",
+              diff: 7,
+              desc: "Count both single line and multi-line comments",
+              file: "ex16",
+            },
+            {
+              id: "regex_17",
+              title: "Trim &nbsp;",
+              diff: 5,
+              desc: "Trim non-breaking spaces in the text",
+              file: "ex17",
+            },
+            {
+              id: "regex_18",
+              title: "Special IP Count",
+              diff: 6,
+              desc: "Count IP addresses with specific patterns (4+ units)",
+              file: "ex18",
+            },
+            {
+              id: "regex_19",
+              title: "ASCII Password",
+              diff: 6,
+              desc: "Check if password consists only of ASCII symbols",
+              file: "ex19",
+            },
+            {
+              id: "regex_20",
+              title: "Capitalize Headers",
+              diff: 8,
+              desc: "Make all text within h1-h6 tags CAPITAL",
+              file: "ex20",
+            },
+            {
+              id: "regex_21",
+              title: "Same Letter Start/End",
+              diff: 7,
+              desc: "Count words ending with the same letter they start with",
+              file: "ex21",
+            },
+            {
+              id: "regex_22",
+              title: "Replace <b> tags",
+              diff: 6,
+              desc: "Replace all <b> tags with BTAG",
+              file: "ex22",
+            },
+            {
+              id: "regex_23",
+              title: "Exclude 'lol'",
+              diff: 6,
+              desc: "Find words like lel, lil, lal but NOT lol",
+              file: "ex23",
+            },
+            {
+              id: "regex_24",
+              title: "Phone Normalizer",
+              diff: 7,
+              desc: "Transform any phone format to digits only",
+              file: "ex24",
+            },
+            {
+              id: "regex_25",
+              title: "Lookahead/Behind",
+              diff: 7,
+              desc: "Extract prices and HTML titles using lookaround",
+              file: "ex25",
+            },
+            {
+              id: "regex_26",
+              title: "Product Quantifiers",
+              diff: 8,
+              desc: "Find product counts but omit prices",
+              file: "ex26",
+            },
+            {
+              id: "regex_27",
+              title: "Digit Count Logic",
+              diff: 9,
+              desc: "Regex for exactly 3, less than 3, or 3+ digits",
+              file: "ex27",
+            },
+            {
+              id: "regex_28",
+              title: "Strong Password",
+              diff: 9,
+              desc: "Complex validation (case, digits, special, length)",
+              file: "ex28",
+            },
+            {
+              id: "regex_29",
+              title: "Date Format DD/MM/YYYY",
+              diff: 7,
+              desc: "Find all correct dates in DD/MM/YYYY format",
+              file: "ex29",
+            },
+            {
+              id: "regex_30",
+              title: "Password Scavenger",
+              diff: 9,
+              desc: "Find all valid complex passwords in a large text",
+              file: "regex_30",
+            },
+            {
+              id: "regex_31",
+              title: "HEX Color Picker",
+              diff: 6,
+              desc: "Find valid HEX codes (#RGB, #RGBA, #RRGGBB, etc.)",
+              file: "ex31",
             },
           ],
-        },
-        {
-          id: "sort",
-          name: "SORT",
-          desc: "Sorting Algorithms",
-          folder: "sort",
-          tasks: [],
-        },
-        {
-          id: "tree",
-          name: "TREE",
-          desc: "Tree Traversal",
-          folder: "tree",
-          tasks: [],
-        },
-        {
-          id: "graph",
-          name: "GRAPH",
-          desc: "Graph Problems",
-          folder: "graph",
-          tasks: [],
-        },
-        {
-          id: "dp",
-          name: "DP",
-          desc: "Dynamic Programming",
-          folder: "dp",
-          tasks: [],
-        },
-        {
-          id: "string",
-          name: "STRING",
-          desc: "String Manipulation",
-          folder: "string",
-          tasks: [],
-        },
-        {
-          id: "math",
-          name: "MATH",
-          desc: "Mathematical Problems",
-          folder: "math",
-          tasks: [],
-        },
-        {
-          id: "array",
-          name: "ARRAY",
-          desc: "Array Operations",
-          folder: "array",
-          tasks: [],
-        },
-        {
-          id: "hash",
-          name: "HASH",
-          desc: "Hash Map Patterns",
-          folder: "hash",
-          tasks: [],
-        },
-        {
-          id: "recursion",
-          name: "RECURSION",
-          desc: "Recursion & Backtrack",
-          folder: "recursion",
-          tasks: [],
-        },
-        {
-          id: "linked",
-          name: "LINKED",
-          desc: "Linked List Problems",
-          folder: "linked",
-          tasks: [],
         },
       ];
 
@@ -1642,6 +1824,17 @@
       const CODE = {};
       const FILECACHE = {};
       const ICONSTORE = {};
+
+      // ── Strict mode state ──
+      let _strictOn = STRICT_DEFAULT; // current toggle state
+      let _strictLocked = false; // task.strict=true → cannot turn off
+
+      // ── Font size (persisted to localStorage) ──
+      const FZ_KEY = "gr_fontsize";
+      const FZ_MIN = 9,
+        FZ_MAX = 28;
+      let _fz = parseInt(localStorage.getItem(FZ_KEY) || "14", 10);
+      if (_fz < FZ_MIN || _fz > FZ_MAX) _fz = 14;
 
       // ── Pagination ──
       const PAGE_SIZE = 9;
@@ -2381,6 +2574,10 @@
         curCat = cat;
         curTask = task;
         curTab = "ed";
+        // Strict mode: lock if task.strict===true, else use current toggle
+        _strictLocked = task.strict === true;
+        if (_strictLocked) _strictOn = true;
+        updateStrictUI();
         document.getElementById("breadc").innerHTML =
           `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>`;
         setTabs("ed");
@@ -2467,7 +2664,11 @@
       });
 
       // ═══════════ MONACO — DARK SOLARIZED ═══════════
-      require.config({ paths: { vs: "assets/monaco/vs" } });
+      require.config({
+        paths: {
+          vs: "assets/monaco/vs",
+        },
+      });
       require(["vs/editor/editor.main"], function () {
         monaco.editor.defineTheme("solarized-dark", {
           base: "vs-dark",
@@ -2519,15 +2720,15 @@
             "scrollbarSlider.activeBackground": "rgba(42,161,152,.62)",
             "editor.findMatchBackground": "rgba(181,137,0,.3)",
             "editor.findMatchHighlightBackground": "rgba(181,137,0,.15)",
-            "editorBracketMatch.background": "rgba(42,161,152,.2)",
-            "editorBracketMatch.border": "#2aa198",
+            "editorBracketMatch.background": "rgba(0,200,200,.18)",
+            "editorBracketMatch.border": "#00cccc",
           },
         });
         editor = monaco.editor.create(document.getElementById("monaco"), {
           value: "",
           language: "javascript",
           theme: "solarized-dark",
-          fontSize: 14,
+          fontSize: _fz,
           fontFamily: '"JetBrains Mono",monospace',
           fontWeight: "bold",
           fontLigatures: true,
@@ -2558,6 +2759,21 @@
           editor.setValue(solCode);
           editor.updateOptions({ readOnly: false });
         }
+        // Init font size display
+        document.getElementById("fz-val").textContent = _fz;
+        // Init strict mode UI
+        updateStrictUI();
+        // Ctrl+Wheel font size on monaco
+        document.getElementById("monaco").addEventListener(
+          "wheel",
+          (e) => {
+            if (!(e.ctrlKey || e.metaKey)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            changeFZ(e.deltaY < 0 ? 1 : -1);
+          },
+          { passive: false },
+        );
       });
 
       // ═══════════ PRETTIER ═══════════
@@ -2618,6 +2834,48 @@
         });
       }
 
+      // ═══════════ FONT SIZE ═══════════
+      function applyFZ() {
+        if (editor) editor.updateOptions({ fontSize: _fz });
+        document.getElementById("fz-val").textContent = _fz;
+        localStorage.setItem(FZ_KEY, _fz);
+      }
+      function changeFZ(delta) {
+        _fz = Math.min(FZ_MAX, Math.max(FZ_MIN, _fz + delta));
+        applyFZ();
+      }
+      // Ctrl+Scroll on the editor area
+      document.getElementById("monaco") &&
+        document.addEventListener(
+          "wheel",
+          (e) => {
+            if (!(e.ctrlKey || e.metaKey)) return;
+            if (!document.getElementById("monaco").contains(e.target)) return;
+            e.preventDefault();
+            changeFZ(e.deltaY < 0 ? 1 : -1);
+          },
+          { passive: false },
+        );
+
+      // ═══════════ STRICT MODE ═══════════
+      function toggleStrict() {
+        if (_strictLocked) return;
+        _strictOn = !_strictOn;
+        updateStrictUI();
+        playClick();
+      }
+      function updateStrictUI() {
+        const g = document.getElementById("strict-grp");
+        const c = document.getElementById("strict-chk");
+        if (!g || !c) return;
+        g.classList.toggle("strict-on", _strictOn);
+        g.classList.toggle("strict-locked", _strictLocked);
+        c.textContent = _strictOn ? "✓" : "";
+        g.title = _strictLocked
+          ? "STRICT MODE locked — required by this task"
+          : `STRICT MODE ${_strictOn ? "ON" : "OFF"}: compare timing vs reference (×${STRICT_FACTOR})`;
+      }
+
       // ═══════════ MOBILE RESULTS SHEET ═══════════
       function isMobile() {
         return window.innerWidth <= 680;
@@ -2639,16 +2897,19 @@
           setStatus("⚠ Files not loaded", "err");
           return;
         }
+
         playRunStart();
         if (curTab !== "ed") switchTab("ed");
         const btn = document.getElementById("run-btn");
         btn.classList.add("go");
         btn.textContent = "⟳ RUNNING";
+
+        // Format
         let code = editor ? editor.getValue() : solCode;
         setStatus("⟳ Formatting...");
-        const f = fmt(code);
-        if (f.ok) {
-          code = f.code;
+        const fmtR = fmt(code);
+        if (fmtR.ok) {
+          code = fmtR.code;
           solCode = code;
           CODE[key] = code;
           _editorLoading = true;
@@ -2660,16 +2921,29 @@
           _editorLoading = false;
           setStatus("✓ Formatted", "ok");
         } else {
-          setStatus("⚠ Format skipped: " + f.err.split("\n")[0], "err");
+          setStatus("⚠ Format skipped: " + fmtR.err.split("\n")[0], "err");
         }
+
         document.getElementById("res-body").innerHTML =
           `<div class="res-empty"><div style="font-size:1.2rem;animation:blk .36s infinite alternate">⟳</div><div>EXECUTING...</div></div>`;
         document.getElementById("res-sum").innerHTML = "";
+
+        // Run user solution
+        setStatus("⟳ Running tests…");
         const r = await runWorker(code, files.spec);
+
+        // Strict mode: also benchmark the reference solution
+        let refResult = null;
+        if (_strictOn && files.sol) {
+          setStatus("⟳ Benchmarking reference solution…");
+          refResult = await runWorker(files.sol, files.spec);
+        }
+
         btn.classList.remove("go");
         btn.textContent = "▶ RUN";
-        renderResults(r);
+        renderResults(r, refResult);
         openMobResults();
+
         if (!r.error) {
           const all = Object.values(r.suites).flat();
           const st =
@@ -2682,26 +2956,57 @@
           if (st === "ok") playAllPass();
           else if (st === "ng") playFail();
         } else playError();
+        setStatus("");
       }
 
       // ═══════════ RENDER ═══════════
-      function renderResults(r) {
+      function renderResults(r, refResult) {
         const body = document.getElementById("res-body"),
           sum = document.getElementById("res-sum");
+
         if (r.error) {
           body.innerHTML = `<div style="padding:11px"><div style="color:#dc322f;font-family:'JetBrains Mono',monospace;font-size:.74rem;border-left:2px solid #dc322f;padding-left:9px"><div style="margin-bottom:3px;color:#cb4b16">⚠ ERROR</div><div style="white-space:pre-wrap;color:#a93020">${esc(r.error)}</div></div></div>`;
           sum.innerHTML = `<span class="bf">✗ ERROR</span>`;
           return;
         }
+
         const suites = r.suites || {},
           all = Object.values(suites).flat();
-        const pass = all.filter((t) => t.status === "pass").length,
-          fail = all.filter((t) => t.status !== "pass").length;
-        sum.innerHTML = `<span class="bp">✓ ${pass}</span>${fail ? `<span class="bf"> ✗ ${fail}</span>` : ""}<span class="bt">${(r.total || 0).toFixed(2)}ms</span>`;
+        const pass = all.filter((t) => t.status === "pass").length;
+        const fail = all.filter((t) => t.status !== "pass").length;
+
+        // Memory summary: collect all non-null mem values
+        const mems = all.map((t) => t.mem).filter((m) => m != null);
+        const totalMem = mems.length ? mems.reduce((a, b) => a + b, 0) : null;
+        const memStr = totalMem != null ? fmtB(totalMem) : "";
+
+        // Strict mode: compute ref total time and per-test times
+        let strictBanner = "";
+        if (_strictOn && refResult && !refResult.error) {
+          const refAll = Object.values(refResult.suites || {}).flat();
+          const refTime = refAll.reduce((a, t) => a + t.time, 0);
+          const userTime = all.reduce((a, t) => a + t.time, 0);
+          const ratio = refTime > 0 ? userTime / refTime : 0;
+          const ok = ratio <= STRICT_FACTOR;
+          const color = ok ? "#859900" : "#dc322f";
+          strictBanner = `<div style="display:flex;align-items:center;gap:8px;padding:4px 8px 6px;font-family:'JetBrains Mono',monospace;font-size:.65rem;border-bottom:1px solid var(--bd);flex-shrink:0">
+      <span style="color:${color};font-weight:bold">${ok ? "⚡ STRICT PASS" : "⚡ STRICT FAIL"}</span>
+      <span style="color:var(--txd)">user:</span><span style="color:${color}">${userTime.toFixed(2)}ms</span>
+      <span style="color:var(--txd)">ref:</span><span style="color:#2aa198">${refTime.toFixed(2)}ms</span>
+      <span style="color:var(--txd)">ratio:</span><span style="color:${color}">×${ratio.toFixed(2)}</span>
+      <span style="color:var(--txd)">(max ×${STRICT_FACTOR})</span>
+    </div>`;
+        }
+
+        sum.innerHTML = `<span class="bp">✓ ${pass}</span>${fail ? `<span class="bf"> ✗ ${fail}</span>` : ""}<span class="bt">${(r.total || 0).toFixed(2)}ms</span>${memStr ? `<span class="bt" style="color:#2aa198">${memStr}</span>` : ""}`;
+
         if (!all.length) {
-          body.innerHTML = `<div class="res-empty"><div>NO TESTS FOUND</div></div>`;
+          body.innerHTML =
+            strictBanner +
+            `<div class="res-empty"><div>NO TESTS FOUND</div></div>`;
           return;
         }
+
         let h = "";
         Object.entries(suites).forEach(([sn, tests]) => {
           if (!tests?.length) return;
@@ -2709,17 +3014,17 @@
           if (sn !== "__root__")
             h += `<div class="r-suite-nm">${esc(sn)}</div>`;
           tests.forEach((t) => {
-            const mem =
+            const memD =
               t.mem != null ? (t.mem >= 0 ? "+" : "") + fmtB(t.mem) : "";
             h += `<div class="r-item ${t.status}"><div class="r-nr">
         <span class="r-ico">${t.status === "pass" ? "●" : "✗"}</span><span class="r-nm">${esc(t.name)}</span>
-        <span class="r-ms">${t.time.toFixed(2)}ms</span>${mem ? `<span class="r-mem">${mem}</span>` : ""}</div>
-        ${t.error ? `<div class="r-err">${esc(t.error)}</div>` : ""}
-      </div>`;
+        <span class="r-ms">${t.time.toFixed(2)}ms</span>${memD ? `<span class="r-mem" style="color:#2aa198">${memD}</span>` : ""}
+      </div>${t.error ? `<div class="r-err">${esc(t.error)}</div>` : ""}</div>`;
           });
           h += `</div>`;
         });
-        body.innerHTML = h;
+
+        body.innerHTML = strictBanner + h;
       }
       function clearResults() {
         document.getElementById("res-body").innerHTML =
