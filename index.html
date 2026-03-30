@@ -7,16 +7,12 @@
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000810'/%3E%3Cline x1='4' y1='16' x2='28' y2='16' stroke='%2300ffff' stroke-width='1' opacity='.4'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%2300ffff' stroke-width='1' opacity='.4'/%3E%3Crect x='2' y='2' width='28' height='28' rx='1' stroke='%2300ffff' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='16' cy='16' r='5' stroke='%2300ffff' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ffff'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000810'/%3E%3Crect x='2' y='2' width='28' height='28' rx='1' stroke='%2300ffff' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='16' cy='16' r='5' stroke='%2300ffff' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ffff'/%3E%3Cline x1='4' y1='16' x2='28' y2='16' stroke='%2300ffff' stroke-width='1' opacity='.35'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%2300ffff' stroke-width='1' opacity='.35'/%3E%3C/svg%3E"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
-    <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    <link href="assets/fonts.css" rel="stylesheet" />
+    <script src="assets/prettier-standalone.js"></script>
+    <script src="assets/prettier-parser-babel.js"></script>
+    <script src="assets/monaco/vs/loader.js"></script>
     <style>
       *,
       *::before,
@@ -29,22 +25,22 @@
         --c: #00ffff;
         --cd: #00aaaa;
         --cm: #004455;
-        --bg: #000810;
-        --bg2: #000d1a;
-        --bd: rgba(0, 255, 255, 0.2);
-        --tx: #b0dce0;
-        --txd: #2a6070;
+        --bg: #002b36;
+        --bg2: #073642;
+        --bd: rgba(0, 255, 255, 0.18);
+        --tx: #839496;
+        --txd: #405c64;
         --glow: 0 0 10px rgba(0, 255, 255, 0.45);
         --glowb:
-          0 0 20px rgba(0, 255, 255, 0.8), 0 0 45px rgba(0, 255, 255, 0.3);
+          0 0 20px rgba(0, 255, 255, 0.8), 0 0 45px rgba(0, 255, 255, 0.28);
       }
       html,
       body {
         width: 100%;
         height: 100%;
-        background: var(--bg);
+        background: #001a22;
         color: var(--tx);
-        font-family: "Exo 2", sans-serif;
+        font-family: "JetBrains Mono", monospace;
         overflow: hidden;
         cursor: crosshair;
       }
@@ -62,6 +58,23 @@
         pointer-events: none;
         z-index: 9999;
       }
+
+      /* ── GLOBAL SCROLLBAR ── */
+      ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 20, 30, 0.8);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 180, 220, 0.38);
+        border-radius: 0;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 220, 255, 0.62);
+      }
+
       #bg {
         position: fixed;
         inset: 0;
@@ -79,20 +92,9 @@
         flex: 1;
         flex-direction: column;
         overflow: hidden;
-        animation: fadeIn 0.22s ease;
       }
       .view.active {
         display: flex;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(5px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
       }
 
       /* ── BOOT ── */
@@ -100,7 +102,7 @@
         position: fixed;
         inset: 0;
         z-index: 500;
-        background: var(--bg);
+        background: #000810;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -113,10 +115,10 @@
         pointer-events: none;
       }
       .boot-line {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.73rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
         color: var(--cd);
-        letter-spacing: 0.11em;
+        letter-spacing: 0.1em;
         opacity: 0;
         animation: btIn 0.1s forwards;
       }
@@ -137,27 +139,41 @@
       }
 
       /* ── HOME ── */
+      /* overflow-y on the view; margin:auto on content for vertical centering.
+   When content < viewport → auto margins split space → true center.
+   When content > viewport (search results) → margins collapse → scrollable from top. */
       #view-home {
         align-items: center;
-        justify-content: center;
-        padding: 8px 10px 14px;
-        gap: 12px;
         overflow-y: auto;
+        padding: 0;
       }
+      .home-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 11px;
+        width: 100%;
+        max-width: 720px;
+        padding: 14px 10px 18px;
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+
       .home-hdr {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 5px;
         flex-shrink: 0;
+        width: 100%;
       }
       .logo {
         font-family: "Orbitron", sans-serif;
-        font-size: clamp(1.5rem, 3.6vw, 2.9rem);
+        font-size: clamp(1.4rem, 3.4vw, 2.8rem);
         font-weight: 900;
         color: var(--c);
         text-shadow: var(--glowb);
-        letter-spacing: 0.16em;
+        letter-spacing: 0.15em;
         animation: pulse 3s ease-in-out infinite;
         text-align: center;
         white-space: nowrap;
@@ -167,43 +183,43 @@
         100% {
           text-shadow:
             0 0 18px rgba(0, 255, 255, 0.8),
-            0 0 40px rgba(0, 255, 255, 0.28);
+            0 0 40px rgba(0, 255, 255, 0.25);
         }
         50% {
           text-shadow:
-            0 0 32px #0ff,
-            0 0 65px rgba(0, 255, 255, 0.45),
-            0 0 85px rgba(0, 255, 255, 0.12);
+            0 0 30px #0ff,
+            0 0 60px rgba(0, 255, 255, 0.42),
+            0 0 80px rgba(0, 255, 255, 0.1);
         }
       }
       .logo-sub {
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         color: var(--cd);
-        font-size: clamp(0.48rem, 0.75vw, 0.72rem);
-        letter-spacing: 0.16em;
-        opacity: 0.6;
+        font-size: clamp(0.44rem, 0.7vw, 0.68rem);
+        letter-spacing: 0.14em;
+        opacity: 0.55;
         text-align: center;
       }
       .vtag {
         border: 1px solid var(--cm);
         padding: 1px 10px;
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.6rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.57rem;
         color: var(--cm);
-        letter-spacing: 0.18em;
+        letter-spacing: 0.16em;
       }
 
-      /* search */
+      /* ── SEARCH ── */
       .search-wrap {
         width: 100%;
-        max-width: 460px;
+        max-width: 520px;
         position: relative;
         flex-shrink: 0;
       }
       .search-wrap::before {
         content: "⌕";
         position: absolute;
-        left: 11px;
+        left: 10px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--cd);
@@ -213,14 +229,14 @@
       }
       #srch {
         width: 100%;
-        background: rgba(0, 18, 32, 0.9);
+        background: rgba(0, 20, 35, 0.94);
         border: 1px solid var(--bd);
         color: var(--c);
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.85rem;
-        padding: 9px 12px 9px 34px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.84rem;
+        padding: 9px 12px 9px 32px;
         outline: none;
-        letter-spacing: 0.09em;
+        letter-spacing: 0.08em;
         transition:
           border-color 0.2s,
           box-shadow 0.2s;
@@ -230,17 +246,17 @@
         border-color: var(--c);
         box-shadow:
           var(--glow),
-          inset 0 0 16px rgba(0, 255, 255, 0.03);
+          inset 0 0 14px rgba(0, 255, 255, 0.03);
       }
       #srch::placeholder {
         color: var(--txd);
-        letter-spacing: 0.13em;
+        letter-spacing: 0.12em;
       }
 
       /* search results */
       #srch-results {
         width: 100%;
-        max-width: 620px;
+        max-width: 720px;
         display: none;
         flex-direction: column;
         gap: 3px;
@@ -249,31 +265,33 @@
         display: flex;
       }
       .srch-lbl {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.64rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
         color: var(--txd);
-        letter-spacing: 0.16em;
+        letter-spacing: 0.15em;
         padding-left: 3px;
+        margin-bottom: 1px;
       }
       .srch-row {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 7px 12px;
-        background: rgba(0, 12, 22, 0.88);
+        padding: 6px 11px;
+        background: rgba(0, 24, 35, 0.92);
         border: 1px solid var(--bd);
         cursor: pointer;
-        transition: all 0.14s;
+        transition: all 0.12s;
         min-width: 0;
       }
-      .srch-row:hover {
+      .srch-row:hover,
+      .srch-row.focused {
         border-color: var(--c);
         box-shadow: var(--glow);
         padding-left: 18px;
       }
       .srch-cat {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.62rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
         color: var(--cd);
         border: 1px solid var(--cm);
         padding: 1px 6px;
@@ -281,13 +299,13 @@
         flex-shrink: 0;
       }
       .srch-id {
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         font-size: 0.8rem;
-        color: var(--tx);
+        color: #93a1a1;
         white-space: nowrap;
       }
       .srch-desc {
-        font-size: 0.68rem;
+        font-size: 0.66rem;
         color: var(--txd);
         flex: 1;
         overflow: hidden;
@@ -295,30 +313,46 @@
         white-space: nowrap;
       }
       .srch-st {
-        font-size: 0.64rem;
+        font-size: 0.62rem;
         letter-spacing: -1px;
         flex-shrink: 0;
       }
+      .srch-more {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.63rem;
+        color: var(--cd);
+        text-align: center;
+        padding: 5px;
+        cursor: pointer;
+        border: 1px dashed var(--cm);
+        letter-spacing: 0.13em;
+        transition: all 0.13s;
+      }
+      .srch-more:hover {
+        border-color: var(--c);
+        color: var(--c);
+      }
 
       /* cat grid */
+      .cat-grid-wrap {
+        width: 100%;
+        flex-shrink: 0;
+      }
       .cat-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        width: 100%;
-        max-width: 620px;
-        flex-shrink: 0;
+        gap: 9px;
       }
       .cat-card {
-        background: rgba(0, 12, 22, 0.88);
+        background: rgba(0, 24, 35, 0.9);
         border: 1px solid var(--bd);
-        padding: 22px 16px;
+        padding: 18px 12px;
         cursor: pointer;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 9px;
-        transition: all 0.2s;
+        gap: 8px;
+        transition: all 0.18s;
         position: relative;
         overflow: hidden;
         backdrop-filter: blur(12px);
@@ -333,7 +367,7 @@
         background: var(--c);
         box-shadow: 0 0 10px var(--c);
         transform: scaleX(0);
-        transition: transform 0.3s;
+        transition: transform 0.28s;
       }
       .cat-card::after {
         content: "";
@@ -344,59 +378,145 @@
         height: 1px;
         background: linear-gradient(90deg, transparent, var(--cm), transparent);
       }
-      .cat-card:hover::before {
+      .cat-card:hover::before,
+      .cat-card.focused::before {
         transform: scaleX(1);
       }
-      .cat-card:hover {
+      .cat-card:hover,
+      .cat-card.focused {
         border-color: var(--c);
         box-shadow:
           var(--glow),
-          inset 0 0 28px rgba(0, 255, 255, 0.04);
+          inset 0 0 22px rgba(0, 255, 255, 0.04);
         transform: translateY(-2px);
       }
       .cat-icon {
-        width: 42px;
-        height: 42px;
+        width: 38px;
+        height: 38px;
         color: var(--c);
         filter: drop-shadow(0 0 7px rgba(0, 255, 255, 0.5));
       }
       .cat-name {
         font-family: "Orbitron", sans-serif;
-        font-size: 0.82rem;
+        font-size: 0.76rem;
         font-weight: 700;
         color: var(--c);
-        letter-spacing: 0.22em;
+        letter-spacing: 0.2em;
       }
       .cat-meta {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.65rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
         color: var(--txd);
       }
 
-      /* ── CATEGORY ── */
+      /* ── PAGINATION ── */
+      .cat-pager {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        width: 100%;
+        flex-shrink: 0;
+        padding: 4px 0;
+      }
+      .pag-arrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        color: var(--cd);
+        cursor: pointer;
+        padding: 3px 10px;
+        border: 1px solid var(--cm);
+        transition: all 0.16s;
+        user-select: none;
+        letter-spacing: 0.05em;
+        line-height: 1;
+      }
+      .pag-arrow:hover {
+        color: var(--c);
+        border-color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .pag-arrow.disabled {
+        opacity: 0.2;
+        pointer-events: none;
+      }
+      .pag-dots {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .pag-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--cm);
+        cursor: pointer;
+        transition: all 0.18s;
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      }
+      .pag-dot.active {
+        background: var(--c);
+        box-shadow: var(--glow);
+        transform: scale(1.35);
+      }
+      .pag-dot:hover {
+        background: var(--cd);
+      }
+
+      /* ── CATEGORY (bottom-sheet style) ── */
       #view-category {
-        background: rgba(0, 5, 12, 0.62);
-        backdrop-filter: blur(4px);
+        background: transparent;
+        position: relative;
+        cursor: pointer;
+      }
+      .cat-backdrop {
+        flex: 1;
+        min-height: 0;
+      }
+      .cat-sheet {
+        background: rgba(0, 20, 32, 0.97);
+        border-top: 1px solid var(--bd);
+        backdrop-filter: blur(24px);
+        display: flex;
+        flex-direction: column;
+        max-height: 62vh;
+        flex-shrink: 0;
+        cursor: default;
+        animation: slideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+      .sheet-handle {
+        width: 36px;
+        height: 3px;
+        background: var(--cm);
+        margin: 7px auto 4px;
+        flex-shrink: 0;
+        border-radius: 2px;
+        opacity: 0.6;
       }
       .panel-hdr {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 11px 16px;
+        gap: 11px;
+        padding: 6px 14px 8px;
         border-bottom: 1px solid var(--bd);
-        background: rgba(0, 7, 16, 0.94);
-        backdrop-filter: blur(20px);
         flex-shrink: 0;
       }
       .bk {
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         color: var(--cd);
         cursor: pointer;
-        padding: 4px 11px;
+        padding: 4px 10px;
         border: 1px solid var(--bd);
-        font-size: 0.75rem;
-        letter-spacing: 0.13em;
-        transition: all 0.2s;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        transition: all 0.18s;
         user-select: none;
         flex-shrink: 0;
       }
@@ -407,11 +527,11 @@
       }
       .panel-title {
         font-family: "Orbitron", sans-serif;
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-weight: 700;
         color: var(--c);
         text-shadow: var(--glow);
-        letter-spacing: 0.14em;
+        letter-spacing: 0.13em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -419,31 +539,33 @@
       .task-list {
         flex: 1;
         overflow-y: auto;
-        padding: 10px 14px;
+        padding: 6px 10px 8px;
         display: flex;
         flex-direction: column;
-        gap: 5px;
-      }
-      .task-list::-webkit-scrollbar {
-        width: 3px;
-      }
-      .task-list::-webkit-scrollbar-track {
-        background: var(--bg);
-      }
-      .task-list::-webkit-scrollbar-thumb {
-        background: var(--cd);
+        gap: 4px;
       }
       .task-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 14px;
-        background: rgba(0, 12, 22, 0.72);
+        padding: 8px 12px;
+        background: rgba(0, 20, 32, 0.75);
         border: 1px solid var(--bd);
         cursor: pointer;
-        transition: all 0.18s;
-        backdrop-filter: blur(4px);
+        transition: all 0.14s;
         position: relative;
+        opacity: 0;
+        animation: rowSlide 0.22s ease forwards;
+      }
+      @keyframes rowSlide {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       .task-row::before {
         content: "";
@@ -454,21 +576,23 @@
         width: 2px;
         background: var(--c);
         transform: scaleY(0);
-        transition: transform 0.18s;
+        transition: transform 0.14s;
       }
-      .task-row:hover::before {
+      .task-row:hover::before,
+      .task-row.focused::before {
         transform: scaleY(1);
       }
-      .task-row:hover {
+      .task-row:hover,
+      .task-row.focused {
         border-color: var(--c);
         box-shadow: var(--glow);
-        background: rgba(0, 24, 36, 0.72);
-        padding-left: 22px;
+        background: rgba(0, 38, 55, 0.75);
+        padding-left: 20px;
       }
       .trow-l {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 9px;
       }
       .t-dot {
         width: 6px;
@@ -478,26 +602,26 @@
         flex-shrink: 0;
       }
       .t-dot.ok {
-        background: #00ff88;
-        box-shadow: 0 0 5px #00ff88;
+        background: #859900;
+        box-shadow: 0 0 5px #859900;
       }
       .t-dot.ng {
-        background: #ff4040;
-        box-shadow: 0 0 5px #ff4040;
+        background: #dc322f;
+        box-shadow: 0 0 5px #dc322f;
       }
       .t-num {
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         color: var(--txd);
-        font-size: 0.7rem;
-        min-width: 22px;
+        font-size: 0.67rem;
+        min-width: 20px;
       }
       .t-id {
-        font-family: "Share Tech Mono", monospace;
-        color: var(--tx);
-        font-size: 0.85rem;
+        font-family: "JetBrains Mono", monospace;
+        color: #93a1a1;
+        font-size: 0.83rem;
       }
       .t-desc {
-        font-size: 0.7rem;
+        font-size: 0.67rem;
         color: var(--txd);
         margin-top: 2px;
       }
@@ -508,58 +632,58 @@
         flex-shrink: 0;
       }
       .stars {
-        font-size: 0.7rem;
+        font-size: 0.67rem;
         letter-spacing: -1px;
       }
       .d12 {
-        color: #00ff88;
-        text-shadow: 0 0 5px #00ff88;
+        color: #859900;
+        text-shadow: 0 0 5px #859900;
       }
       .d34 {
-        color: #00ddff;
-        text-shadow: 0 0 5px #00ddff;
+        color: #2aa198;
+        text-shadow: 0 0 5px #2aa198;
       }
       .d56 {
-        color: #ffaa00;
-        text-shadow: 0 0 5px #ffaa00;
+        color: #b58900;
+        text-shadow: 0 0 5px #b58900;
       }
       .d78 {
-        color: #ff5500;
-        text-shadow: 0 0 5px #ff5500;
+        color: #cb4b16;
+        text-shadow: 0 0 5px #cb4b16;
       }
       .d910 {
-        color: #ff0044;
-        text-shadow: 0 0 5px #ff0044;
+        color: #dc322f;
+        text-shadow: 0 0 5px #dc322f;
       }
       .d-lbl {
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         color: var(--txd);
-        font-size: 0.65rem;
+        font-size: 0.62rem;
       }
 
-      /* ── TASK VIEW ── */
+      /* ── TASK ── */
       #view-task {
-        background: var(--bg);
+        background: #002b36;
       }
       .task-bar {
         display: flex;
         align-items: center;
         gap: 6px;
         padding: 4px 8px;
-        background: rgba(0, 5, 12, 0.98);
+        background: rgba(0, 20, 30, 0.98);
         border-bottom: 1px solid var(--bd);
         flex-shrink: 0;
         backdrop-filter: blur(20px);
       }
       .breadc {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.71rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
         color: var(--txd);
         flex: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.03em;
         min-width: 0;
       }
       .breadc .act {
@@ -571,15 +695,15 @@
         flex-shrink: 0;
       }
       .tab {
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         font-size: 0.68rem;
-        padding: 4px 9px;
+        padding: 3px 9px;
         border: 1px solid var(--bd);
         background: transparent;
         color: var(--txd);
         cursor: pointer;
-        letter-spacing: 0.09em;
-        transition: all 0.14s;
+        letter-spacing: 0.08em;
+        transition: all 0.13s;
         white-space: nowrap;
       }
       .tab.on {
@@ -589,35 +713,41 @@
         box-shadow: var(--glow);
       }
       .tab.sol-tab {
-        border-color: rgba(255, 160, 0, 0.28);
-        color: rgba(255, 160, 0, 0.55);
+        border-color: rgba(181, 137, 0, 0.28);
+        color: rgba(181, 137, 0, 0.55);
       }
       .tab.sol-tab:hover,
       .tab.sol-tab.on {
-        background: rgba(255, 160, 0, 0.08);
-        border-color: #ffa000;
-        color: #ffa000;
-        box-shadow: 0 0 7px rgba(255, 160, 0, 0.32);
+        background: rgba(181, 137, 0, 0.08);
+        border-color: #b58900;
+        color: #b58900;
+        box-shadow: 0 0 7px rgba(181, 137, 0, 0.3);
       }
       .mem-grp {
         display: flex;
         align-items: center;
         gap: 3px;
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         font-size: 0.68rem;
         color: var(--txd);
         flex-shrink: 0;
       }
       .mem-grp input {
-        width: 40px;
-        background: var(--bg2);
+        width: 52px;
+        background: #002b36;
         border: 1px solid var(--bd);
         color: var(--c);
-        font-family: "Share Tech Mono", monospace;
+        font-family: "JetBrains Mono", monospace;
         font-size: 0.68rem;
-        padding: 2px 4px;
+        padding: 3px 5px;
         text-align: center;
         outline: none;
+        -moz-appearance: textfield;
+      }
+      .mem-grp input::-webkit-inner-spin-button,
+      .mem-grp input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
       }
       .run-btn {
         font-family: "Orbitron", sans-serif;
@@ -629,7 +759,7 @@
         color: var(--c);
         cursor: pointer;
         letter-spacing: 0.18em;
-        transition: all 0.14s;
+        transition: all 0.13s;
         white-space: nowrap;
         flex-shrink: 0;
       }
@@ -638,11 +768,11 @@
         box-shadow: var(--glow);
       }
       .run-btn.go {
-        animation: blk 0.38s ease-in-out infinite alternate;
+        animation: blk 0.36s ease-in-out infinite alternate;
       }
       @keyframes blk {
         from {
-          opacity: 0.38;
+          opacity: 0.36;
         }
         to {
           opacity: 1;
@@ -664,11 +794,28 @@
         inset: 0;
       }
 
+      /* Monaco scrollbar tint */
+      .monaco-scrollable-element > .scrollbar > .slider {
+        background: rgba(42, 161, 152, 0.25) !important;
+      }
+      .monaco-scrollable-element > .scrollbar > .slider:hover {
+        background: rgba(42, 161, 152, 0.45) !important;
+      }
+      .monaco-scrollable-element > .scrollbar > .slider:active {
+        background: rgba(42, 161, 152, 0.65) !important;
+      }
+      .monaco-scrollable-element > .scrollbar.vertical {
+        background: rgba(0, 20, 28, 0.7) !important;
+      }
+      .monaco-scrollable-element > .scrollbar.horizontal {
+        background: rgba(0, 20, 28, 0.7) !important;
+      }
+
       /* solutions overlay */
       .sol-overlay {
         position: absolute;
         inset: 0;
-        background: var(--bg);
+        background: #002b36;
         z-index: 10;
         display: none;
         flex-direction: column;
@@ -680,45 +827,36 @@
       .sol-inner {
         flex: 1;
         overflow-y: auto;
-        padding: 18px 20px;
-      }
-      .sol-inner::-webkit-scrollbar {
-        width: 3px;
-      }
-      .sol-inner::-webkit-scrollbar-track {
-        background: var(--bg);
-      }
-      .sol-inner::-webkit-scrollbar-thumb {
-        background: #7a5000;
+        padding: 16px 18px;
       }
       .sol-banner {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.7rem;
-        color: rgba(255, 160, 0, 0.65);
-        letter-spacing: 0.18em;
-        margin-bottom: 12px;
-        border-left: 3px solid #ffa000;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.67rem;
+        color: rgba(181, 137, 0, 0.65);
+        letter-spacing: 0.17em;
+        margin-bottom: 11px;
+        border-left: 2px solid #b58900;
         padding-left: 8px;
       }
       .sol-code {
-        background: rgba(0, 12, 22, 0.92);
-        border: 1px solid rgba(255, 160, 0, 0.18);
-        border-left: 3px solid rgba(255, 160, 0, 0.4);
-        padding: 16px;
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.8rem;
-        color: #b8e0e8;
+        background: #073642;
+        border: 1px solid rgba(181, 137, 0, 0.15);
+        border-left: 2px solid rgba(181, 137, 0, 0.36);
+        padding: 14px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.79rem;
+        color: #839496;
         white-space: pre-wrap;
         word-break: break-all;
-        line-height: 1.6;
+        line-height: 1.65;
       }
       .sol-note {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.66rem;
-        color: rgba(255, 160, 0, 0.35);
-        margin-top: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        color: rgba(181, 137, 0, 0.3);
+        margin-top: 11px;
         text-align: center;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.09em;
       }
 
       /* results */
@@ -726,15 +864,15 @@
         flex: 2;
         display: flex;
         flex-direction: column;
-        background: rgba(0, 4, 10, 0.98);
+        background: #001d26;
       }
       .res-hdr {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.7rem;
-        padding: 6px 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.67rem;
+        padding: 5px 11px;
         border-bottom: 1px solid var(--bd);
         color: var(--txd);
-        letter-spacing: 0.13em;
+        letter-spacing: 0.12em;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -742,105 +880,96 @@
       }
       .res-sum {
         display: flex;
-        gap: 9px;
+        gap: 8px;
         align-items: center;
       }
       .bp {
-        color: #00ff88;
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.7rem;
+        color: #859900;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
       }
       .bf {
-        color: #ff4040;
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.7rem;
+        color: #dc322f;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
       }
       .bt {
         color: var(--txd);
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.66rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.64rem;
       }
       #res-body {
         flex: 1;
         overflow-y: auto;
-        padding: 10px 12px;
-      }
-      #res-body::-webkit-scrollbar {
-        width: 3px;
-      }
-      #res-body::-webkit-scrollbar-track {
-        background: var(--bg);
-      }
-      #res-body::-webkit-scrollbar-thumb {
-        background: var(--cd);
+        padding: 9px 11px;
       }
       .r-suite {
-        margin-bottom: 12px;
+        margin-bottom: 11px;
       }
       .r-suite-nm {
-        font-family: "Share Tech Mono", monospace;
-        color: var(--cd);
-        font-size: 0.7rem;
-        letter-spacing: 0.13em;
-        margin-bottom: 4px;
+        font-family: "JetBrains Mono", monospace;
+        color: #2aa198;
+        font-size: 0.67rem;
+        letter-spacing: 0.12em;
+        margin-bottom: 3px;
         padding-left: 3px;
-        border-left: 2px solid var(--cd);
+        border-left: 2px solid #2aa198;
       }
       .r-item {
-        padding: 5px 8px;
+        padding: 5px 7px;
         margin-bottom: 2px;
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.74rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 1px;
       }
       .r-item.pass {
-        background: rgba(0, 255, 136, 0.04);
-        border-left: 2px solid #00ff88;
+        background: rgba(133, 153, 0, 0.06);
+        border-left: 2px solid #859900;
       }
       .r-item.fail {
-        background: rgba(255, 64, 64, 0.04);
-        border-left: 2px solid #ff4040;
+        background: rgba(220, 50, 47, 0.06);
+        border-left: 2px solid #dc322f;
       }
       .r-item.error {
-        background: rgba(255, 160, 0, 0.04);
-        border-left: 2px solid #ffa000;
+        background: rgba(181, 137, 0, 0.06);
+        border-left: 2px solid #b58900;
       }
       .r-nr {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
       }
       .r-ico {
-        font-size: 0.82rem;
+        font-size: 0.8rem;
       }
       .pass .r-ico {
-        color: #00ff88;
+        color: #859900;
       }
       .fail .r-ico {
-        color: #ff4040;
+        color: #dc322f;
       }
       .error .r-ico {
-        color: #ffa000;
+        color: #b58900;
       }
       .r-nm {
-        color: var(--tx);
+        color: #93a1a1;
         flex: 1;
       }
       .r-ms {
         color: var(--txd);
-        font-size: 0.66rem;
+        font-size: 0.64rem;
       }
       .r-mem {
         color: var(--txd);
-        font-size: 0.63rem;
+        font-size: 0.61rem;
       }
       .r-err {
-        color: #ff6060;
-        font-size: 0.71rem;
-        padding: 2px 0 2px 20px;
-        background: rgba(255, 0, 0, 0.03);
+        color: #cb4b16;
+        font-size: 0.69rem;
+        padding: 2px 0 2px 17px;
+        background: rgba(203, 75, 22, 0.04);
         word-break: break-all;
         white-space: pre-wrap;
       }
@@ -851,33 +980,179 @@
         justify-content: center;
         height: 100%;
         color: var(--txd);
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.76rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.74rem;
         text-align: center;
-        gap: 9px;
+        gap: 8px;
       }
       .res-empty .ico {
-        font-size: 1.8rem;
-        opacity: 0.2;
+        font-size: 1.7rem;
+        opacity: 0.18;
       }
       .statusbar {
-        padding: 2px 12px;
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.66rem;
+        padding: 2px 11px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
         color: var(--txd);
         border-top: 1px solid var(--bd);
-        background: rgba(0, 3, 7, 0.98);
-        min-height: 20px;
+        background: #001520;
+        min-height: 19px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         flex-shrink: 0;
       }
       .statusbar.ok {
-        color: #00ff88;
+        color: #859900;
       }
       .statusbar.err {
-        color: #ff6060;
+        color: #dc322f;
+      }
+
+      /* ── MOBILE RESULTS SHEET (slide up after RUN) ── */
+      .res-close {
+        display: none;
+      }
+
+      @media (max-width: 680px) {
+        /* Task bar: wrap into two rows */
+        .task-bar {
+          flex-wrap: wrap;
+          gap: 4px;
+          padding: 4px 6px;
+        }
+        .breadc {
+          order: -1;
+          width: 100%;
+          font-size: 0.64rem;
+        }
+        .mem-grp {
+          display: none;
+        } /* hide on tiny screens */
+        .tab {
+          font-size: 0.64rem;
+          padding: 3px 7px;
+        }
+        .run-btn {
+          font-size: 0.66rem;
+          padding: 5px 10px;
+          letter-spacing: 0.12em;
+        }
+
+        /* Editor fills the whole area */
+        .editor-area {
+          flex-direction: column;
+        }
+        .ed-panel {
+          flex: 1;
+          border-right: none;
+          min-height: 0;
+        }
+
+        /* Results panel becomes a fixed bottom sheet */
+        .res-panel {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 60vh;
+          z-index: 200;
+          border-top: 1px solid var(--c);
+          box-shadow: 0 -4px 40px rgba(0, 200, 255, 0.12);
+          transform: translateY(110%);
+          transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .res-panel.mob-open {
+          transform: translateY(0);
+        }
+
+        /* Close handle for the sheet */
+        .res-close {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 22px;
+          cursor: pointer;
+          flex-shrink: 0;
+          background: rgba(0, 255, 255, 0.04);
+          border-bottom: 1px solid var(--bd);
+        }
+        .res-close::before {
+          content: "";
+          display: block;
+          width: 32px;
+          height: 3px;
+          background: var(--cm);
+          border-radius: 2px;
+        }
+        .res-close:hover::before {
+          background: var(--c);
+        }
+
+        /* Cat grid: 2 columns on mobile */
+        .cat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Home: tighter */
+        .home-content {
+          gap: 8px;
+          padding: 10px 8px 14px;
+        }
+        .logo {
+          font-size: clamp(1.2rem, 6vw, 2rem);
+        }
+        .logo-sub {
+          font-size: 0.55rem;
+          letter-spacing: 0.08em;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .cat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .tab-grp {
+          gap: 1px;
+        }
+        .tab {
+          font-size: 0.6rem;
+          padding: 2px 6px;
+        }
+      }
+      #hud {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        z-index: 50;
+        display: flex;
+        gap: 6px;
+      }
+      .hud-btn {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        padding: 4px 10px;
+        background: rgba(0, 20, 30, 0.9);
+        border: 1px solid var(--cm);
+        color: var(--txd);
+        cursor: pointer;
+        letter-spacing: 0.09em;
+        transition: all 0.15s;
+        backdrop-filter: blur(8px);
+        user-select: none;
+      }
+      .hud-btn:hover {
+        border-color: var(--c);
+        color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .hud-btn.active {
+        border-color: rgba(220, 50, 47, 0.45);
+        color: rgba(220, 80, 80, 0.7);
+      }
+      .hud-btn.active:hover {
+        border-color: #dc322f;
+        color: #dc322f;
       }
 
       /* ── MODAL ── */
@@ -885,26 +1160,34 @@
         position: fixed;
         inset: 0;
         z-index: 800;
-        background: rgba(0, 3, 9, 0.86);
+        background: rgba(0, 15, 22, 0.88);
         backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: fadeIn 0.14s ease;
+        animation: mfade 0.13s ease;
+      }
+      @keyframes mfade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
       .modal-bg.hide {
         display: none;
       }
       .modal {
-        background: var(--bg2);
-        border: 1px solid rgba(255, 160, 0, 0.4);
-        max-width: 380px;
+        background: #002b36;
+        border: 1px solid rgba(181, 137, 0, 0.35);
+        max-width: 360px;
         width: 90%;
-        padding: 26px;
+        padding: 24px;
         position: relative;
         box-shadow:
-          0 0 36px rgba(255, 160, 0, 0.1),
-          0 0 70px rgba(0, 0, 0, 0.5);
+          0 0 30px rgba(181, 137, 0, 0.08),
+          0 0 60px rgba(0, 0, 0, 0.5);
       }
       .modal::before {
         content: "";
@@ -913,31 +1196,29 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: linear-gradient(90deg, transparent, #ffa000, transparent);
+        background: linear-gradient(90deg, transparent, #b58900, transparent);
       }
       .m-ico {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
         text-align: center;
-        margin-bottom: 8px;
-        color: #ffa000;
-        text-shadow: 0 0 16px rgba(255, 160, 0, 0.6);
+        margin-bottom: 7px;
       }
       .m-title {
         font-family: "Orbitron", sans-serif;
-        font-size: 0.88rem;
+        font-size: 0.83rem;
         font-weight: 700;
-        color: #ffa000;
-        letter-spacing: 0.16em;
+        color: #b58900;
+        letter-spacing: 0.14em;
         text-align: center;
-        margin-bottom: 9px;
+        margin-bottom: 8px;
       }
       .m-body {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.74rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
         color: var(--tx);
-        line-height: 1.65;
+        line-height: 1.62;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
         opacity: 0.8;
       }
       .m-acts {
@@ -946,13 +1227,13 @@
         justify-content: center;
       }
       .m-btn {
-        font-family: "Share Tech Mono", monospace;
-        font-size: 0.74rem;
-        padding: 6px 18px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        padding: 6px 17px;
         border: 1px solid;
         cursor: pointer;
-        letter-spacing: 0.13em;
-        transition: all 0.14s;
+        letter-spacing: 0.12em;
+        transition: all 0.13s;
       }
       .m-btn.cancel {
         border-color: var(--bd);
@@ -965,13 +1246,13 @@
         box-shadow: var(--glow);
       }
       .m-btn.go {
-        border-color: #ffa000;
-        color: #ffa000;
-        background: rgba(255, 160, 0, 0.05);
+        border-color: #b58900;
+        color: #b58900;
+        background: rgba(181, 137, 0, 0.05);
       }
       .m-btn.go:hover {
-        background: rgba(255, 160, 0, 0.12);
-        box-shadow: 0 0 9px rgba(255, 160, 0, 0.3);
+        background: rgba(181, 137, 0, 0.12);
+        box-shadow: 0 0 8px rgba(181, 137, 0, 0.28);
       }
     </style>
   </head>
@@ -980,48 +1261,65 @@
       <div id="boot-logo">GRID::RUNNER</div>
       <div id="boot-lines"></div>
     </div>
-
     <canvas id="bg"></canvas>
 
     <div id="app">
       <!-- HOME -->
       <div id="view-home" class="view active">
-        <div class="home-hdr">
-          <div class="logo">GRID::RUNNER</div>
-          <div class="logo-sub">
-            // JAVASCRIPT ALGORITHM TESTING ENVIRONMENT //
+        <div class="home-content">
+          <div class="home-hdr">
+            <div class="logo">GRID::RUNNER</div>
+            <div class="logo-sub">
+              // JAVASCRIPT ALGORITHM TESTING ENVIRONMENT //
+            </div>
+            <div class="vtag">v1.3.0 — CYBERNETIC BUILD</div>
           </div>
-          <div class="vtag">v1.2.0 — CYBERNETIC BUILD</div>
+          <div class="search-wrap">
+            <input
+              id="srch"
+              type="text"
+              placeholder="SEARCH_PROTOCOL... [F]"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div id="srch-results"></div>
+          <div class="cat-grid-wrap">
+            <div class="cat-grid" id="cat-grid"></div>
+          </div>
+          <div class="cat-pager" id="cat-pager" style="display: none">
+            <div class="pag-arrow" id="pag-prev" onclick="prevCatPage()">◁</div>
+            <div class="pag-dots" id="pag-dots"></div>
+            <div class="pag-arrow" id="pag-next" onclick="nextCatPage()">▷</div>
+          </div>
         </div>
-        <div class="search-wrap">
-          <input
-            id="srch"
-            type="text"
-            placeholder="SEARCH_PROTOCOL..."
-            autocomplete="off"
-            spellcheck="false"
-          />
-        </div>
-        <div id="srch-results"></div>
-        <div class="cat-grid" id="cat-grid"></div>
       </div>
 
-      <!-- CATEGORY -->
-      <div id="view-category" class="view">
-        <div class="panel-hdr">
-          <div class="bk" id="bk-cat">← BACK</div>
-          <div class="panel-title" id="cat-lbl">CATEGORY</div>
-          <div style="flex: 1"></div>
-          <div
-            style="
-              font-family: &quot;Share Tech Mono&quot;, monospace;
-              font-size: 0.68rem;
-              color: var(--txd);
-            "
-            id="cat-cnt"
-          ></div>
+      <!-- CATEGORY (bottom sheet) -->
+      <div
+        id="view-category"
+        class="view"
+        id="view-category"
+        onclick="handleCatBgClick(event)"
+      >
+        <div class="cat-backdrop"></div>
+        <div class="cat-sheet" id="cat-sheet">
+          <div class="sheet-handle"></div>
+          <div class="panel-hdr">
+            <div class="bk" id="bk-cat">← BACK</div>
+            <div class="panel-title" id="cat-lbl">CATEGORY</div>
+            <div style="flex: 1"></div>
+            <div
+              style="
+                font-family: &quot;JetBrains Mono&quot;, monospace;
+                font-size: 0.65rem;
+                color: var(--txd);
+              "
+              id="cat-cnt"
+            ></div>
+          </div>
+          <div class="task-list" id="task-list"></div>
         </div>
-        <div class="task-list" id="task-list"></div>
       </div>
 
       <!-- TASK -->
@@ -1071,7 +1369,12 @@
               </div>
             </div>
           </div>
-          <div class="res-panel">
+          <div class="res-panel" id="res-panel">
+            <div
+              class="res-close"
+              id="res-close"
+              onclick="closeMobResults()"
+            ></div>
             <div class="res-hdr">
               <span>TEST RESULTS</span>
               <div class="res-sum" id="res-sum"></div>
@@ -1080,8 +1383,8 @@
               <div class="res-empty">
                 <div class="ico">⬡</div>
                 <div>AWAITING EXECUTION</div>
-                <div style="opacity: 0.38; font-size: 0.68rem; margin-top: 4px">
-                  Click ▶ RUN to execute
+                <div style="opacity: 0.28; font-size: 0.63rem; margin-top: 3px">
+                  ▶ RUN to execute
                 </div>
               </div>
             </div>
@@ -1089,6 +1392,12 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-btn" id="btn-fs" onclick="toggleFS()">⛶ FULLSCREEN</div>
+      <div class="hud-btn" id="btn-mute" onclick="toggleMute()">♪ SOUND</div>
     </div>
 
     <!-- SOLUTIONS MODAL -->
@@ -1112,10 +1421,8 @@
       function describe(n,fn){curSuite=n;if(!suites[n])suites[n]=[];try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null});}}
       function it(name,fn){
         const s=curSuite;if(!suites[s])suites[s]=[];
-        const mb=(self.performance&&self.performance.memory)?self.performance.memory.usedJSHeapSize:-1;
-        const t0=self.performance.now();
-        try{fn();const dt=self.performance.now()-t0;
-          const ma=(self.performance&&self.performance.memory)?self.performance.memory.usedJSHeapSize:-1;
+        const mb=self.performance?.memory?.usedJSHeapSize??-1,t0=self.performance.now();
+        try{fn();const dt=self.performance.now()-t0,ma=self.performance?.memory?.usedJSHeapSize??-1;
           suites[s].push({name,status:'pass',time:dt,mem:ma>=0?ma-mb:null});}
         catch(e){suites[s].push({name,status:'fail',error:e.message,time:self.performance.now()-t0,mem:null});}
       }
@@ -1123,26 +1430,22 @@
       function expect(v){
         function a(ok,msg){if(!ok)throw new Error(msg);}
         const m={
-          toBe:(e)=>a(Object.is(v,e),'Expected '+JSON.stringify(e)+' but got '+JSON.stringify(v)),
+          toBe:(e)=>a(Object.is(v,e),'Expected '+JSON.stringify(e)+' got '+JSON.stringify(v)),
           toEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'exp '+JSON.stringify(e)+' got '+JSON.stringify(v)),
           toStrictEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'toStrictEqual failed'),
           toMatch:(r)=>{const re=typeof r==='string'?new RegExp(r):r;a(re.test(String(v)),'toMatch failed');},
-          toBeTruthy:()=>a(!!v,'Expected truthy, got '+JSON.stringify(v)),
-          toBeFalsy:()=>a(!v,'Expected falsy, got '+JSON.stringify(v)),
-          toBeNull:()=>a(v===null,'Expected null'),
-          toBeUndefined:()=>a(v===undefined,'Expected undefined'),
+          toBeTruthy:()=>a(!!v,'Expected truthy'),toBeFalsy:()=>a(!v,'Expected falsy'),
+          toBeNull:()=>a(v===null,'Expected null'),toBeUndefined:()=>a(v===undefined,'Expected undefined'),
           toBeDefined:()=>a(v!==undefined,'Expected defined'),
-          toContain:(i)=>a(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'Expected to contain '+JSON.stringify(i)),
-          toHaveLength:(n)=>a(v!=null&&v.length===n,'Expected length '+n+', got '+(v?v.length:'N/A')),
-          toBeGreaterThan:(n)=>a(v>n,v+' > '+n+' failed'),
-          toBeLessThan:(n)=>a(v<n,v+' < '+n+' failed'),
-          toBeGreaterThanOrEqual:(n)=>a(v>=n,v+' >= '+n+' failed'),
-          toBeLessThanOrEqual:(n)=>a(v<=n,v+' <= '+n+' failed'),
+          toContain:(i)=>a(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'toContain failed'),
+          toHaveLength:(n)=>a(v!=null&&v.length===n,'Expected length '+n+' got '+(v?.length??'N/A')),
+          toBeGreaterThan:(n)=>a(v>n,v+'>'+n+' failed'),toBeLessThan:(n)=>a(v<n,v+'<'+n+' failed'),
+          toBeGreaterThanOrEqual:(n)=>a(v>=n,v+'>='+n+' failed'),toBeLessThanOrEqual:(n)=>a(v<=n,v+'<='+n+' failed'),
           toThrow:()=>{try{v();a(false,'Expected to throw');}catch(e){}}
         };
         m.not={};Object.keys(m).forEach(k=>{if(k==='not')return;
           m.not[k]=(...args)=>{let ok=false;try{m[k](...args);}catch(e){ok=true;}
-            if(!ok)throw new Error('Expected NOT to: '+k);};});
+            if(!ok)throw new Error('NOT expected: '+k);};});
         return m;
       }
       self.onmessage=function(e){
@@ -1156,42 +1459,37 @@
     </script>
 
     <script>
-      // ═══════════ TASK REGISTRY ═══════════
-      // Files live in: grid/{folder}/{file}.js  .spec.js  .sol.js
-      // Icons live in: grid/{folder}/icon.svg
+      // ════════════════════════════════════════════════
+      //  CONFIG
+      // ════════════════════════════════════════════════
+      const TEST_ON_SAVE = true; // Ctrl+S triggers format + run
 
-      const CATS = [
+      const MENU = [
         {
           id: "regex",
           name: "REGEX",
-          desc: "Pattern Matching Protocols",
+          desc: "Pattern Matching",
           folder: "regex",
-          icon: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="3" width="42" height="42" rx="2" stroke="currentColor" stroke-width="1.5"/>
-      <text x="7" y="27" font-family="monospace" font-size="18" fill="currentColor" font-weight="bold">.*</text>
-      <line x1="3" y1="32" x2="45" y2="32" stroke="currentColor" stroke-width="1" opacity=".35"/>
-      <text x="7" y="41" font-family="monospace" font-size="7" fill="currentColor" opacity=".5" letter-spacing="2">REGEX ENGINE</text>
-    </svg>`,
           tasks: [
             {
               id: "regex_1",
               title: 'Remove "cat"',
               diff: 2,
-              desc: 'Remove all occurrences of the word "cat" (case-insensitive)',
+              desc: 'Remove all occurrences of "cat" (case-insensitive)',
               file: "regex_1",
             },
             {
               id: "regex_2",
               title: "Extract Emails",
               diff: 4,
-              desc: "Extract all email addresses from a string into an array",
+              desc: "Extract all email addresses into an array",
               file: "regex_2",
             },
             {
               id: "regex_3",
               title: "Replace Numbers",
               diff: 3,
-              desc: "Replace every sequence of digits with the # symbol",
+              desc: "Replace every digit sequence with #",
               file: "regex_3",
             },
             {
@@ -1205,7 +1503,7 @@
               id: "regex_5",
               title: "Trim Extra Spaces",
               diff: 3,
-              desc: "Collapse multiple whitespace to single space and trim",
+              desc: "Collapse multiple whitespace to single space",
               file: "regex_5",
             },
           ],
@@ -1213,16 +1511,8 @@
         {
           id: "algo",
           name: "ALGO",
-          desc: "Core Algorithm Protocols",
+          desc: "Core Algorithms",
           folder: "algo",
-          icon: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polyline points="4,40 14,18 24,28 34,8 44,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="14" cy="18" r="3" fill="currentColor" opacity=".8"/>
-      <circle cx="24" cy="28" r="3" fill="currentColor" opacity=".8"/>
-      <circle cx="34" cy="8"  r="3" fill="currentColor" opacity=".8"/>
-      <line x1="4" y1="44" x2="44" y2="44" stroke="currentColor" stroke-width="1" opacity=".3"/>
-      <line x1="4" y1="44" x2="4"  y2="4"  stroke="currentColor" stroke-width="1" opacity=".3"/>
-    </svg>`,
           tasks: [
             {
               id: "algo_1",
@@ -1256,7 +1546,7 @@
               id: "algo_5",
               title: "Binary Search",
               diff: 4,
-              desc: "Return index of target in sorted array, -1 if not found",
+              desc: "Return index of target in sorted array, -1 if none",
               file: "algo_5",
             },
             {
@@ -1268,17 +1558,99 @@
             },
           ],
         },
+        {
+          id: "sort",
+          name: "SORT",
+          desc: "Sorting Algorithms",
+          folder: "sort",
+          tasks: [],
+        },
+        {
+          id: "tree",
+          name: "TREE",
+          desc: "Tree Traversal",
+          folder: "tree",
+          tasks: [],
+        },
+        {
+          id: "graph",
+          name: "GRAPH",
+          desc: "Graph Problems",
+          folder: "graph",
+          tasks: [],
+        },
+        {
+          id: "dp",
+          name: "DP",
+          desc: "Dynamic Programming",
+          folder: "dp",
+          tasks: [],
+        },
+        {
+          id: "string",
+          name: "STRING",
+          desc: "String Manipulation",
+          folder: "string",
+          tasks: [],
+        },
+        {
+          id: "math",
+          name: "MATH",
+          desc: "Mathematical Problems",
+          folder: "math",
+          tasks: [],
+        },
+        {
+          id: "array",
+          name: "ARRAY",
+          desc: "Array Operations",
+          folder: "array",
+          tasks: [],
+        },
+        {
+          id: "hash",
+          name: "HASH",
+          desc: "Hash Map Patterns",
+          folder: "hash",
+          tasks: [],
+        },
+        {
+          id: "recursion",
+          name: "RECURSION",
+          desc: "Recursion & Backtrack",
+          folder: "recursion",
+          tasks: [],
+        },
+        {
+          id: "linked",
+          name: "LINKED",
+          desc: "Linked List Problems",
+          folder: "linked",
+          tasks: [],
+        },
       ];
 
-      // ═══════════ IN-MEMORY STATE (no localStorage) ═══════════
+      const FALLBACK_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="4" y="4" width="40" height="40" rx="3" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="24" cy="24" r="10" stroke="currentColor" stroke-width="1.5"/>
+  <line x1="24" y1="4" x2="24" y2="44" stroke="currentColor" stroke-width="1" opacity=".4"/>
+  <line x1="4" y1="24" x2="44" y2="24" stroke="currentColor" stroke-width="1" opacity=".4"/>
+</svg>`;
 
-      const STATUS = {}; // { 'cat/taskId': 'ok'|'ng' }
-      const CODE = {}; // { 'cat/taskId': string }  — user edits this session
-      const FILE_CACHE = {}; // { 'cat/taskId': {code,spec,sol} }
+      // ── In-memory state (no localStorage) ──
+      const STATUS = {};
+      const CODE = {};
+      const FILECACHE = {};
+      const ICONSTORE = {};
+
+      // ── Pagination ──
+      const PAGE_SIZE = 9;
+      let catPage = 0;
+      let _filteredMenu = MENU; // what's visible during search
 
       // ═══════════ AUDIO ═══════════
-
-      let _ac = null;
+      let _ac = null,
+        _muted = false;
       function ac() {
         if (!_ac)
           _ac = new (window.AudioContext || window.webkitAudioContext)();
@@ -1286,6 +1658,7 @@
         return _ac;
       }
       function snd(fn) {
+        if (_muted) return;
         try {
           fn(ac());
         } catch (e) {}
@@ -1299,14 +1672,14 @@
           g.connect(c.destination);
           o.type = "square";
           o.frequency.value = 1050;
-          g.gain.setValueAtTime(0.052, c.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.06);
+          g.gain.setValueAtTime(0.048, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.057);
           o.start();
           o.stop(c.currentTime + 0.06);
         });
       const playNav = () =>
         snd((c) => {
-          [270, 450].forEach((fr, i) => {
+          [260, 430].forEach((fr, i) => {
             const o = c.createOscillator(),
               g = c.createGain();
             o.connect(g);
@@ -1314,10 +1687,10 @@
             o.type = "sine";
             o.frequency.value = fr;
             const t = c.currentTime + i * 0.05;
-            g.gain.setValueAtTime(0.048, t);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+            g.gain.setValueAtTime(0.043, t);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
             o.start(t);
-            o.stop(t + 0.14);
+            o.stop(t + 0.13);
           });
         });
       const playRunStart = () =>
@@ -1327,12 +1700,12 @@
           o.connect(g);
           g.connect(c.destination);
           o.type = "sawtooth";
-          o.frequency.setValueAtTime(155, c.currentTime);
-          o.frequency.exponentialRampToValueAtTime(800, c.currentTime + 0.26);
-          g.gain.setValueAtTime(0.062, c.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.3);
+          o.frequency.setValueAtTime(148, c.currentTime);
+          o.frequency.exponentialRampToValueAtTime(760, c.currentTime + 0.24);
+          g.gain.setValueAtTime(0.058, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.27);
           o.start();
-          o.stop(c.currentTime + 0.3);
+          o.stop(c.currentTime + 0.28);
         });
       const playAllPass = () =>
         snd((c) => {
@@ -1345,10 +1718,10 @@
             o.frequency.value = fr;
             const t = c.currentTime + i * 0.07;
             g.gain.setValueAtTime(0.0001, t);
-            g.gain.linearRampToValueAtTime(0.058, t + 0.03);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+            g.gain.linearRampToValueAtTime(0.052, t + 0.03);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
             o.start(t);
-            o.stop(t + 0.36);
+            o.stop(t + 0.34);
           });
         });
       const playFail = () =>
@@ -1358,16 +1731,16 @@
           o.connect(g);
           g.connect(c.destination);
           o.type = "sawtooth";
-          o.frequency.setValueAtTime(410, c.currentTime);
-          o.frequency.exponentialRampToValueAtTime(160, c.currentTime + 0.36);
-          g.gain.setValueAtTime(0.075, c.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.4);
+          o.frequency.setValueAtTime(395, c.currentTime);
+          o.frequency.exponentialRampToValueAtTime(152, c.currentTime + 0.34);
+          g.gain.setValueAtTime(0.07, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.37);
           o.start();
-          o.stop(c.currentTime + 0.4);
+          o.stop(c.currentTime + 0.38);
         });
       const playError = () =>
         snd((c) => {
-          [305, 285, 265].forEach((fr, i) => {
+          [298, 278, 258].forEach((fr, i) => {
             const o = c.createOscillator(),
               g = c.createGain();
             o.connect(g);
@@ -1375,43 +1748,56 @@
             o.type = "square";
             o.frequency.value = fr;
             const t = c.currentTime + i * 0.08;
-            g.gain.setValueAtTime(0.062, t);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+            g.gain.setValueAtTime(0.058, t);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
             o.start(t);
-            o.stop(t + 0.12);
+            o.stop(t + 0.11);
           });
         });
       let _lt = 0;
       const playType = () => {
         const n = Date.now();
-        if (n - _lt < 36) return;
+        if (n - _lt < 34) return;
         _lt = n;
         snd((c) => {
           const buf = c.createBuffer(
             1,
-            Math.floor(c.sampleRate * 0.022),
+            Math.floor(c.sampleRate * 0.02),
             c.sampleRate,
           );
           const d = buf.getChannelData(0);
           for (let i = 0; i < d.length; i++)
-            d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) * 0.8;
+            d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) * 0.74;
           const src = c.createBufferSource(),
-            filt = c.createBiquadFilter(),
+            fi = c.createBiquadFilter(),
             g = c.createGain();
-          filt.type = "bandpass";
-          filt.frequency.value = 2650;
-          filt.Q.value = 2.1;
+          fi.type = "bandpass";
+          fi.frequency.value = 2580;
+          fi.Q.value = 1.9;
           src.buffer = buf;
-          src.connect(filt);
-          filt.connect(g);
+          src.connect(fi);
+          fi.connect(g);
           g.connect(c.destination);
-          g.gain.value = 0.016;
+          g.gain.value = 0.014;
           src.start();
         });
       };
 
-      // ═══════════ BACKGROUND ═══════════
+      function toggleMute() {
+        _muted = !_muted;
+        const b = document.getElementById("btn-mute");
+        b.textContent = _muted ? "♪ MUTED" : "♪ SOUND";
+        b.classList.toggle("active", _muted);
+        if (!_muted) playClick();
+      }
+      function toggleFS() {
+        if (!document.fullscreenElement)
+          document.documentElement.requestFullscreen().catch(() => {});
+        else document.exitFullscreen().catch(() => {});
+        playClick();
+      }
 
+      // ═══════════ BACKGROUND ═══════════
       const cv = document.getElementById("bg"),
         cx = cv.getContext("2d");
       let T = 0,
@@ -1423,48 +1809,57 @@
       resize();
       window.addEventListener("resize", resize);
 
+      function lcg(seed) {
+        let s = seed >>> 0;
+        return () => {
+          s = (1664525 * s + 1013904223) >>> 0;
+          return s / 4294967296;
+        };
+      }
+      const rnd = lcg(0xcafe1234);
+      const STARS = Array.from({ length: 120 }, () => ({
+        x: rnd(),
+        y: rnd() * 0.44,
+        sz: rnd() < 0.14 ? 1.5 : 1,
+        ph: rnd() * Math.PI * 2,
+        sp: 0.28 + rnd() * 0.48,
+      }));
+
       function drawBg(t) {
         const W = cv.width,
           H = cv.height;
-        // Sky gradient
         const sky = cx.createLinearGradient(0, 0, 0, H * 0.56);
         sky.addColorStop(0, "#000005");
-        sky.addColorStop(0.75, "#000512");
+        sky.addColorStop(0.75, "#000a10");
         sky.addColorStop(1, "#001420");
         cx.fillStyle = sky;
         cx.fillRect(0, 0, W, H);
-        // Ground gradient
         const gnd = cx.createLinearGradient(0, H * 0.5, 0, H);
         gnd.addColorStop(0, "#000d18");
         gnd.addColorStop(1, "#000208");
         cx.fillStyle = gnd;
         cx.fillRect(0, H * 0.5, W, H * 0.5);
-        // Horizon glow band
         const hg = cx.createLinearGradient(0, H * 0.43, 0, H * 0.62);
         hg.addColorStop(0, "rgba(0,80,140,0)");
         hg.addColorStop(0.5, "rgba(0,180,220,.1)");
         hg.addColorStop(1, "rgba(0,80,140,0)");
         cx.fillStyle = hg;
         cx.fillRect(0, H * 0.43, W, H * 0.22);
-        // Stars
         cx.save();
-        for (let i = 0; i < 90; i++) {
-          const sx = (i * 137.5 + 11) % W,
-            sy = (i * 91.3 + 5) % (H * 0.44);
-          const fl = 0.35 + 0.65 * Math.abs(Math.sin(t * 0.38 + i * 0.7));
-          cx.fillStyle = `rgba(160,220,255,${fl * 0.52})`;
-          cx.fillRect(sx, sy, i % 4 === 0 ? 1.5 : 1, i % 4 === 0 ? 1.5 : 1);
-        }
+        STARS.forEach((s) => {
+          const fl = 0.3 + 0.7 * Math.abs(Math.sin(t * s.sp + s.ph));
+          cx.fillStyle = `rgba(160,220,255,${fl * 0.5})`;
+          cx.fillRect(s.x * W, s.y * H, s.sz, s.sz);
+        });
         cx.restore();
         drawGrid(W, H, t);
-        // Lightning
-        if (Math.random() < 0.004) lightnings.push(mkLightning(W, H));
+        if (Math.random() < 0.0038) lightnings.push(mkLightning(W, H));
         cx.save();
         lightnings = lightnings.filter((l) => l.a > 0.01);
         lightnings.forEach((l) => {
           l.a -= l.dk;
-          drawLP(l.pts, 1.5, l.a * 0.9);
-          l.br.forEach((b) => drawLP(b, 0.75, l.a * 0.4));
+          drawLP(l.pts, 1.4, l.a * 0.88);
+          l.br.forEach((b) => drawLP(b, 0.65, l.a * 0.36));
           if (l.a > 0.65) {
             cx.fillStyle = `rgba(100,170,255,${(l.a - 0.65) * 0.07})`;
             cx.fillRect(0, 0, W, H);
@@ -1472,107 +1867,94 @@
         });
         cx.restore();
       }
-
-      // ─── FIXED GRID: full-coverage perspective grid ───────────────────────────
       function drawGrid(W, H, t) {
-        const hz = H * 0.5; // horizon y
-        const vp = W * 0.5; // vanishing point x
-        const NV = 18; // vertical line divisions (edge-to-edge)
-        const dz = 1.0; // world z spacing between horizontal lines
-        const spd = 0.55; // camera speed (z-units/sec)
-        const scroll = (t * spd) % dz;
-        const maxN = 28;
-
+        const hz = H * 0.5,
+          vpX = W * 0.5,
+          NV = 26,
+          dz = 1,
+          spd = 0.52,
+          scroll = (t * spd) % dz,
+          maxN = 32;
+        // ── GRID_SPREAD controls how wide the infinite plane appears.
+        // 0.0 = road-narrow,  0.8 = moderate (default),  2.0+ = extremely wide.
+        // Increase to push vertical lines further beyond screen edges.
+        const GRID_SPREAD = 0.8;
+        const BL = -W * GRID_SPREAD;
+        const BR = W * (1 + GRID_SPREAD);
         cx.save();
-
-        // ── Vertical lines ──────────────────────────────────────────
-        // Fan from (vp, hz) to evenly-spaced points along the bottom edge.
-        // i=0 → x=0 (left corner), i=NV → x=W (right corner): FULL COVERAGE.
+        cx.beginPath();
+        cx.rect(0, hz, W, H - hz + 2);
+        cx.clip();
         for (let i = 0; i <= NV; i++) {
-          const bx = (i / NV) * W;
-          const isMid = i === NV / 2;
+          const bx = BL + (i / NV) * (BR - BL),
+            isMid = i === NV / 2;
           cx.beginPath();
-          cx.moveTo(vp, hz);
-          cx.lineTo(bx, H + 2);
-          cx.strokeStyle = `rgba(0,200,255,${isMid ? 0.52 : 0.18})`;
-          cx.lineWidth = isMid ? 1.4 : 0.65;
+          cx.moveTo(vpX, hz);
+          cx.lineTo(bx, H + 4);
+          cx.strokeStyle = `rgba(0,200,255,${isMid ? 0.5 : 0.14})`;
+          cx.lineWidth = isMid ? 1.2 : 0.55;
           cx.stroke();
         }
-
-        // ── Horizontal lines ─────────────────────────────────────────
-        // Perspective formula: y = hz + C/wz  where C = (H-hz)*dz
-        // At wz=dz (n=1,scroll=0): y = H (bottom). As wz→∞: y→hz (horizon).
-        // Scrolling: wz = n*dz - scroll  →  lines rush toward camera (y increases).
         const C = (H - hz) * dz;
-
         for (let n = 1; n <= maxN; n++) {
           const wz = n * dz - scroll;
-          if (wz <= 0.015) continue;
+          if (wz <= 0.01) continue;
           const y = hz + C / wz;
-          if (y <= hz + 0.5 || y > H + 3) continue;
-
-          // X extents from boundary lines:
-          //  left  boundary: (vp,hz)→(0,H)  → x = vp*(1-frac)
-          //  right boundary: (vp,hz)→(W,H)  → x = vp+(W-vp)*frac
+          if (y <= hz + 0.5 || y > H + 4) continue;
           const frac = (y - hz) / (H - hz);
-          const lx = vp * (1 - frac);
-          const rx = vp + (W - vp) * frac;
-          const alpha = Math.min(0.44, frac * frac * 1.8);
-
+          const lx = vpX + (BL - vpX) * frac,
+            rx = vpX + (BR - vpX) * frac;
+          const alpha = Math.min(0.42, frac * frac * 1.8);
           cx.beginPath();
           cx.moveTo(lx, y);
           cx.lineTo(rx, y);
           cx.strokeStyle = `rgba(0,200,255,${alpha})`;
-          cx.lineWidth = 0.65;
+          cx.lineWidth = 0.55;
           cx.stroke();
         }
-
-        // Horizon line glow
-        const hgl = cx.createLinearGradient(0, hz - 2, 0, hz + 6);
+        const hgl = cx.createLinearGradient(0, hz - 2, 0, hz + 7);
         hgl.addColorStop(0, "rgba(0,200,255,0)");
-        hgl.addColorStop(0.5, "rgba(0,200,255,.16)");
+        hgl.addColorStop(0.5, "rgba(0,200,255,.17)");
         hgl.addColorStop(1, "rgba(0,200,255,0)");
         cx.fillStyle = hgl;
-        cx.fillRect(0, hz - 2, W, 8);
-
+        cx.fillRect(0, hz - 2, W, 9);
         cx.restore();
       }
-
       function mkLightning(W, H) {
-        const x = Math.random() * W,
-          y0 = Math.random() * H * 0.22,
-          y1 = y0 + 55 + Math.random() * 105;
+        const x = rnd() * W,
+          y0 = rnd() * H * 0.22,
+          y1 = y0 + 50 + rnd() * 100;
         const pts = [{ x, y: y0 }];
         let cx2 = x,
           cy = y0;
         while (cy < y1) {
-          cy += 7 + Math.random() * 14;
-          cx2 += (Math.random() - 0.5) * 36;
+          cy += 7 + rnd() * 13;
+          cx2 += (rnd() - 0.5) * 33;
           pts.push({ x: cx2, y: cy });
         }
         const br = [];
-        if (pts.length > 2 && Math.random() > 0.5) {
+        if (pts.length > 2 && rnd() > 0.52) {
           const bi = Math.floor(pts.length * 0.4);
           let bx = pts[bi].x,
             by = pts[bi].y;
           const bp = [{ x: bx, y: by }];
-          for (let i = 0; i < 3 + Math.floor(Math.random() * 4); i++) {
-            by += 6 + Math.random() * 10;
-            bx += (Math.random() - 0.5) * 26;
+          for (let i = 0; i < 3 + Math.floor(rnd() * 4); i++) {
+            by += 5 + rnd() * 9;
+            bx += (rnd() - 0.5) * 23;
             bp.push({ x: bx, y: by });
           }
           br.push(bp);
         }
-        return { pts, br, a: 1, dk: 0.048 + Math.random() * 0.052 };
+        return { pts, br, a: 1, dk: 0.046 + rnd() * 0.05 };
       }
       function drawLP(pts, w, a) {
         if (pts.length < 2) return;
         cx.beginPath();
         cx.moveTo(pts[0].x, pts[0].y);
         for (let i = 1; i < pts.length; i++) cx.lineTo(pts[i].x, pts[i].y);
-        cx.strokeStyle = `rgba(160,210,255,${a})`;
+        cx.strokeStyle = `rgba(160,212,255,${a})`;
         cx.lineWidth = w;
-        cx.shadowBlur = 12;
+        cx.shadowBlur = 10;
         cx.shadowColor = "#55aaff";
         cx.stroke();
         cx.shadowBlur = 0;
@@ -1586,10 +1968,9 @@
       requestAnimationFrame(loop);
 
       // ═══════════ BOOT ═══════════
-
       (function () {
-        const bootL = [
-          "INITIALIZING GRID RUNTIME v1.2.0...",
+        const BL = [
+          "INITIALIZING GRID RUNTIME v1.3.0...",
           "LOADING MONACO EDITOR ENGINE...",
           "MOUNTING PRETTIER FORMATTER v2.8.8...",
           "SPAWNING WORKER SANDBOX...",
@@ -1602,7 +1983,7 @@
           logo.style.opacity = "1";
           logo.style.transition = "opacity .5s";
         }, 100);
-        bootL.forEach((t, i) =>
+        BL.forEach((t, i) =>
           setTimeout(
             () => {
               const d = document.createElement("div");
@@ -1610,7 +1991,7 @@
               d.textContent = "> " + t;
               lines.appendChild(d);
             },
-            200 + i * 190,
+            200 + i * 185,
           ),
         );
         setTimeout(
@@ -1618,19 +1999,21 @@
             document.getElementById("boot").classList.add("done");
             setTimeout(() => document.getElementById("boot").remove(), 700);
           },
-          200 + bootL.length * 190 + 300,
+          200 + BL.length * 185 + 280,
         );
       })();
 
       // ═══════════ STATE ═══════════
-
       let view = "home",
         curCat = null,
         curTask = null,
         curTab = "ed";
       let editor = null,
         solCode = "",
-        wkBlob = null;
+        wkBlob = null,
+        _editorLoading = false;
+      let focusCatIdx = -1,
+        focusTaskIdx = -1;
 
       function showView(id) {
         document
@@ -1638,33 +2021,43 @@
           .forEach((v) => v.classList.remove("active"));
         document.getElementById("view-" + id).classList.add("active");
         view = id;
+        document.getElementById("hud").style.display =
+          id === "home" ? "flex" : "none";
+        if (id === "home") {
+          focusCatIdx = -1;
+        }
+        if (id === "category") {
+          focusTaskIdx = -1;
+        }
       }
 
       // ═══════════ ICON PRELOAD ═══════════
-
-      (async function preloadIcons() {
-        for (const cat of CATS) {
-          try {
-            const svg = await fetch(`grid/${cat.folder}/icon.svg`).then((r) => {
-              if (!r.ok) throw 0;
-              return r.text();
-            });
-            cat._icon = svg;
-          } catch (e) {
-            cat._icon = cat.icon;
-          }
-        }
-        renderCats(document.getElementById("srch").value);
+      (async () => {
+        await Promise.all(
+          MENU.map(async (cat) => {
+            try {
+              const svg = await fetch(`grid/${cat.folder}/icon.svg`).then(
+                (r) => {
+                  if (!r.ok) throw 0;
+                  return r.text();
+                },
+              );
+              ICONSTORE[cat.folder] = svg;
+            } catch (e) {
+              ICONSTORE[cat.folder] = FALLBACK_SVG;
+            }
+          }),
+        );
+        renderCats("");
       })();
 
       // ═══════════ FILE LOADING ═══════════
-
       async function loadTask(cat, task) {
         const key = `${cat.id}/${task.id}`;
-        if (FILE_CACHE[key]) return FILE_CACHE[key];
+        if (FILECACHE[key]) return FILECACHE[key];
         const base = `grid/${cat.folder}/${task.file}`;
-        const load = (url) =>
-          fetch(url).then((r) => {
+        const load = (u) =>
+          fetch(u).then((r) => {
             if (!r.ok) throw 0;
             return r.text();
           });
@@ -1674,116 +2067,280 @@
             load(`${base}.spec.js`),
             load(`${base}.sol.js`).catch(() => null),
           ]);
-          FILE_CACHE[key] = { code, spec, sol };
+          FILECACHE[key] = { code, spec, sol };
         } catch (e) {
-          FILE_CACHE[key] = {
-            code: `// ⚠ Could not load ${task.file}.js\n// Run build.sh and serve via HTTP:\n//   python3 -m http.server 8080\n//   open http://localhost:8080/grid-runner.html\n`,
-            spec: `// ⚠ Could not load ${task.file}.spec.js`,
+          FILECACHE[key] = {
+            code: `// ⚠ File not found: ${task.file}.js\n// Start: python3 -m http.server 8080\n`,
+            spec: `// ⚠ File not found: ${task.file}.spec.js`,
             sol: null,
           };
         }
-        return FILE_CACHE[key];
+        return FILECACHE[key];
       }
 
-      // ═══════════ HOME ═══════════
+      // ═══════════ SEARCH ═══════════
+      let _srchTimer = null,
+        _srchPage = 1,
+        _srchAll = [],
+        _srchFocusIdx = -1;
+      const PAGE_SRCH = 5;
 
-      function renderCats(q = "") {
-        const g = document.getElementById("cat-grid");
+      document.getElementById("srch").addEventListener("input", (e) => {
+        clearTimeout(_srchTimer);
+        const q = e.target.value.trim();
+        if (!q) {
+          hideSrch();
+          renderCats("");
+          return;
+        }
+        _srchTimer = setTimeout(() => doSearch(q), 270);
+      });
+      document.getElementById("srch").addEventListener("keydown", (e) => {
+        playType();
+        if (e.key === "Escape") {
+          e.preventDefault();
+          clearSrch();
+          return;
+        }
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const rows = document.querySelectorAll(".srch-row");
+          if (_srchFocusIdx >= 0 && rows[_srchFocusIdx]) {
+            rows[_srchFocusIdx].click();
+            return;
+          }
+          if (_srchAll.length === 1) {
+            navigateToTask(_srchAll[0].cat, _srchAll[0].task);
+            return;
+          }
+          return;
+        }
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          const rows = document.querySelectorAll(".srch-row");
+          if (!rows.length) return;
+          _srchFocusIdx = Math.min(_srchFocusIdx + 1, rows.length - 1);
+          rows.forEach((r, i) =>
+            r.classList.toggle("focused", i === _srchFocusIdx),
+          );
+          return;
+        }
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          const rows = document.querySelectorAll(".srch-row");
+          if (!rows.length) return;
+          _srchFocusIdx = Math.max(_srchFocusIdx - 1, 0);
+          rows.forEach((r, i) =>
+            r.classList.toggle("focused", i === _srchFocusIdx),
+          );
+          return;
+        }
+      });
+      function clearSrch() {
+        document.getElementById("srch").value = "";
+        _srchFocusIdx = -1;
+        hideSrch();
+        renderCats("");
+        document.getElementById("srch").blur();
+      }
+      function hideSrch() {
         const sr = document.getElementById("srch-results");
-        g.innerHTML = "";
         sr.innerHTML = "";
         sr.classList.remove("show");
-        if (q) {
-          const ql = q.toLowerCase(),
-            matches = [];
-          CATS.forEach((cat) =>
-            cat.tasks.forEach((t) => {
-              if (
-                t.id.toLowerCase().includes(ql) ||
-                t.title.toLowerCase().includes(ql) ||
-                t.desc.toLowerCase().includes(ql)
-              )
-                matches.push({ cat, task: t });
-            }),
-          );
-          if (matches.length) {
-            const lbl = document.createElement("div");
-            lbl.className = "srch-lbl";
-            lbl.textContent = `// ${matches.length} MATCH${matches.length > 1 ? "ES" : ""} //`;
-            sr.appendChild(lbl);
-            matches.forEach(({ cat, task }) => {
-              const el = document.createElement("div");
-              el.className = "srch-row";
-              el.innerHTML = `<span class="srch-cat">${cat.name}</span>
-          <span class="srch-id">${task.id.toUpperCase()}</span>
-          <span class="srch-desc">— ${task.desc}</span>
-          <span class="srch-st ${diffCls(task.diff)}">${mkStars(task.diff)}</span>`;
-              el.onclick = () => {
-                playNav();
-                openTask(cat, task);
-              };
-              sr.appendChild(el);
-            });
-            sr.classList.add("show");
-          }
-          CATS.forEach((cat) => {
-            const cm =
-              cat.name.toLowerCase().includes(ql) ||
-              cat.desc.toLowerCase().includes(ql);
-            const tm = cat.tasks.some(
+        _srchAll = [];
+        _srchPage = 1;
+        _srchFocusIdx = -1;
+      }
+      function doSearch(q) {
+        const ql = q.toLowerCase();
+        _srchAll = [];
+        MENU.forEach((cat) =>
+          cat.tasks.forEach((t) => {
+            if (
+              t.id.toLowerCase().includes(ql) ||
+              t.title.toLowerCase().includes(ql) ||
+              t.desc.toLowerCase().includes(ql)
+            )
+              _srchAll.push({ cat, task: t });
+          }),
+        );
+        _srchPage = 1;
+        _srchFocusIdx = -1;
+        renderSrch();
+        // filter categories too
+        _filteredMenu = MENU.filter((cat) => {
+          return (
+            cat.name.toLowerCase().includes(ql) ||
+            cat.desc.toLowerCase().includes(ql) ||
+            cat.tasks.some(
               (t) =>
                 t.id.toLowerCase().includes(ql) ||
                 t.title.toLowerCase().includes(ql) ||
                 t.desc.toLowerCase().includes(ql),
-            );
-            if (!cm && !tm) return;
-            addCatCard(g, cat);
-          });
+            )
+          );
+        });
+        catPage = 0;
+        renderCatGrid(_filteredMenu);
+      }
+      function renderSrch() {
+        const sr = document.getElementById("srch-results");
+        sr.innerHTML = "";
+        if (!_srchAll.length) {
+          sr.classList.remove("show");
           return;
         }
-        CATS.forEach((cat) => addCatCard(g, cat));
+        sr.classList.add("show");
+        const lbl = document.createElement("div");
+        lbl.className = "srch-lbl";
+        lbl.textContent = `// ${_srchAll.length} MATCH${_srchAll.length !== 1 ? "ES" : ""} FOUND //`;
+        sr.appendChild(lbl);
+        const slice = _srchAll.slice(0, _srchPage * PAGE_SRCH);
+        slice.forEach(({ cat, task }, i) => {
+          const el = document.createElement("div");
+          el.className = "srch-row";
+          if (i === _srchFocusIdx) el.classList.add("focused");
+          el.innerHTML = `<span class="srch-cat">${cat.name}</span>
+      <span class="srch-id">${task.id.toUpperCase()}</span>
+      <span class="srch-desc">— ${task.desc}</span>
+      <span class="srch-st ${diffCls(task.diff)}">${mkStars(task.diff)}</span>`;
+          el.onclick = () => navigateToTask(cat, task);
+          sr.appendChild(el);
+        });
+        if (_srchAll.length > slice.length) {
+          const more = document.createElement("div");
+          more.className = "srch-more";
+          more.textContent = `▼ SHOW MORE (${_srchAll.length - slice.length} remaining)`;
+          more.onclick = () => {
+            _srchPage++;
+            renderSrch();
+          };
+          sr.appendChild(more);
+        }
+      }
+      function navigateToTask(cat, task) {
+        playNav();
+        clearSrch();
+        openTask(cat, task);
       }
 
-      function addCatCard(g, cat) {
-        const el = document.createElement("div");
-        el.className = "cat-card";
-        el.innerHTML = `<div class="cat-icon">${cat._icon || cat.icon}</div>
-    <div class="cat-name">${cat.name}</div>
-    <div class="cat-meta">${cat.tasks.length} PROTOCOLS</div>`;
-        el.onclick = () => {
-          playNav();
-          openCat(cat);
-        };
-        g.appendChild(el);
+      // ═══════════ HOME / CAT GRID + PAGINATION ═══════════
+      function renderCats(q) {
+        if (q) {
+          return;
+        } // handled by doSearch
+        _filteredMenu = MENU;
+        catPage = 0;
+        renderCatGrid(MENU);
       }
 
-      document
-        .getElementById("srch")
-        .addEventListener("input", (e) => renderCats(e.target.value));
-      document
-        .getElementById("srch")
-        .addEventListener("keydown", () => playType());
-      renderCats();
+      function renderCatGrid(list) {
+        const totalPages = Math.ceil(list.length / PAGE_SIZE);
+        const pageItems = list.slice(
+          catPage * PAGE_SIZE,
+          (catPage + 1) * PAGE_SIZE,
+        );
+        const g = document.getElementById("cat-grid");
+        g.innerHTML = "";
+        focusCatIdx = -1;
+        pageItems.forEach((cat) => {
+          const el = document.createElement("div");
+          el.className = "cat-card";
+          const icon = ICONSTORE[cat.folder] || FALLBACK_SVG;
+          el.innerHTML = `<div class="cat-icon">${icon}</div>
+      <div class="cat-name">${cat.name}</div>
+      <div class="cat-meta">${cat.tasks.length ? cat.tasks.length + " PROTOCOLS" : "COMING SOON"}</div>`;
+          el.onclick = () => {
+            playNav();
+            openCat(cat);
+          };
+          g.appendChild(el);
+        });
+        // pagination
+        const pager = document.getElementById("cat-pager");
+        if (totalPages <= 1) {
+          pager.style.display = "none";
+          return;
+        }
+        pager.style.display = "flex";
+        document
+          .getElementById("pag-prev")
+          .classList.toggle("disabled", catPage === 0);
+        document
+          .getElementById("pag-next")
+          .classList.toggle("disabled", catPage >= totalPages - 1);
+        const dots = document.getElementById("pag-dots");
+        dots.innerHTML = "";
+        for (let i = 0; i < totalPages; i++) {
+          const d = document.createElement("div");
+          d.className = "pag-dot" + (i === catPage ? " active" : "");
+          d.onclick = (() => {
+            const p = i;
+            return () => {
+              catPage = p;
+              renderCatGrid(_filteredMenu);
+              playClick();
+            };
+          })();
+          dots.appendChild(d);
+        }
+      }
+      function prevCatPage() {
+        if (catPage > 0) {
+          catPage--;
+          renderCatGrid(_filteredMenu);
+          playClick();
+        }
+      }
+      function nextCatPage() {
+        const tp = Math.ceil(_filteredMenu.length / PAGE_SIZE);
+        if (catPage < tp - 1) {
+          catPage++;
+          renderCatGrid(_filteredMenu);
+          playClick();
+        }
+      }
 
-      // ═══════════ CATEGORY ═══════════
+      // ═══════════ CATEGORY (bottom sheet) ═══════════
+      function handleCatBgClick(e) {
+        // clicking the backdrop (not the sheet) goes back
+        if (
+          e.target === e.currentTarget ||
+          e.target.classList.contains("cat-backdrop")
+        ) {
+          playClick();
+          showView("home");
+        }
+      }
 
       function openCat(cat) {
         curCat = cat;
         document.getElementById("cat-lbl").textContent =
           cat.name + " // " + cat.desc;
-        document.getElementById("cat-cnt").textContent =
-          cat.tasks.length + " TASKS";
+        document.getElementById("cat-cnt").textContent = cat.tasks.length
+          ? cat.tasks.length + " TASKS"
+          : "NO TASKS";
         renderTaskList(cat);
         showView("category");
       }
+
       function renderTaskList(cat) {
         const el = document.getElementById("task-list");
         el.innerHTML = "";
+        focusTaskIdx = -1;
+        if (!cat.tasks.length) {
+          el.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;color:var(--txd);font-size:.74rem;padding:22px;text-align:center;opacity:.45">// NO TASKS IN THIS CATEGORY YET //</div>`;
+          return;
+        }
+        const total = cat.tasks.length;
         cat.tasks.forEach((t, i) => {
           const st = STATUS[`${cat.id}/${t.id}`] || "";
           const dc = diffCls(t.diff);
           const row = document.createElement("div");
           row.className = "task-row";
+          // Stagger: bottom item animates first → top item animates last
+          // delay = (total-1-i)*30ms  so i=last has delay=0, i=0 has max delay
+          row.style.animationDelay = `${(total - 1 - i) * 30}ms`;
           row.innerHTML = `<div class="trow-l">
       <div class="t-dot${st === "ok" ? " ok" : st === "ng" ? " ng" : ""}"></div>
       <div class="t-num">${String(i + 1).padStart(2, "0")}.</div>
@@ -1813,42 +2370,40 @@
                 ? "d78"
                 : "d910";
       }
-      document.getElementById("bk-cat").onclick = () => {
+      document.getElementById("bk-cat").onclick = (e) => {
+        e.stopPropagation();
         playClick();
         showView("home");
       };
 
       // ═══════════ TASK ═══════════
-
       async function openTask(cat, task) {
         curCat = cat;
         curTask = task;
         curTab = "ed";
         document.getElementById("breadc").innerHTML =
-          `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span> <span style="color:var(--txd)">— ${task.desc}</span>`;
+          `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>`;
         setTabs("ed");
         hideSolOverlay();
         clearResults();
-        setStatus("");
+        setStatus("⟳ Loading…");
         showView("task");
-
-        // Show loading placeholder
+        _editorLoading = true;
         if (editor) {
           editor.setValue("// Loading…");
           editor.updateOptions({ readOnly: true });
         }
-
         const files = await loadTask(cat, task);
+        _editorLoading = false;
         const key = `${cat.id}/${task.id}`;
         solCode = CODE[key] !== undefined ? CODE[key] : files.code;
-
         if (editor) {
           editor.setValue(solCode);
           editor.updateOptions({ readOnly: false });
           editor.focus();
         }
+        setStatus("");
       }
-
       function setTabs(t) {
         document.getElementById("tab-ed").classList.toggle("on", t === "ed");
         document.getElementById("tab-sp").classList.toggle("on", t === "sp");
@@ -1860,8 +2415,8 @@
         setTabs(t);
         hideSolOverlay();
         if (!editor || !curTask) return;
-        const key = `${curCat.id}/${curTask.id}`;
-        const files = FILE_CACHE[key];
+        const files = FILECACHE[`${curCat.id}/${curTask.id}`];
+        _editorLoading = true;
         if (t === "ed") {
           editor.setValue(solCode);
           editor.updateOptions({ readOnly: false });
@@ -1870,11 +2425,11 @@
           editor.setValue(files.spec || "// spec not loaded");
           editor.updateOptions({ readOnly: true });
         }
+        _editorLoading = false;
       }
       function hideSolOverlay() {
         document.getElementById("sol-overlay").classList.remove("show");
       }
-
       function requestSolutions() {
         playClick();
         if (!curTask) return;
@@ -1887,79 +2442,94 @@
       function doShowSolution() {
         playClick();
         closeModal();
-        const key = `${curCat.id}/${curTask.id}`;
-        const files = FILE_CACHE[key];
-        const sol = (files && files.sol) || null;
+        const files = FILECACHE[`${curCat.id}/${curTask.id}`];
         setTabs("sol");
         document.getElementById("sol-code").textContent =
-          sol ||
-          "// No reference solution available.\n// Run build.sh to set up task files.";
-        document.getElementById("sol-note").textContent = sol
-          ? "// grid/" + curCat.folder + "/" + curTask.file + ".sol.js //"
+          files?.sol ||
+          "// No reference solution available.\n// Run build.sh to generate task files.";
+        document.getElementById("sol-note").textContent = files?.sol
+          ? `// grid/${curCat.folder}/${curTask.file}.sol.js`
           : "";
         document.getElementById("sol-overlay").classList.add("show");
       }
-
       document.getElementById("bk-task").onclick = () => {
         playClick();
-        if (editor && curTask) {
+        if (editor && curTask && !_editorLoading) {
           solCode = editor.getValue();
           CODE[`${curCat.id}/${curTask.id}`] = solCode;
         }
+        closeMobResults();
         hideSolOverlay();
         showView("category");
       };
-
       document.getElementById("modal").addEventListener("click", (e) => {
         if (e.target === e.currentTarget) closeModal();
       });
 
-      // ═══════════ MONACO ═══════════
-
-      require.config({
-        paths: {
-          vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs",
-        },
-      });
+      // ═══════════ MONACO — DARK SOLARIZED ═══════════
+      require.config({ paths: { vs: "assets/monaco/vs" } });
       require(["vs/editor/editor.main"], function () {
-        monaco.editor.defineTheme("tron", {
+        monaco.editor.defineTheme("solarized-dark", {
           base: "vs-dark",
-          inherit: true,
+          inherit: false,
           rules: [
-            { token: "keyword", foreground: "00ccff", fontStyle: "bold" },
-            { token: "string", foreground: "00ff88" },
-            { token: "comment", foreground: "1a5544", fontStyle: "italic" },
-            { token: "number", foreground: "ff55ff" },
-            { token: "regexp", foreground: "ffaa00" },
-            { token: "delimiter", foreground: "007788" },
+            { token: "", foreground: "839496", background: "002b36" },
+            { token: "keyword", foreground: "859900", fontStyle: "bold" },
+            { token: "keyword.operator", foreground: "657b83" },
+            { token: "string", foreground: "2aa198" },
+            { token: "string.escape", foreground: "cb4b16" },
+            { token: "comment", foreground: "586e75", fontStyle: "italic" },
+            { token: "number", foreground: "d33682" },
+            { token: "regexp", foreground: "cb4b16" },
+            { token: "regexp.escape", foreground: "dc322f" },
+            { token: "delimiter", foreground: "586e75" },
+            { token: "delimiter.curly", foreground: "657b83" },
+            { token: "delimiter.paren", foreground: "657b83" },
+            { token: "delimiter.square", foreground: "657b83" },
+            { token: "type", foreground: "268bd2" },
+            { token: "variable", foreground: "839496" },
+            { token: "identifier", foreground: "268bd2" },
+            { token: "constant", foreground: "b58900" },
+            { token: "function", foreground: "268bd2" },
           ],
           colors: {
-            "editor.background": "#000810",
-            "editor.foreground": "#b0dce0",
-            "editorCursor.foreground": "#00ffff",
-            "editor.lineHighlightBackground": "#001420",
-            "editorLineNumber.foreground": "#003b4a",
-            "editorLineNumber.activeForeground": "#00aacc",
-            "editor.selectionBackground": "#003344",
-            "editorGutter.background": "#000610",
-            "editorWidget.background": "#000d1a",
-            "editorWidget.border": "#004455",
-            "editorSuggestWidget.background": "#000d1a",
-            "editorSuggestWidget.border": "#004455",
-            "editorSuggestWidget.selectedBackground": "#001a2a",
-            "list.hoverBackground": "#001420",
-            "list.activeSelectionBackground": "#002233",
-            "scrollbarSlider.background": "rgba(0,150,180,.18)",
-            "scrollbarSlider.hoverBackground": "rgba(0,200,255,.28)",
-            "editor.findMatchBackground": "rgba(255,200,0,.28)",
+            "editor.background": "#002b36",
+            "editor.foreground": "#839496",
+            "editorCursor.foreground": "#2aa198",
+            "editor.lineHighlightBackground": "#073642",
+            "editor.selectionBackground": "#073642",
+            "editor.inactiveSelectionBackground": "#03303a",
+            "editorLineNumber.foreground": "#405c64",
+            "editorLineNumber.activeForeground": "#839496",
+            "editorGutter.background": "#002028",
+            "editorIndentGuide.background": "#073642",
+            "editorIndentGuide.activeBackground": "#586e75",
+            "editorWidget.background": "#002b36",
+            "editorWidget.border": "#073642",
+            "editorSuggestWidget.background": "#002b36",
+            "editorSuggestWidget.border": "#073642",
+            "editorSuggestWidget.selectedBackground": "#073642",
+            "editorSuggestWidget.foreground": "#839496",
+            "editorSuggestWidget.highlightForeground": "#2aa198",
+            "list.hoverBackground": "#073642",
+            "list.activeSelectionBackground": "#073642",
+            "list.activeSelectionForeground": "#93a1a1",
+            "scrollbarSlider.background": "rgba(42,161,152,.22)",
+            "scrollbarSlider.hoverBackground": "rgba(42,161,152,.42)",
+            "scrollbarSlider.activeBackground": "rgba(42,161,152,.62)",
+            "editor.findMatchBackground": "rgba(181,137,0,.3)",
+            "editor.findMatchHighlightBackground": "rgba(181,137,0,.15)",
+            "editorBracketMatch.background": "rgba(42,161,152,.2)",
+            "editorBracketMatch.border": "#2aa198",
           },
         });
         editor = monaco.editor.create(document.getElementById("monaco"), {
           value: "",
           language: "javascript",
-          theme: "tron",
+          theme: "solarized-dark",
           fontSize: 14,
-          fontFamily: '"Share Tech Mono","Fira Code","Cascadia Code",monospace',
+          fontFamily: '"JetBrains Mono",monospace',
+          fontWeight: "bold",
           fontLigatures: true,
           lineNumbers: "on",
           minimap: { enabled: false },
@@ -1967,30 +2537,30 @@
           automaticLayout: true,
           tabSize: 2,
           renderWhitespace: "selection",
-          cursorBlinking: "smooth", // smooth blinking
-          cursorStyle: "line", // I-beam
+          cursorBlinking: "smooth",
+          cursorStyle: "line",
           cursorWidth: 2,
           smoothScrolling: true,
-          padding: { top: 14, bottom: 14 },
+          padding: { top: 13, bottom: 13 },
           wordWrap: "on",
           contextmenu: true,
           fixedOverflowWidgets: true,
+          scrollbar: { verticalScrollbarSize: 3, horizontalScrollbarSize: 3 },
         });
         editor.onDidChangeModelContent(() => {
-          if (curTab === "ed" && curTask) {
+          if (!_editorLoading && curTab === "ed" && curTask) {
             solCode = editor.getValue();
             CODE[`${curCat.id}/${curTask.id}`] = solCode;
           }
-          playType();
+          if (!_editorLoading) playType();
         });
-        if (curTask) {
+        if (curTask && !_editorLoading) {
           editor.setValue(solCode);
           editor.updateOptions({ readOnly: false });
         }
       });
 
       // ═══════════ PRETTIER ═══════════
-
       function fmt(code) {
         try {
           if (typeof prettier === "undefined")
@@ -2018,7 +2588,6 @@
       }
 
       // ═══════════ WORKER ═══════════
-
       function getWkUrl() {
         if (!wkBlob) {
           const src = document.getElementById("wk").textContent;
@@ -2049,49 +2618,58 @@
         });
       }
 
-      // ═══════════ FORMAT & RUN ═══════════
+      // ═══════════ MOBILE RESULTS SHEET ═══════════
+      function isMobile() {
+        return window.innerWidth <= 680;
+      }
+      function openMobResults() {
+        if (isMobile())
+          document.getElementById("res-panel").classList.add("mob-open");
+      }
+      function closeMobResults() {
+        document.getElementById("res-panel").classList.remove("mob-open");
+      }
 
+      // ═══════════ FORMAT & RUN ═══════════
       async function formatAndRun() {
         if (!curTask || view !== "task") return;
         const key = `${curCat.id}/${curTask.id}`;
-        const files = FILE_CACHE[key];
+        const files = FILECACHE[key];
         if (!files) {
-          setStatus("⚠ Task files not loaded", "err");
+          setStatus("⚠ Files not loaded", "err");
           return;
         }
-
         playRunStart();
         if (curTab !== "ed") switchTab("ed");
         const btn = document.getElementById("run-btn");
         btn.classList.add("go");
         btn.textContent = "⟳ RUNNING";
         let code = editor ? editor.getValue() : solCode;
-
         setStatus("⟳ Formatting...");
         const f = fmt(code);
         if (f.ok) {
           code = f.code;
           solCode = code;
           CODE[key] = code;
+          _editorLoading = true;
           if (editor) {
             const pos = editor.getPosition();
             editor.setValue(code);
             if (pos) editor.setPosition(pos);
           }
+          _editorLoading = false;
           setStatus("✓ Formatted", "ok");
         } else {
           setStatus("⚠ Format skipped: " + f.err.split("\n")[0], "err");
         }
-
         document.getElementById("res-body").innerHTML =
-          `<div class="res-empty"><div style="font-size:1.3rem;animation:blk .38s infinite alternate">⟳</div><div>EXECUTING...</div></div>`;
+          `<div class="res-empty"><div style="font-size:1.2rem;animation:blk .36s infinite alternate">⟳</div><div>EXECUTING...</div></div>`;
         document.getElementById("res-sum").innerHTML = "";
-
         const r = await runWorker(code, files.spec);
         btn.classList.remove("go");
         btn.textContent = "▶ RUN";
         renderResults(r);
-
+        openMobResults();
         if (!r.error) {
           const all = Object.values(r.suites).flat();
           const st =
@@ -2100,28 +2678,25 @@
               : all.some((t) => t.status !== "pass")
                 ? "ng"
                 : "";
-          if (st) {
-            STATUS[key] = st;
-          }
+          if (st) STATUS[key] = st;
           if (st === "ok") playAllPass();
           else if (st === "ng") playFail();
         } else playError();
       }
 
       // ═══════════ RENDER ═══════════
-
       function renderResults(r) {
         const body = document.getElementById("res-body"),
           sum = document.getElementById("res-sum");
         if (r.error) {
-          body.innerHTML = `<div style="padding:12px"><div style="color:#ff4040;font-family:'Share Tech Mono',monospace;font-size:.76rem;border-left:2px solid #ff4040;padding-left:10px"><div style="margin-bottom:4px;color:#ff6060">⚠ ERROR</div><div style="white-space:pre-wrap;color:#cc3030">${esc(r.error)}</div></div></div>`;
+          body.innerHTML = `<div style="padding:11px"><div style="color:#dc322f;font-family:'JetBrains Mono',monospace;font-size:.74rem;border-left:2px solid #dc322f;padding-left:9px"><div style="margin-bottom:3px;color:#cb4b16">⚠ ERROR</div><div style="white-space:pre-wrap;color:#a93020">${esc(r.error)}</div></div></div>`;
           sum.innerHTML = `<span class="bf">✗ ERROR</span>`;
           return;
         }
-        const suites = r.suites || {};
-        const all = Object.values(suites).flat();
-        const pass = all.filter((t) => t.status === "pass").length;
-        const fail = all.filter((t) => t.status !== "pass").length;
+        const suites = r.suites || {},
+          all = Object.values(suites).flat();
+        const pass = all.filter((t) => t.status === "pass").length,
+          fail = all.filter((t) => t.status !== "pass").length;
         sum.innerHTML = `<span class="bp">✓ ${pass}</span>${fail ? `<span class="bf"> ✗ ${fail}</span>` : ""}<span class="bt">${(r.total || 0).toFixed(2)}ms</span>`;
         if (!all.length) {
           body.innerHTML = `<div class="res-empty"><div>NO TESTS FOUND</div></div>`;
@@ -2129,15 +2704,15 @@
         }
         let h = "";
         Object.entries(suites).forEach(([sn, tests]) => {
-          if (!tests || !tests.length) return;
+          if (!tests?.length) return;
           h += `<div class="r-suite">`;
           if (sn !== "__root__")
             h += `<div class="r-suite-nm">${esc(sn)}</div>`;
           tests.forEach((t) => {
             const mem =
               t.mem != null ? (t.mem >= 0 ? "+" : "") + fmtB(t.mem) : "";
-            h += `<div class="r-item ${t.status}">
-        <div class="r-nr"><span class="r-ico">${t.status === "pass" ? "●" : "✗"}</span><span class="r-nm">${esc(t.name)}</span>
+            h += `<div class="r-item ${t.status}"><div class="r-nr">
+        <span class="r-ico">${t.status === "pass" ? "●" : "✗"}</span><span class="r-nm">${esc(t.name)}</span>
         <span class="r-ms">${t.time.toFixed(2)}ms</span>${mem ? `<span class="r-mem">${mem}</span>` : ""}</div>
         ${t.error ? `<div class="r-err">${esc(t.error)}</div>` : ""}
       </div>`;
@@ -2148,7 +2723,7 @@
       }
       function clearResults() {
         document.getElementById("res-body").innerHTML =
-          `<div class="res-empty"><div class="ico">⬡</div><div>AWAITING EXECUTION</div><div style="opacity:.35;font-size:.66rem;margin-top:4px">Click ▶ RUN</div></div>`;
+          `<div class="res-empty"><div class="ico">⬡</div><div>AWAITING EXECUTION</div><div style="opacity:.28;font-size:.62rem;margin-top:3px">▶ RUN</div></div>`;
         document.getElementById("res-sum").innerHTML = "";
       }
       function setStatus(msg, cls = "") {
@@ -2169,9 +2744,13 @@
       }
 
       // ═══════════ KEYBOARD ═══════════
-
       document.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === "s") e.preventDefault(); // block browser save, no run
+        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+          e.preventDefault();
+          if (TEST_ON_SAVE && view === "task") formatAndRun();
+          return;
+        }
+
         if (e.key === "Escape") {
           if (!document.getElementById("modal").classList.contains("hide")) {
             closeModal();
@@ -2180,10 +2759,98 @@
           if (view === "task") {
             playClick();
             document.getElementById("bk-task").click();
-          } else if (view === "category") {
+            return;
+          }
+          if (view === "category") {
             playClick();
             showView("home");
+            return;
           }
+          return;
+        }
+
+        // F → focus search (home view only, when not already in input)
+        if (
+          (e.key === "f" || e.key === "F") &&
+          view === "home" &&
+          e.target !== document.getElementById("srch") &&
+          !e.ctrlKey &&
+          !e.metaKey
+        ) {
+          e.preventDefault();
+          document.getElementById("srch").focus();
+          return;
+        }
+
+        // Don't intercept when typing in search or editor
+        if (e.target === document.getElementById("srch")) return;
+        if (
+          view === "task" &&
+          document.activeElement &&
+          document.getElementById("monaco").contains(document.activeElement)
+        )
+          return;
+
+        const isUp = e.key === "ArrowUp" || e.key === "w" || e.key === "W";
+        const isDown = e.key === "ArrowDown" || e.key === "s" || e.key === "S";
+        const isLeft = e.key === "ArrowLeft" || e.key === "a" || e.key === "A";
+        const isRight =
+          e.key === "ArrowRight" || e.key === "d" || e.key === "D";
+        const isEnter = e.key === "Enter";
+
+        if (view === "home") {
+          const cards = document
+            .getElementById("cat-grid")
+            .querySelectorAll(".cat-card");
+          if (!cards.length) return;
+          const cols = 3,
+            max = cards.length - 1;
+          if (isRight) {
+            e.preventDefault();
+            focusCatIdx = Math.min(focusCatIdx + 1, max);
+          } else if (isLeft) {
+            e.preventDefault();
+            focusCatIdx = Math.max(focusCatIdx - 1, 0);
+          } else if (isDown) {
+            e.preventDefault();
+            focusCatIdx = Math.min(focusCatIdx + cols, max);
+          } else if (isUp) {
+            e.preventDefault();
+            focusCatIdx = Math.max(focusCatIdx - cols, 0);
+          } else if (isEnter && focusCatIdx >= 0) {
+            e.preventDefault();
+            cards[focusCatIdx].click();
+            return;
+          } else return;
+          if (focusCatIdx < 0) focusCatIdx = 0;
+          cards.forEach((c, i) =>
+            c.classList.toggle("focused", i === focusCatIdx),
+          );
+          cards[focusCatIdx].scrollIntoView({ block: "nearest" });
+          return;
+        }
+        if (view === "category") {
+          const rows = document
+            .getElementById("task-list")
+            .querySelectorAll(".task-row");
+          if (!rows.length) return;
+          if (isDown || isRight) {
+            e.preventDefault();
+            focusTaskIdx = Math.min(focusTaskIdx + 1, rows.length - 1);
+          } else if (isUp || isLeft) {
+            e.preventDefault();
+            focusTaskIdx = Math.max(focusTaskIdx - 1, 0);
+          } else if (isEnter && focusTaskIdx >= 0) {
+            e.preventDefault();
+            rows[focusTaskIdx].click();
+            return;
+          } else return;
+          if (focusTaskIdx < 0) focusTaskIdx = 0;
+          rows.forEach((r, i) =>
+            r.classList.toggle("focused", i === focusTaskIdx),
+          );
+          rows[focusTaskIdx].scrollIntoView({ block: "nearest" });
+          return;
         }
       });
     </script>
