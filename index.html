@@ -13,6 +13,7 @@
     <script src="assets/prettier-standalone.js"></script>
     <script src="assets/prettier-parser-babel.js"></script>
     <script src="assets/monaco/vs/loader.js"></script>
+    <script src="menu.js"></script>
     <style>
       *,
       *::before,
@@ -139,39 +140,24 @@
       }
 
       /* ── HOME ── */
-      /* Two-zone layout: header is vertically centered in top half, grid scrolls below */
+      /* overflow-y on the view; margin:auto on content for vertical centering.
+   When content < viewport → auto margins split space → true center.
+   When content > viewport (search results) → margins collapse → scrollable from top. */
       #view-home {
-        flex-direction: column;
         align-items: center;
-        overflow: hidden;
+        overflow-y: auto;
         padding: 0;
       }
-      .home-top {
+      .home-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 10px;
-        flex-shrink: 0;
+        gap: 11px;
         width: 100%;
         max-width: 720px;
-        padding: 12px 10px 10px;
-        /* stays ~40% of screen height → never shifts on pagination */
-        min-height: min(44vh, 280px);
-      }
-      .home-grid-area {
-        flex: 1;
-        overflow-y: auto;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        padding: 0 10px 14px;
-        min-height: 0;
-      }
-      .home-grid-area::-webkit-scrollbar {
-        width: 3px;
+        padding: 14px 10px 18px;
+        margin-top: auto;
+        margin-bottom: auto;
       }
 
       .home-hdr {
@@ -179,6 +165,7 @@
         flex-direction: column;
         align-items: center;
         gap: 5px;
+        flex-shrink: 0;
         width: 100%;
       }
       .logo {
@@ -550,10 +537,24 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      /* ── Virtual scroll task list ── */
       .task-list {
         flex: 1;
         overflow-y: auto;
-        padding: 6px 10px 8px;
+        position: relative;
+        padding: 0 10px;
+      }
+      .task-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .task-vspace {
+        flex-shrink: 0;
+      } /* total height spacer */
+      .task-window {
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        top: 0;
         display: flex;
         flex-direction: column;
         gap: 4px;
@@ -566,19 +567,22 @@
         background: rgba(0, 20, 32, 0.75);
         border: 1px solid var(--bd);
         cursor: pointer;
-        transition: all 0.14s;
+        transition:
+          border-color 0.14s,
+          box-shadow 0.14s,
+          background 0.14s,
+          padding-left 0.14s;
         position: relative;
-        opacity: 0;
-        animation: rowSlide 0.22s ease forwards;
+        animation: rowSlide 0.18s ease both;
       }
       @keyframes rowSlide {
         from {
           opacity: 0;
-          transform: translateY(14px);
+          transform: translateX(-8px);
         }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translateX(0);
         }
       }
       .task-row::before {
@@ -1109,9 +1113,9 @@
         }
 
         /* Home: tighter */
-        .home-top {
-          min-height: auto;
-          padding: 8px 8px 6px;
+        .home-content {
+          gap: 8px;
+          padding: 10px 8px 14px;
         }
         .logo {
           font-size: clamp(1.2rem, 6vw, 2rem);
@@ -1134,83 +1138,6 @@
           padding: 2px 6px;
         }
       }
-
-      /* ── STRICT MODE TOGGLE ── */
-      .strict-grp {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        flex-shrink: 0;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.63rem;
-        color: var(--txd);
-        cursor: pointer;
-        user-select: none;
-        padding: 3px 7px;
-        border: 1px solid var(--bd);
-        transition: all 0.14s;
-        white-space: nowrap;
-      }
-      .strict-grp:hover {
-        border-color: var(--c);
-        color: var(--c);
-      }
-      .strict-grp.strict-on {
-        border-color: #b58900;
-        color: #b58900;
-        background: rgba(181, 137, 0, 0.07);
-      }
-      .strict-grp.strict-locked {
-        opacity: 0.75;
-        cursor: not-allowed;
-      }
-      .strict-chk {
-        width: 11px;
-        height: 11px;
-        border: 1px solid currentColor;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.55rem;
-      }
-
-      /* ── FONT SIZE CONTROL ── */
-      .fz-grp {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        flex-shrink: 0;
-      }
-      .fz-btn {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.8rem;
-        width: 20px;
-        height: 20px;
-        border: 1px solid var(--bd);
-        background: transparent;
-        color: var(--txd);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.12s;
-        line-height: 1;
-        padding: 0;
-      }
-      .fz-btn:hover {
-        border-color: var(--c);
-        color: var(--c);
-      }
-      .fz-val {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.62rem;
-        color: var(--txd);
-        min-width: 22px;
-        text-align: center;
-        pointer-events: none;
-      }
-
       #hud {
         position: fixed;
         bottom: 10px;
@@ -1357,8 +1284,7 @@
     <div id="app">
       <!-- HOME -->
       <div id="view-home" class="view active">
-        <!-- Top zone: logo + search. Height is fixed, never shifts. -->
-        <div class="home-top">
+        <div class="home-content">
           <div class="home-hdr">
             <div class="logo">GRID::RUNNER</div>
             <div class="logo-sub">
@@ -1375,11 +1301,8 @@
               spellcheck="false"
             />
           </div>
-        </div>
-        <!-- Bottom zone: search results + grid + pager. Scrolls independently. -->
-        <div class="home-grid-area" id="home-grid-area">
-          <div id="srch-results" style="width: 100%; max-width: 720px"></div>
-          <div class="cat-grid-wrap" style="width: 100%; max-width: 720px">
+          <div id="srch-results"></div>
+          <div class="cat-grid-wrap">
             <div class="cat-grid" id="cat-grid"></div>
           </div>
           <div class="cat-pager" id="cat-pager" style="display: none">
@@ -1436,26 +1359,6 @@
             >
               SOLUTIONS
             </button>
-          </div>
-          <!-- font size -->
-          <div
-            class="fz-grp"
-            id="fz-grp"
-            title="Editor font size (Ctrl+Scroll)"
-          >
-            <button class="fz-btn" onclick="changeFZ(-1)">−</button>
-            <span class="fz-val" id="fz-val">14</span>
-            <button class="fz-btn" onclick="changeFZ(+1)">+</button>
-          </div>
-          <!-- strict mode -->
-          <div
-            class="strict-grp strict-on"
-            id="strict-grp"
-            onclick="toggleStrict()"
-            title="STRICT MODE: compare speed vs reference solution"
-          >
-            <div class="strict-chk" id="strict-chk">✓</div>
-            <span>STRICT</span>
           </div>
           <div class="mem-grp">
             <span>MEM:</span>
@@ -1530,46 +1433,95 @@
       </div>
     </div>
 
-    <!-- WORKER -->
+    <!-- WORKER — runs in a separate thread; all tests are WebWorker-isolated -->
     <script id="wk" type="x/worker">
-      const suites={};let curSuite='__root__';
-      function describe(n,fn){curSuite=n;if(!suites[n])suites[n]=[];try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null});}}
-      function it(name,fn){
-        const s=curSuite;if(!suites[s])suites[s]=[];
-        const mb=self.performance?.memory?.usedJSHeapSize??-1,t0=self.performance.now();
-        try{fn();const dt=self.performance.now()-t0,ma=self.performance?.memory?.usedJSHeapSize??-1;
-          suites[s].push({name,status:'pass',time:dt,mem:ma>=0?ma-mb:null});}
-        catch(e){suites[s].push({name,status:'fail',error:e.message,time:self.performance.now()-t0,mem:null});}
+      // ── Jest-compatible mini test runner ──────────────────────────────
+      function makeRunner(){
+        const suites={};let curSuite='__root__';
+        function describe(n,fn){curSuite=n;if(!suites[n])suites[n]=[];try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null});}}
+        function it(name,fn){
+          const s=curSuite;if(!suites[s])suites[s]=[];
+          const mb=self.performance?.memory?.usedJSHeapSize??-1,t0=self.performance.now();
+          try{fn();const dt=self.performance.now()-t0,ma=self.performance?.memory?.usedJSHeapSize??-1;
+            suites[s].push({name,status:'pass',time:dt,mem:ma>=0?ma-mb:null});}
+          catch(e){suites[s].push({name,status:'fail',error:e.message,time:self.performance.now()-t0,mem:null});}
+        }
+        const test=it;
+        function expect(v){
+          function a(ok,msg){if(!ok)throw new Error(msg);}
+          const m={
+            toBe:(e)=>a(Object.is(v,e),'Expected '+JSON.stringify(e)+' got '+JSON.stringify(v)),
+            toEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'exp '+JSON.stringify(e)+' got '+JSON.stringify(v)),
+            toStrictEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'toStrictEqual failed'),
+            toMatch:(r)=>{const re=typeof r==='string'?new RegExp(r):r;a(re.test(String(v)),'toMatch failed');},
+            toBeTruthy:()=>a(!!v,'Expected truthy'),toBeFalsy:()=>a(!v,'Expected falsy'),
+            toBeNull:()=>a(v===null,'Expected null'),toBeUndefined:()=>a(v===undefined,'Expected undefined'),
+            toBeDefined:()=>a(v!==undefined,'Expected defined'),
+            toContain:(i)=>a(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'toContain failed'),
+            toHaveLength:(n)=>a(v!=null&&v.length===n,'Expected length '+n+' got '+(v?.length??'N/A')),
+            toBeGreaterThan:(n)=>a(v>n,v+'>'+n+' failed'),toBeLessThan:(n)=>a(v<n,v+'<'+n+' failed'),
+            toBeGreaterThanOrEqual:(n)=>a(v>=n,v+'>='+n+' failed'),toBeLessThanOrEqual:(n)=>a(v<=n,v+'<='+n+' failed'),
+            toThrow:()=>{try{v();a(false,'Expected to throw');}catch(e){}}
+          };
+          m.not={};Object.keys(m).forEach(k=>{if(k==='not')return;
+            m.not[k]=(...args)=>{let ok=false;try{m[k](...args);}catch(e){ok=true;}
+              if(!ok)throw new Error('NOT expected: '+k);};});
+          return m;
+        }
+        return{suites,describe,it,test,expect};
       }
-      const test=it;
-      function expect(v){
-        function a(ok,msg){if(!ok)throw new Error(msg);}
-        const m={
-          toBe:(e)=>a(Object.is(v,e),'Expected '+JSON.stringify(e)+' got '+JSON.stringify(v)),
-          toEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'exp '+JSON.stringify(e)+' got '+JSON.stringify(v)),
-          toStrictEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'toStrictEqual failed'),
-          toMatch:(r)=>{const re=typeof r==='string'?new RegExp(r):r;a(re.test(String(v)),'toMatch failed');},
-          toBeTruthy:()=>a(!!v,'Expected truthy'),toBeFalsy:()=>a(!v,'Expected falsy'),
-          toBeNull:()=>a(v===null,'Expected null'),toBeUndefined:()=>a(v===undefined,'Expected undefined'),
-          toBeDefined:()=>a(v!==undefined,'Expected defined'),
-          toContain:(i)=>a(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'toContain failed'),
-          toHaveLength:(n)=>a(v!=null&&v.length===n,'Expected length '+n+' got '+(v?.length??'N/A')),
-          toBeGreaterThan:(n)=>a(v>n,v+'>'+n+' failed'),toBeLessThan:(n)=>a(v<n,v+'<'+n+' failed'),
-          toBeGreaterThanOrEqual:(n)=>a(v>=n,v+'>='+n+' failed'),toBeLessThanOrEqual:(n)=>a(v<=n,v+'<='+n+' failed'),
-          toThrow:()=>{try{v();a(false,'Expected to throw');}catch(e){}}
-        };
-        m.not={};Object.keys(m).forEach(k=>{if(k==='not')return;
-          m.not[k]=(...args)=>{let ok=false;try{m[k](...args);}catch(e){ok=true;}
-            if(!ok)throw new Error('NOT expected: '+k);};});
-        return m;
-      }
-      self.onmessage=function(e){
-        const{sol,spec}=e.data,t0=self.performance.now();let ex;
+
+      // ── Single run ────────────────────────────────────────────────────
+      function singleRun(sol,spec){
+        const{suites,describe,it,test,expect}=makeRunner();
+        const t0=self.performance.now();
+        let ex;
         try{const mod={exports:{}};new Function('module','exports','require',sol)(mod,mod.exports,()=>mod.exports);ex=mod.exports;}
-        catch(err){self.postMessage({error:'SYNTAX/RUNTIME:\n'+err.message,suites:{},total:0});return;}
+        catch(err){return{error:'SYNTAX/RUNTIME:\n'+err.message,suites:{},total:0};}
         try{new Function('describe','it','test','expect','f','require',spec)(describe,it,test,expect,ex,()=>ex);}
         catch(err){if(!suites['__root__'])suites['__root__']=[];suites['__root__'].push({name:'spec error',status:'error',error:err.message,time:0,mem:null});}
-        self.postMessage({suites,total:self.performance.now()-t0});
+        return{suites,total:self.performance.now()-t0};
+      }
+
+      // ── Benchmark: run up to maxRuns times, stop at timeLimit ms ──────
+      // Returns {minTime, runs, suites (last run)}
+      function benchmark(sol,spec,maxRuns,timeLimit){
+        const wallStart=self.performance.now();
+        let minTime=Infinity,runs=0,lastResult=null;
+        while(runs<maxRuns&&(self.performance.now()-wallStart)<timeLimit){
+          const r=singleRun(sol,spec);
+          if(r.error) return{error:r.error};
+          const all=Object.values(r.suites).flat();
+          const totalTime=all.reduce((a,t)=>a+t.time,0);
+          if(totalTime<minTime) minTime=totalTime;
+          lastResult=r;
+          runs++;
+        }
+        return{minTime,runs,suites:lastResult?.suites||{},total:lastResult?.total||0};
+      }
+
+      self.onmessage=function(e){
+        const{sol,spec,mode,refSol,maxRuns,timeLimit}=e.data;
+
+        if(mode==='benchmark'){
+          // benchmark both ref and user, return minTimes
+          const refB=benchmark(refSol,spec,maxRuns,timeLimit);
+          if(refB.error){self.postMessage({error:'REF ERROR: '+refB.error});return;}
+          self.postMessage({type:'ref_done',refRuns:refB.runs,refMinTime:refB.minTime});
+
+          const userB=benchmark(sol,spec,maxRuns,timeLimit);
+          if(userB.error){self.postMessage({error:'USER ERROR: '+userB.error});return;}
+          self.postMessage({
+            type:'bench_done',
+            suites:userB.suites,total:userB.total,
+            userMinTime:userB.minTime,userRuns:userB.runs,
+            refMinTime:refB.minTime,refRuns:refB.runs,
+          });
+        } else {
+          // normal single run
+          const r=singleRun(sol,spec);
+          self.postMessage(r);
+        }
       };
     </script>
 
@@ -1578,239 +1530,6 @@
       //  CONFIG
       // ════════════════════════════════════════════════
       const TEST_ON_SAVE = true; // Ctrl+S triggers format + run
-
-      // Strict mode: user time must not exceed reference solution time × STRICT_FACTOR.
-      // 1.0 = exact parity, 1.5 = 50% slower allowed (default), 2.0 = 2× allowed.
-      const STRICT_FACTOR = 1.5;
-      const STRICT_DEFAULT = true; // strict mode on by default
-
-      const MENU = [
-        {
-          id: "regex",
-          name: "REGEX",
-          desc: "Pattern Matching",
-          folder: "regex",
-          tasks: [
-            {
-              id: "regex_1",
-              title: "Remove all words `cat`",
-              diff: 2,
-              desc: "Remove all occurrences of 'cat' (case-insensitive)",
-              file: "ex1",
-            },
-            {
-              id: "regex_2",
-              title: "Remove Mr. and Mrs.",
-              diff: 3,
-              desc: "Remove all Mr. and Mrs. from text",
-              file: "ex2",
-            },
-            {
-              id: "regex_3",
-              title: "Replace Google variations",
-              diff: 4,
-              desc: "Replace Google, Goooogle, etc. with Yandex",
-              file: "ex3",
-            },
-            {
-              id: "regex_4",
-              title: "Mask mid letter",
-              diff: 4,
-              desc: "Change lel. lil. to l*l. (with dots)",
-              file: "ex4",
-            },
-            {
-              id: "regex_5",
-              title: "4-letter owners",
-              diff: 5,
-              desc: "Find 4-letter names of rat/cat owners",
-              file: "ex5",
-            },
-            {
-              id: "regex_6",
-              title: "Remove 0-5 and Capitals",
-              diff: 4,
-              desc: "Remove digits 0-5 and uppercase letters",
-              file: "ex6",
-            },
-            {
-              id: "regex_7",
-              title: "Replace 'the' with 'a'",
-              diff: 3,
-              desc: "Replace all 'the' and 'The' with 'a'",
-              file: "ex7",
-            },
-            {
-              id: "regex_8",
-              title: "Validate 'xo' count",
-              diff: 5,
-              desc: "Check if message contains 'xo' 2 or 3 times",
-              file: "ex8",
-            },
-            {
-              id: "regex_9",
-              title: "Lines starting with 'The'",
-              diff: 4,
-              desc: "Count how many lines start with 'The'",
-              file: "ex9",
-            },
-            {
-              id: "regex_10",
-              title: "Format lol-like words",
-              diff: 6,
-              desc: "Change lel, lil to l*l, but keep lol",
-              file: "ex10",
-            },
-            {
-              id: "regex_11",
-              title: "Bills >= $100",
-              diff: 6,
-              desc: "Count bills that are more than or equal to $100",
-              file: "ex11",
-            },
-            {
-              id: "regex_12",
-              title: "Bills < $100",
-              diff: 6,
-              desc: "Count bills that are less than $100",
-              file: "ex12",
-            },
-            {
-              id: "regex_13",
-              title: "Bills in range",
-              diff: 6,
-              desc: "Count bills between $100 and $9999",
-              file: "ex13",
-            },
-            {
-              id: "regex_14",
-              title: "URL to Link",
-              diff: 8,
-              desc: "Transform social media URLs into HTML anchors",
-              file: "ex14",
-            },
-            {
-              id: "regex_15",
-              title: "Valid HTML",
-              diff: 6,
-              desc: "Check if the text is a single valid HTML document",
-              file: "ex15",
-            },
-            {
-              id: "regex_16",
-              title: "Count JS Comments",
-              diff: 7,
-              desc: "Count both single line and multi-line comments",
-              file: "ex16",
-            },
-            {
-              id: "regex_17",
-              title: "Trim &nbsp;",
-              diff: 5,
-              desc: "Trim non-breaking spaces in the text",
-              file: "ex17",
-            },
-            {
-              id: "regex_18",
-              title: "Special IP Count",
-              diff: 6,
-              desc: "Count IP addresses with specific patterns (4+ units)",
-              file: "ex18",
-            },
-            {
-              id: "regex_19",
-              title: "ASCII Password",
-              diff: 6,
-              desc: "Check if password consists only of ASCII symbols",
-              file: "ex19",
-            },
-            {
-              id: "regex_20",
-              title: "Capitalize Headers",
-              diff: 8,
-              desc: "Make all text within h1-h6 tags CAPITAL",
-              file: "ex20",
-            },
-            {
-              id: "regex_21",
-              title: "Same Letter Start/End",
-              diff: 7,
-              desc: "Count words ending with the same letter they start with",
-              file: "ex21",
-            },
-            {
-              id: "regex_22",
-              title: "Replace <b> tags",
-              diff: 6,
-              desc: "Replace all <b> tags with BTAG",
-              file: "ex22",
-            },
-            {
-              id: "regex_23",
-              title: "Exclude 'lol'",
-              diff: 6,
-              desc: "Find words like lel, lil, lal but NOT lol",
-              file: "ex23",
-            },
-            {
-              id: "regex_24",
-              title: "Phone Normalizer",
-              diff: 7,
-              desc: "Transform any phone format to digits only",
-              file: "ex24",
-            },
-            {
-              id: "regex_25",
-              title: "Lookahead/Behind",
-              diff: 7,
-              desc: "Extract prices and HTML titles using lookaround",
-              file: "ex25",
-            },
-            {
-              id: "regex_26",
-              title: "Product Quantifiers",
-              diff: 8,
-              desc: "Find product counts but omit prices",
-              file: "ex26",
-            },
-            {
-              id: "regex_27",
-              title: "Digit Count Logic",
-              diff: 9,
-              desc: "Regex for exactly 3, less than 3, or 3+ digits",
-              file: "ex27",
-            },
-            {
-              id: "regex_28",
-              title: "Strong Password",
-              diff: 9,
-              desc: "Complex validation (case, digits, special, length)",
-              file: "ex28",
-            },
-            {
-              id: "regex_29",
-              title: "Date Format DD/MM/YYYY",
-              diff: 7,
-              desc: "Find all correct dates in DD/MM/YYYY format",
-              file: "ex29",
-            },
-            {
-              id: "regex_30",
-              title: "Password Scavenger",
-              diff: 9,
-              desc: "Find all valid complex passwords in a large text",
-              file: "regex_30",
-            },
-            {
-              id: "regex_31",
-              title: "HEX Color Picker",
-              diff: 6,
-              desc: "Find valid HEX codes (#RGB, #RGBA, #RRGGBB, etc.)",
-              file: "ex31",
-            },
-          ],
-        },
-      ];
 
       const FALLBACK_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect x="4" y="4" width="40" height="40" rx="3" stroke="currentColor" stroke-width="1.5"/>
@@ -1824,17 +1543,6 @@
       const CODE = {};
       const FILECACHE = {};
       const ICONSTORE = {};
-
-      // ── Strict mode state ──
-      let _strictOn = STRICT_DEFAULT; // current toggle state
-      let _strictLocked = false; // task.strict=true → cannot turn off
-
-      // ── Font size (persisted to localStorage) ──
-      const FZ_KEY = "gr_fontsize";
-      const FZ_MIN = 9,
-        FZ_MAX = 28;
-      let _fz = parseInt(localStorage.getItem(FZ_KEY) || "14", 10);
-      if (_fz < FZ_MIN || _fz > FZ_MAX) _fz = 14;
 
       // ── Pagination ──
       const PAGE_SIZE = 9;
@@ -2517,23 +2225,76 @@
         showView("category");
       }
 
+      // ── Virtual scroll constants ──
+      const ROW_H = 52; // px per row (height + 4px gap)
+      const ROW_OVER = 4; // render extra rows above/below visible area
+      let _vsCat = null,
+        _vsScroll = 0,
+        _vsRaf = 0;
+
       function renderTaskList(cat) {
+        _vsCat = cat;
+        focusTaskIdx = -1;
         const el = document.getElementById("task-list");
         el.innerHTML = "";
-        focusTaskIdx = -1;
+
         if (!cat.tasks.length) {
           el.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;color:var(--txd);font-size:.74rem;padding:22px;text-align:center;opacity:.45">// NO TASKS IN THIS CATEGORY YET //</div>`;
           return;
         }
+
+        // Total height spacer (makes scrollbar the right size)
         const total = cat.tasks.length;
-        cat.tasks.forEach((t, i) => {
-          const st = STATUS[`${cat.id}/${t.id}`] || "";
+        const spacer = document.createElement("div");
+        spacer.style.height = total * ROW_H + 8 + "px";
+        spacer.style.pointerEvents = "none";
+        el.appendChild(spacer);
+
+        // Absolute-positioned window div
+        const win = document.createElement("div");
+        win.className = "task-window";
+        win.id = "task-window";
+        el.appendChild(win);
+
+        // Listen to scroll
+        el.onscroll = () => {
+          _vsScroll = el.scrollTop;
+          cancelAnimationFrame(_vsRaf);
+          _vsRaf = requestAnimationFrame(vsRender);
+        };
+
+        // Initial render (top-to-bottom, first items first)
+        vsRender();
+      }
+
+      function vsRender() {
+        if (!_vsCat) return;
+        const tasks = _vsCat.tasks;
+        const el = document.getElementById("task-list");
+        const win = document.getElementById("task-window");
+        if (!el || !win) return;
+
+        const viewH = el.clientHeight;
+        const scrollTop = el.scrollTop;
+
+        const firstIdx = Math.max(0, Math.floor(scrollTop / ROW_H) - ROW_OVER);
+        const lastIdx = Math.min(
+          tasks.length - 1,
+          Math.ceil((scrollTop + viewH) / ROW_H) + ROW_OVER,
+        );
+
+        win.style.top = firstIdx * ROW_H + 6 + "px";
+        win.innerHTML = "";
+
+        for (let i = firstIdx; i <= lastIdx; i++) {
+          const t = tasks[i];
+          const st = STATUS[`${_vsCat.id}/${t.id}`] || "";
           const dc = diffCls(t.diff);
           const row = document.createElement("div");
-          row.className = "task-row";
-          // Stagger: bottom item animates first → top item animates last
-          // delay = (total-1-i)*30ms  so i=last has delay=0, i=0 has max delay
-          row.style.animationDelay = `${(total - 1 - i) * 30}ms`;
+          row.className = "task-row" + (i === focusTaskIdx ? " focused" : "");
+          // Animate from top, short stagger (max 200ms so list feels snappy)
+          row.style.animationDelay = Math.min((i - firstIdx) * 18, 200) + "ms";
+          row.dataset.idx = i;
           row.innerHTML = `<div class="trow-l">
       <div class="t-dot${st === "ok" ? " ok" : st === "ng" ? " ng" : ""}"></div>
       <div class="t-num">${String(i + 1).padStart(2, "0")}.</div>
@@ -2542,10 +2303,10 @@
     <div class="stars-wrap"><span class="stars ${dc}">${mkStars(t.diff)}</span><span class="d-lbl">(${t.diff}/10)</span></div>`;
           row.onclick = () => {
             playNav();
-            openTask(cat, t);
+            openTask(_vsCat, t);
           };
-          el.appendChild(row);
-        });
+          win.appendChild(row);
+        }
       }
       function mkStars(d) {
         let s = "";
@@ -2574,10 +2335,6 @@
         curCat = cat;
         curTask = task;
         curTab = "ed";
-        // Strict mode: lock if task.strict===true, else use current toggle
-        _strictLocked = task.strict === true;
-        if (_strictLocked) _strictOn = true;
-        updateStrictUI();
         document.getElementById("breadc").innerHTML =
           `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>`;
         setTabs("ed");
@@ -2664,11 +2421,7 @@
       });
 
       // ═══════════ MONACO — DARK SOLARIZED ═══════════
-      require.config({
-        paths: {
-          vs: "assets/monaco/vs",
-        },
-      });
+      require.config({ paths: { vs: "assets/monaco/vs" } });
       require(["vs/editor/editor.main"], function () {
         monaco.editor.defineTheme("solarized-dark", {
           base: "vs-dark",
@@ -2728,7 +2481,7 @@
           value: "",
           language: "javascript",
           theme: "solarized-dark",
-          fontSize: _fz,
+          fontSize: 14,
           fontFamily: '"JetBrains Mono",monospace',
           fontWeight: "bold",
           fontLigatures: true,
@@ -2759,21 +2512,6 @@
           editor.setValue(solCode);
           editor.updateOptions({ readOnly: false });
         }
-        // Init font size display
-        document.getElementById("fz-val").textContent = _fz;
-        // Init strict mode UI
-        updateStrictUI();
-        // Ctrl+Wheel font size on monaco
-        document.getElementById("monaco").addEventListener(
-          "wheel",
-          (e) => {
-            if (!(e.ctrlKey || e.metaKey)) return;
-            e.preventDefault();
-            e.stopPropagation();
-            changeFZ(e.deltaY < 0 ? 1 : -1);
-          },
-          { passive: false },
-        );
       });
 
       // ═══════════ PRETTIER ═══════════
@@ -2834,48 +2572,6 @@
         });
       }
 
-      // ═══════════ FONT SIZE ═══════════
-      function applyFZ() {
-        if (editor) editor.updateOptions({ fontSize: _fz });
-        document.getElementById("fz-val").textContent = _fz;
-        localStorage.setItem(FZ_KEY, _fz);
-      }
-      function changeFZ(delta) {
-        _fz = Math.min(FZ_MAX, Math.max(FZ_MIN, _fz + delta));
-        applyFZ();
-      }
-      // Ctrl+Scroll on the editor area
-      document.getElementById("monaco") &&
-        document.addEventListener(
-          "wheel",
-          (e) => {
-            if (!(e.ctrlKey || e.metaKey)) return;
-            if (!document.getElementById("monaco").contains(e.target)) return;
-            e.preventDefault();
-            changeFZ(e.deltaY < 0 ? 1 : -1);
-          },
-          { passive: false },
-        );
-
-      // ═══════════ STRICT MODE ═══════════
-      function toggleStrict() {
-        if (_strictLocked) return;
-        _strictOn = !_strictOn;
-        updateStrictUI();
-        playClick();
-      }
-      function updateStrictUI() {
-        const g = document.getElementById("strict-grp");
-        const c = document.getElementById("strict-chk");
-        if (!g || !c) return;
-        g.classList.toggle("strict-on", _strictOn);
-        g.classList.toggle("strict-locked", _strictLocked);
-        c.textContent = _strictOn ? "✓" : "";
-        g.title = _strictLocked
-          ? "STRICT MODE locked — required by this task"
-          : `STRICT MODE ${_strictOn ? "ON" : "OFF"}: compare timing vs reference (×${STRICT_FACTOR})`;
-      }
-
       // ═══════════ MOBILE RESULTS SHEET ═══════════
       function isMobile() {
         return window.innerWidth <= 680;
@@ -2897,19 +2593,16 @@
           setStatus("⚠ Files not loaded", "err");
           return;
         }
-
         playRunStart();
         if (curTab !== "ed") switchTab("ed");
         const btn = document.getElementById("run-btn");
         btn.classList.add("go");
         btn.textContent = "⟳ RUNNING";
-
-        // Format
         let code = editor ? editor.getValue() : solCode;
         setStatus("⟳ Formatting...");
-        const fmtR = fmt(code);
-        if (fmtR.ok) {
-          code = fmtR.code;
+        const f = fmt(code);
+        if (f.ok) {
+          code = f.code;
           solCode = code;
           CODE[key] = code;
           _editorLoading = true;
@@ -2921,29 +2614,37 @@
           _editorLoading = false;
           setStatus("✓ Formatted", "ok");
         } else {
-          setStatus("⚠ Format skipped: " + fmtR.err.split("\n")[0], "err");
+          setStatus("⚠ Format skipped: " + f.err.split("\n")[0], "err");
         }
-
         document.getElementById("res-body").innerHTML =
           `<div class="res-empty"><div style="font-size:1.2rem;animation:blk .36s infinite alternate">⟳</div><div>EXECUTING...</div></div>`;
         document.getElementById("res-sum").innerHTML = "";
-
-        // Run user solution
-        setStatus("⟳ Running tests…");
         const r = await runWorker(code, files.spec);
 
-        // Strict mode: also benchmark the reference solution
-        let refResult = null;
-        if (_strictOn && files.sol) {
-          setStatus("⟳ Benchmarking reference solution…");
-          refResult = await runWorker(files.sol, files.spec);
+        // ── Strict mode: multi-run benchmark ──────────────────────────
+        let benchData = null;
+        if (_strictOn && files.sol && !r.error) {
+          const MAX_RUNS = 100,
+            TIME_LIMIT = 5000;
+          setStatus("⚡ STRICT — benchmarking reference…");
+          btn.textContent = "⟳ REF";
+          benchData = await runBenchmark(
+            files.sol,
+            code,
+            files.spec,
+            MAX_RUNS,
+            TIME_LIMIT,
+            () => {
+              setStatus("⚡ STRICT — benchmarking your solution…");
+              btn.textContent = "⟳ USR";
+            },
+          );
         }
 
         btn.classList.remove("go");
         btn.textContent = "▶ RUN";
-        renderResults(r, refResult);
+        renderResults(r, benchData);
         openMobResults();
-
         if (!r.error) {
           const all = Object.values(r.suites).flat();
           const st =
@@ -2959,54 +2660,111 @@
         setStatus("");
       }
 
+      // ── Multi-run benchmark dispatcher ──────────────────────────────
+      function runBenchmark(
+        refSol,
+        userSol,
+        spec,
+        maxRuns,
+        timeLimit,
+        onUserPhase,
+      ) {
+        return new Promise((res) => {
+          const w = new Worker(getWkUrl());
+          const dead = setTimeout(
+            () => {
+              w.terminate();
+              res(null);
+            },
+            timeLimit * 2 + 4000,
+          );
+          w.onmessage = (e) => {
+            const d = e.data;
+            if (!d || d.error) {
+              clearTimeout(dead);
+              w.terminate();
+              res(null);
+              return;
+            }
+            if (d.type === "ref_done") {
+              onUserPhase && onUserPhase();
+              return;
+            }
+            if (d.type === "bench_done") {
+              clearTimeout(dead);
+              w.terminate();
+              res({
+                userMinTime: d.userMinTime,
+                userRuns: d.userRuns,
+                refMinTime: d.refMinTime,
+                refRuns: d.refRuns,
+              });
+            }
+          };
+          w.onerror = () => {
+            clearTimeout(dead);
+            w.terminate();
+            res(null);
+          };
+          w.postMessage({
+            mode: "benchmark",
+            sol: userSol,
+            refSol,
+            spec,
+            maxRuns,
+            timeLimit,
+          });
+        });
+      }
+
       // ═══════════ RENDER ═══════════
-      function renderResults(r, refResult) {
+      function renderResults(r, benchData) {
         const body = document.getElementById("res-body"),
           sum = document.getElementById("res-sum");
-
         if (r.error) {
           body.innerHTML = `<div style="padding:11px"><div style="color:#dc322f;font-family:'JetBrains Mono',monospace;font-size:.74rem;border-left:2px solid #dc322f;padding-left:9px"><div style="margin-bottom:3px;color:#cb4b16">⚠ ERROR</div><div style="white-space:pre-wrap;color:#a93020">${esc(r.error)}</div></div></div>`;
           sum.innerHTML = `<span class="bf">✗ ERROR</span>`;
           return;
         }
-
         const suites = r.suites || {},
           all = Object.values(suites).flat();
-        const pass = all.filter((t) => t.status === "pass").length;
-        const fail = all.filter((t) => t.status !== "pass").length;
-
-        // Memory summary: collect all non-null mem values
+        const pass = all.filter((t) => t.status === "pass").length,
+          fail = all.filter((t) => t.status !== "pass").length;
         const mems = all.map((t) => t.mem).filter((m) => m != null);
         const totalMem = mems.length ? mems.reduce((a, b) => a + b, 0) : null;
         const memStr = totalMem != null ? fmtB(totalMem) : "";
 
-        // Strict mode: compute ref total time and per-test times
+        // Strict banner (STRICT_TOLERANCE = 10%)
         let strictBanner = "";
-        if (_strictOn && refResult && !refResult.error) {
-          const refAll = Object.values(refResult.suites || {}).flat();
-          const refTime = refAll.reduce((a, t) => a + t.time, 0);
-          const userTime = all.reduce((a, t) => a + t.time, 0);
-          const ratio = refTime > 0 ? userTime / refTime : 0;
-          const ok = ratio <= STRICT_FACTOR;
+        if (_strictOn && benchData) {
+          const { userMinTime, userRuns, refMinTime, refRuns } = benchData;
+          const TOLS = 0.1; // 10% tolerance
+          const ratio =
+            refMinTime > 0 ? (userMinTime - refMinTime) / refMinTime : 0;
+          const ok = ratio <= TOLS;
           const color = ok ? "#859900" : "#dc322f";
-          strictBanner = `<div style="display:flex;align-items:center;gap:8px;padding:4px 8px 6px;font-family:'JetBrains Mono',monospace;font-size:.65rem;border-bottom:1px solid var(--bd);flex-shrink:0">
-      <span style="color:${color};font-weight:bold">${ok ? "⚡ STRICT PASS" : "⚡ STRICT FAIL"}</span>
-      <span style="color:var(--txd)">user:</span><span style="color:${color}">${userTime.toFixed(2)}ms</span>
-      <span style="color:var(--txd)">ref:</span><span style="color:#2aa198">${refTime.toFixed(2)}ms</span>
-      <span style="color:var(--txd)">ratio:</span><span style="color:${color}">×${ratio.toFixed(2)}</span>
-      <span style="color:var(--txd)">(max ×${STRICT_FACTOR})</span>
+          strictBanner = `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:5px 9px 6px;font-family:'JetBrains Mono',monospace;font-size:.64rem;border-bottom:1px solid var(--bd);flex-shrink:0;background:rgba(0,0,0,.2)">
+      <span style="color:${color};font-weight:bold;letter-spacing:.08em">⚡ ${ok ? "STRICT PASS" : "STRICT FAIL"}</span>
+      <span style="color:var(--txd)">user min:</span><span style="color:${color}">${userMinTime.toFixed(3)}ms ×${userRuns}</span>
+      <span style="color:var(--txd)">ref min:</span><span style="color:#2aa198">${refMinTime.toFixed(3)}ms ×${refRuns}</span>
+      <span style="color:var(--txd)">delta:</span><span style="color:${color}">${ratio >= 0 ? "+" : ""}${(ratio * 100).toFixed(1)}% (limit +${(TOLS * 100).toFixed(0)}%)</span>
     </div>`;
+        } else if (
+          _strictOn &&
+          !benchData &&
+          files &&
+          FILECACHE[`${curCat.id}/${curTask.id}`]?.sol == null
+        ) {
+          strictBanner = `<div style="padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--txd);border-bottom:1px solid var(--bd)">⚡ STRICT: no .sol.js found — skipped</div>`;
         }
 
         sum.innerHTML = `<span class="bp">✓ ${pass}</span>${fail ? `<span class="bf"> ✗ ${fail}</span>` : ""}<span class="bt">${(r.total || 0).toFixed(2)}ms</span>${memStr ? `<span class="bt" style="color:#2aa198">${memStr}</span>` : ""}`;
-
         if (!all.length) {
           body.innerHTML =
             strictBanner +
             `<div class="res-empty"><div>NO TESTS FOUND</div></div>`;
           return;
         }
-
         let h = "";
         Object.entries(suites).forEach(([sn, tests]) => {
           if (!tests?.length) return;
@@ -3023,7 +2781,6 @@
           });
           h += `</div>`;
         });
-
         body.innerHTML = strictBanner + h;
       }
       function clearResults() {
