@@ -2579,6 +2579,18 @@
 
       // ═══════════ MONACO — DARK SOLARIZED ═══════════
       require.config({ paths: { vs: "assets/monaco/vs" } });
+
+      // ── Editor bracket-match palette (change these to restyle paired brackets) ──
+      const BRACKET_BG = "rgba(0,160,200,.18)"; // match-highlight fill
+      const BRACKET_BORDER = "#0099bb"; // match-highlight border
+      // Bracket pair colorization levels (foreground on the bracket chars themselves)
+      const BRACKET_L1 = "#00aacc"; // level 1 — cyan
+      const BRACKET_L2 = "#2aa198"; // level 2 — teal
+      const BRACKET_L3 = "#268bd2"; // level 3 — blue
+      const BRACKET_L4 = "#6c71c4"; // level 4 — indigo (solarized violet)
+      const BRACKET_L5 = "#00aacc"; // level 5 — repeat cycle
+      const BRACKET_L6 = "#2aa198"; // level 6 — repeat cycle
+
       require(["vs/editor/editor.main"], function () {
         monaco.editor.defineTheme("solarized-dark", {
           base: "vs-dark",
@@ -2630,8 +2642,24 @@
             "scrollbarSlider.activeBackground": "rgba(42,161,152,.62)",
             "editor.findMatchBackground": "rgba(181,137,0,.3)",
             "editor.findMatchHighlightBackground": "rgba(181,137,0,.15)",
-            "editorBracketMatch.background": "rgba(0,220,255,.15)",
-            "editorBracketMatch.border": "#00ddff",
+            // "editorBracketMatch.background": BRACKET_BG,
+            // "editorBracketMatch.border": BRACKET_BORDER,
+            // Bracket pair colorization — overrides the default red/green/blue cycle
+            // Bracket pair colorization foreground (the bracket characters)
+            // "editorBracketHighlight.foreground1": BRACKET_L1,
+            // "editorBracketHighlight.foreground2": BRACKET_L2,
+            // "editorBracketHighlight.foreground3": BRACKET_L3,
+            // "editorBracketHighlight.foreground4": BRACKET_L4,
+            // "editorBracketHighlight.foreground5": BRACKET_L5,
+            // "editorBracketHighlight.foreground6": BRACKET_L6,
+            // "editorBracketHighlight.unexpectedBracket.foreground": "#dc322f",
+            // Bracket pair colorization background (the box behind each bracket char)
+            // "editorBracketHighlight.background1": "#00000000",
+            // "editorBracketHighlight.background2": "#00000000",
+            // "editorBracketHighlight.background3": "#00000000",
+            // "editorBracketHighlight.background4": "#00000000",
+            // "editorBracketHighlight.background5": "#00000000",
+            // "editorBracketHighlight.background6": "#00000000",
           },
         });
         editor = monaco.editor.create(document.getElementById("monaco"), {
@@ -2657,6 +2685,7 @@
           contextmenu: true,
           fixedOverflowWidgets: true,
           scrollbar: { verticalScrollbarSize: 3, horizontalScrollbarSize: 3 },
+          bracketPairColorization: { enabled: false },
         });
         editor.onDidChangeModelContent(() => {
           if (!_editorLoading && curTab === "ed" && curTask) {
