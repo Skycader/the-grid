@@ -1,4 +1,4 @@
-const tasks = [
+window.CFG_regex = [
   {
     id: "regex_1",
     title: "Remove all words `cat`",
@@ -207,7 +207,7 @@ const tasks = [
     title: "Password Scavenger",
     diff: 9,
     desc: "Find all valid complex passwords in a large text",
-    file: "regex_30",
+    file: "ex30",
   },
   {
     id: "regex_31",

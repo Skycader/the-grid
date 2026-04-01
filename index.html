@@ -573,17 +573,7 @@
           background 0.14s,
           padding-left 0.14s;
         position: relative;
-        animation: rowSlide 0.18s ease both;
-      }
-      @keyframes rowSlide {
-        from {
-          opacity: 0;
-          transform: translateX(-8px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
+        animation: none;
       }
       .task-row::before {
         content: "";
@@ -1138,6 +1128,82 @@
           padding: 2px 6px;
         }
       }
+      /* ── STRICT MODE TOGGLE ── */
+      .strict-grp {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.63rem;
+        color: var(--txd);
+        cursor: pointer;
+        user-select: none;
+        padding: 3px 7px;
+        border: 1px solid var(--bd);
+        transition: all 0.14s;
+        white-space: nowrap;
+      }
+      .strict-grp:hover {
+        border-color: var(--c);
+        color: var(--c);
+      }
+      .strict-grp.strict-on {
+        border-color: #b58900;
+        color: #b58900;
+        background: rgba(181, 137, 0, 0.07);
+      }
+      .strict-grp.strict-locked {
+        opacity: 0.75;
+        cursor: not-allowed;
+      }
+      .strict-chk {
+        width: 11px;
+        height: 11px;
+        border: 1px solid currentColor;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.55rem;
+      }
+
+      /* ── FONT SIZE CONTROL ── */
+      .fz-grp {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+      .fz-btn {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--bd);
+        background: transparent;
+        color: var(--txd);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.12s;
+        line-height: 1;
+        padding: 0;
+      }
+      .fz-btn:hover {
+        border-color: var(--c);
+        color: var(--c);
+      }
+      .fz-val {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        color: var(--txd);
+        min-width: 22px;
+        text-align: center;
+        pointer-events: none;
+      }
+
       #hud {
         position: fixed;
         bottom: 10px;
@@ -1360,6 +1426,26 @@
               SOLUTIONS
             </button>
           </div>
+          <!-- font size -->
+          <div
+            class="fz-grp"
+            id="fz-grp"
+            title="Editor font size (Ctrl+Scroll)"
+          >
+            <button class="fz-btn" onclick="changeFZ(-1)">−</button>
+            <span class="fz-val" id="fz-val">14</span>
+            <button class="fz-btn" onclick="changeFZ(+1)">+</button>
+          </div>
+          <!-- strict mode -->
+          <div
+            class="strict-grp strict-on"
+            id="strict-grp"
+            onclick="toggleStrict()"
+            title="STRICT MODE: compare speed vs reference solution"
+          >
+            <div class="strict-chk" id="strict-chk">✓</div>
+            <span>STRICT</span>
+          </div>
           <div class="mem-grp">
             <span>MEM:</span>
             <input
@@ -1401,9 +1487,26 @@
               <div class="res-empty">
                 <div class="ico">⬡</div>
                 <div>AWAITING EXECUTION</div>
-                <div style="opacity: 0.28; font-size: 0.63rem; margin-top: 3px">
-                  ▶ RUN to execute
-                </div>
+                <button
+                  onclick="formatAndRun()"
+                  style="
+                    margin-top: 14px;
+                    font-family: &quot;Orbitron&quot;, sans-serif;
+                    font-size: 0.82rem;
+                    font-weight: 700;
+                    padding: 10px 32px;
+                    background: rgba(0, 255, 255, 0.08);
+                    border: 1px solid var(--c);
+                    color: var(--c);
+                    cursor: pointer;
+                    letter-spacing: 0.22em;
+                    transition: all 0.15s;
+                  "
+                  onmouseover="this.style.background = 'rgba(0,255,255,.18)'"
+                  onmouseout="this.style.background = 'rgba(0,255,255,.08)'"
+                >
+                  ▶ RUN
+                </button>
               </div>
             </div>
             <div class="statusbar" id="statusbar"></div>
@@ -1531,6 +1634,11 @@
       // ════════════════════════════════════════════════
       const TEST_ON_SAVE = true; // Ctrl+S triggers format + run
 
+      // Strict mode: user minTime must not exceed ref minTime × (1 + STRICT_TOLERANCE).
+      // 0.10 = 10% slower allowed (recommended). 0.0 = exact match required.
+      const STRICT_TOLERANCE = 0.1;
+      const STRICT_DEFAULT = true; // strict mode on by default
+
       const FALLBACK_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect x="4" y="4" width="40" height="40" rx="3" stroke="currentColor" stroke-width="1.5"/>
   <circle cx="24" cy="24" r="10" stroke="currentColor" stroke-width="1.5"/>
@@ -1543,6 +1651,17 @@
       const CODE = {};
       const FILECACHE = {};
       const ICONSTORE = {};
+
+      // ── Strict mode ──
+      let _strictOn = STRICT_DEFAULT;
+      let _strictLocked = false; // task.strict===true → cannot turn off
+
+      // ── Font size (persisted to localStorage) ──
+      const FZ_KEY = "gr_fontsize";
+      const FZ_MIN = 9,
+        FZ_MAX = 28;
+      let _fz = parseInt(localStorage.getItem(FZ_KEY) || "14", 10);
+      if (_fz < FZ_MIN || _fz > FZ_MAX) _fz = 14;
 
       // ── Pagination ──
       const PAGE_SIZE = 9;
@@ -1932,10 +2051,17 @@
         }
       }
 
-      // ═══════════ ICON PRELOAD ═══════════
+      // ═══════════════════════════════════════════════════════
+      // BOOT LOADER — runs once on startup
+      // Loads in parallel for each category:
+      //   1. grid/{folder}/icon.svg  → ICONSTORE
+      //   2. config/{folder}.js      → window.CFG_{id} → cat.tasks
+      // After all settle, renders the home grid.
+      // ═══════════════════════════════════════════════════════
       (async () => {
         await Promise.all(
           MENU.map(async (cat) => {
+            // Icons
             try {
               const svg = await fetch(`grid/${cat.folder}/icon.svg`).then(
                 (r) => {
@@ -1947,6 +2073,28 @@
             } catch (e) {
               ICONSTORE[cat.folder] = FALLBACK_SVG;
             }
+
+            // Config file — injected via window.CFG_{id}
+            // We load it with a <script> tag so it executes in global scope.
+            await new Promise((resolve) => {
+              const key = `CFG_${cat.id}`;
+              if (window[key]) {
+                cat.tasks = window[key];
+                resolve();
+                return;
+              }
+              const s = document.createElement("script");
+              s.src = `config/${cat.folder}.js`;
+              s.onload = () => {
+                cat.tasks = window[key] || [];
+                resolve();
+              };
+              s.onerror = () => {
+                cat.tasks = [];
+                resolve();
+              };
+              document.head.appendChild(s);
+            });
           }),
         );
         renderCats("");
@@ -2263,7 +2411,7 @@
           _vsRaf = requestAnimationFrame(vsRender);
         };
 
-        // Initial render (top-to-bottom, first items first)
+        // Render immediately — use sheet or window height as fallback if el not laid out yet
         vsRender();
       }
 
@@ -2274,8 +2422,14 @@
         const win = document.getElementById("task-window");
         if (!el || !win) return;
 
-        const viewH = el.clientHeight;
         const scrollTop = el.scrollTop;
+        // If layout not settled yet (animation), use sheet height or fallback to 20 rows
+        let viewH = el.clientHeight;
+        if (viewH < 20) {
+          const sheet = document.getElementById("cat-sheet");
+          viewH = sheet ? Math.max(sheet.clientHeight - 80, 0) : ROW_H * 20;
+          if (viewH < 20) viewH = ROW_H * 20; // absolute fallback: render 20
+        }
 
         const firstIdx = Math.max(0, Math.floor(scrollTop / ROW_H) - ROW_OVER);
         const lastIdx = Math.min(
@@ -2292,7 +2446,6 @@
           const dc = diffCls(t.diff);
           const row = document.createElement("div");
           row.className = "task-row" + (i === focusTaskIdx ? " focused" : "");
-          // Animate from top, short stagger (max 200ms so list feels snappy)
           row.style.animationDelay = Math.min((i - firstIdx) * 18, 200) + "ms";
           row.dataset.idx = i;
           row.innerHTML = `<div class="trow-l">
@@ -2335,6 +2488,12 @@
         curCat = cat;
         curTask = task;
         curTab = "ed";
+        // Strict: lock if task.strict===true
+        _strictLocked = task.strict === true;
+        if (_strictLocked) _strictOn = true;
+        updateStrictUI();
+        // Font size
+        applyFZ();
         document.getElementById("breadc").innerHTML =
           `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>`;
         setTabs("ed");
@@ -2512,6 +2671,20 @@
           editor.setValue(solCode);
           editor.updateOptions({ readOnly: false });
         }
+        // Init font size + strict UI
+        applyFZ();
+        updateStrictUI();
+        // Ctrl+Wheel to resize font
+        document.getElementById("monaco").addEventListener(
+          "wheel",
+          (e) => {
+            if (!(e.ctrlKey || e.metaKey)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            changeFZ(e.deltaY < 0 ? 1 : -1);
+          },
+          { passive: false },
+        );
       });
 
       // ═══════════ PRETTIER ═══════════
@@ -2570,6 +2743,37 @@
           };
           w.postMessage({ sol, spec });
         });
+      }
+
+      // ═══════════ FONT SIZE ═══════════
+      function applyFZ() {
+        if (editor) editor.updateOptions({ fontSize: _fz });
+        const el = document.getElementById("fz-val");
+        if (el) el.textContent = _fz;
+        localStorage.setItem(FZ_KEY, _fz);
+      }
+      function changeFZ(delta) {
+        _fz = Math.min(FZ_MAX, Math.max(FZ_MIN, _fz + delta));
+        applyFZ();
+      }
+
+      // ═══════════ STRICT MODE ═══════════
+      function toggleStrict() {
+        if (_strictLocked) return;
+        _strictOn = !_strictOn;
+        updateStrictUI();
+        playClick();
+      }
+      function updateStrictUI() {
+        const g = document.getElementById("strict-grp");
+        const c = document.getElementById("strict-chk");
+        if (!g || !c) return;
+        g.classList.toggle("strict-on", _strictOn);
+        g.classList.toggle("strict-locked", _strictLocked);
+        c.textContent = _strictOn ? "✓" : "";
+        g.title = _strictLocked
+          ? "STRICT MODE locked — required by this task"
+          : `STRICT MODE ${_strictOn ? "ON" : "OFF"}: compare timing vs reference (±${(STRICT_TOLERANCE * 100).toFixed(0)}%)`;
       }
 
       // ═══════════ MOBILE RESULTS SHEET ═══════════
