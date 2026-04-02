@@ -10,4 +10,5 @@
 // eslint-disable-next-line no-unused-vars
 const MENU = [
   { id: "regex", name: "REGEX", desc: "Pattern Matching", folder: "regex" },
+  { id: "algo", name: "ALGORITHM", desc: "Algorithm solving", folder: "algo" },
 ];
