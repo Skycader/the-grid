@@ -16,7 +16,7 @@ class Api {
   }
 }
 
-const binarySearch = require("./binary-search-api.js");
+const binarySearch = require("./alg1.js");
 
 describe("binarySearch: middle target", () => {
   const api = new Api([1, 2, 3, 10, 11, 20]);

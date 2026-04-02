@@ -1,4 +1,4 @@
-const f = require("./police.js");
+const f = require("./alg2.js");
 
 const testCase = {
   suspects: {
