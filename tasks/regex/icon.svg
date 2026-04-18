@@ -1,0 +1,6 @@
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="42" height="42" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <text x="7" y="27" font-family="monospace" font-size="18" fill="currentColor" font-weight="bold">.*</text>
+        <line x1="3" y1="32" x2="45" y2="32" stroke="currentColor" stroke-width="1" opacity=".35"/>
+        <text x="7" y="41" font-family="monospace" font-size="7" fill="currentColor" opacity=".5" letter-spacing="2">REGEX ENGINE</text>
+      </svg>
