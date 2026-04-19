@@ -1,6 +1,4 @@
-const r = require("./ex28.js");
-
-const f = (text) => r.test(text);
+const f = require("./ex28.js");
 
 describe("Running test cases for ex25", () => {
   it("...running test case #1", () => {
