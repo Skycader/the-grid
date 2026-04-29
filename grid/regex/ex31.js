@@ -8,8 +8,8 @@
  */
 
 const f = (text) => {
-  const r = /(#[A-Fa-f0-9]{3,4}\b)|(#[A-Fa-f0-9]{6}\b)|(#[A-Fa-f0-9]{8}\b)/gi;
-  return text.match(r) || [];
+  const r = //;
+  return 0;
 };
 
 module.exports = f;
