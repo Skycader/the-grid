@@ -21,7 +21,7 @@ window.CFG_algo = [
     name: "Logic",
     files: [
       {
-        id: "police_station",
+        id: "find_murderer",
         title: "Полицейский детектив",
         diff: 1,
         desc: "Определить преступника, который видел всех убитых",
