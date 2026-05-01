@@ -538,6 +538,66 @@
         text-overflow: ellipsis;
       }
       /* ── Virtual scroll task list ── */
+      /* Subcategory cards inside a category */
+      .subcat-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px 10px 4px;
+        border-bottom: 1px solid var(--bd);
+        flex-shrink: 0;
+      }
+      .subcat-card {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        background: rgba(0, 14, 24, 0.82);
+        border: 1px solid var(--bd);
+        cursor: pointer;
+        transition: all 0.15s;
+        min-width: 140px;
+        flex: 1;
+      }
+      .subcat-card:hover {
+        border-color: var(--c);
+        box-shadow: var(--glow);
+        background: rgba(0, 28, 40, 0.82);
+      }
+      .subcat-icon {
+        width: 28px;
+        height: 28px;
+        color: var(--c);
+        flex-shrink: 0;
+        filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.4));
+      }
+      .subcat-name {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--c);
+        letter-spacing: 0.14em;
+      }
+      .subcat-meta {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--txd);
+        margin-top: 1px;
+      }
+      /* Breadcrumb inside category header */
+      .cat-breadc {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--txd);
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .cat-breadc .act {
+        color: var(--c);
+      }
+
       .cat-search-wrap {
         padding: 5px 10px 4px;
         flex-shrink: 0;
@@ -1428,17 +1488,29 @@
           <div class="sheet-handle"></div>
           <div class="panel-hdr">
             <div class="bk" id="bk-cat">← BACK</div>
-            <div class="panel-title" id="cat-lbl">CATEGORY</div>
-            <div style="flex: 1"></div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                min-width: 0;
+                flex: 1;
+              "
+            >
+              <div class="panel-title" id="cat-lbl">CATEGORY</div>
+              <div class="cat-breadc" id="cat-breadc"></div>
+            </div>
             <div
               style="
                 font-family: &quot;JetBrains Mono&quot;, monospace;
                 font-size: 0.65rem;
                 color: var(--txd);
+                flex-shrink: 0;
               "
               id="cat-cnt"
             ></div>
           </div>
+          <div class="subcat-area" id="subcat-area" style="display: none"></div>
           <div class="cat-search-wrap">
             <input
               id="cat-srch"
@@ -2068,9 +2140,14 @@
 
       // ═══════════ STATE ═══════════
       let view = "home",
-        curCat = null,
         curTask = null,
         curTab = "ed";
+      // navStack — open path through the category tree
+      // navStack[0] = top-level cat, navStack[last] = currently viewed node
+      let navStack = [];
+      function curCat() {
+        return navStack[navStack.length - 1] || null;
+      }
       let editor = null,
         solCode = "",
         wkBlob = null,
@@ -2095,51 +2172,87 @@
       }
 
       // ═══════════════════════════════════════════════════════
-      // BOOT LOADER — runs once on startup
-      // Loads in parallel for each category:
+      // BOOT LOADER — recursive, handles arbitrary depth
+      // For every node (category or subcategory):
       //   1. grid/{folder}/icon.svg  → ICONSTORE
-      //   2. config/{folder}.js      → window.CFG_{id} → cat.tasks
-      // After all settle, renders the home grid.
+      //   2. config/{folder}.js      → window.CFG_{id} → node.tasks
+      //   3. Recurse into node.children[]
       // ═══════════════════════════════════════════════════════
-      (async () => {
-        await Promise.all(
-          MENU.map(async (cat) => {
-            // Icons
-            try {
-              const svg = await fetch(`grid/${cat.folder}/icon.svg`).then(
-                (r) => {
-                  if (!r.ok) throw 0;
-                  return r.text();
-                },
-              );
-              ICONSTORE[cat.folder] = svg;
-            } catch (e) {
-              ICONSTORE[cat.folder] = FALLBACK_SVG;
-            }
 
-            // Config file — injected via window.CFG_{id}
-            // We load it with a <script> tag so it executes in global scope.
-            await new Promise((resolve) => {
-              const key = `CFG_${cat.id}`;
-              if (window[key]) {
-                cat.tasks = window[key];
-                resolve();
-                return;
-              }
-              const s = document.createElement("script");
-              s.src = `config/${cat.folder}.js`;
-              s.onload = () => {
-                cat.tasks = window[key] || [];
-                resolve();
-              };
-              s.onerror = () => {
-                cat.tasks = [];
-                resolve();
-              };
-              document.head.appendChild(s);
-            });
-          }),
-        );
+      async function bootNode(node) {
+        // Icon
+        try {
+          const svg = await fetch(`grid/${node.folder}/icon.svg`).then((r) => {
+            if (!r.ok) throw 0;
+            return r.text();
+          });
+          ICONSTORE[node.folder] = svg;
+        } catch (e) {
+          ICONSTORE[node.folder] = FALLBACK_SVG;
+        }
+        // Config: tasks from window.CFG_{id}
+        node.tasks = node.tasks || [];
+        await new Promise((resolve) => {
+          const key = `CFG_${node.id}`;
+          if (window[key]) {
+            processConfig(node, window[key]);
+            resolve();
+            return;
+          }
+          const s = document.createElement("script");
+          s.src = `config/${node.folder}.js`;
+          s.onload = () => {
+            processConfig(node, window[key] || []);
+            resolve();
+          };
+          s.onerror = () => resolve();
+          document.head.appendChild(s);
+        });
+        // Recurse into children (from menu.js + virtual Folder nodes from config)
+        if (node.children && node.children.length) {
+          await Promise.all(node.children.map(bootNode));
+        }
+      }
+
+      // processConfig: plain tasks → node.tasks; {type:"Folder"} → virtual children
+      function processConfig(node, entries) {
+        node.tasks = node.tasks || [];
+        node.children = node.children || [];
+        for (const entry of entries) {
+          if (entry.type === "Folder") {
+            const folderPath =
+              entry.path ||
+              node.folder +
+                "/" +
+                entry.name
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9\-\/]/g, "");
+            const tasks = (entry.files || []).map((t) => ({
+              ...t,
+              _folder: folderPath,
+            }));
+            const childId = "vf_" + folderPath.replace(/\//g, "_");
+            // avoid duplicates if bootNode is called multiple times
+            if (!node.children.find((c) => c.id === childId)) {
+              node.children.push({
+                id: childId,
+                name: entry.name,
+                desc: entry.desc || "",
+                folder: folderPath,
+                tasks,
+                children: [],
+                _virtual: true,
+              });
+            }
+          } else {
+            node.tasks.push({ ...entry, _folder: node.folder });
+          }
+        }
+      }
+
+      (async () => {
+        await Promise.all(MENU.map(bootNode));
         renderCats("");
       })();
 
@@ -2147,7 +2260,9 @@
       async function loadTask(cat, task) {
         const key = `${cat.id}/${task.id}`;
         if (FILECACHE[key]) return FILECACHE[key];
-        const base = `grid/${cat.folder}/${task.file}`;
+        // task._folder set by processConfig (Folder items); fall back to cat.folder
+        const taskFolder = task._folder || cat.folder;
+        const base = `grid/${taskFolder}/${task.file}`;
         const t = Date.now(); // cache-bust: each page load gets fresh files
         const load = (u) =>
           fetch(`${u}?t=${t}`).then((r) => {
@@ -2244,19 +2359,27 @@
         _srchPage = 1;
         _srchFocusIdx = -1;
       }
+      // Recursively collect all {cat, task} pairs from the full menu tree
+      function gatherAllTasks(node, results) {
+        (node.tasks || []).forEach((t) => results.push({ cat: node, task: t }));
+        (node.children || []).forEach((child) =>
+          gatherAllTasks(child, results),
+        );
+      }
+
       function doSearch(q) {
         const ql = q.toLowerCase();
         _srchAll = [];
-        MENU.forEach((cat) =>
-          cat.tasks.forEach((t) => {
-            if (
-              t.id.toLowerCase().includes(ql) ||
-              t.title.toLowerCase().includes(ql) ||
-              t.desc.toLowerCase().includes(ql)
-            )
-              _srchAll.push({ cat, task: t });
-          }),
-        );
+        const all = [];
+        MENU.forEach((cat) => gatherAllTasks(cat, all));
+        all.forEach(({ cat, task: t }) => {
+          if (
+            t.id.toLowerCase().includes(ql) ||
+            t.title.toLowerCase().includes(ql) ||
+            t.desc.toLowerCase().includes(ql)
+          )
+            _srchAll.push({ cat, task: t });
+        });
         _srchPage = 1;
         _srchFocusIdx = -1;
         renderSrch();
@@ -2340,9 +2463,18 @@
           const el = document.createElement("div");
           el.className = "cat-card";
           const icon = ICONSTORE[cat.folder] || FALLBACK_SVG;
+          const taskCount = countTasks(cat);
+          const subCount = (cat.children || []).length;
+          const meta = taskCount
+            ? taskCount +
+              " TASKS" +
+              (subCount ? ", " + subCount + " FOLDERS" : "")
+            : subCount
+              ? subCount + " FOLDERS"
+              : "COMING SOON";
           el.innerHTML = `<div class="cat-icon">${icon}</div>
       <div class="cat-name">${cat.name}</div>
-      <div class="cat-meta">${cat.tasks.length ? cat.tasks.length + " PROTOCOLS" : "COMING SOON"}</div>`;
+      <div class="cat-meta">${meta}</div>`;
           el.onclick = () => {
             playNav();
             openCat(cat);
@@ -2406,23 +2538,96 @@
         }
       }
 
+      // Count all tasks recursively in a node
+      function countTasks(node) {
+        let n = (node.tasks || []).length;
+        (node.children || []).forEach((c) => {
+          n += countTasks(c);
+        });
+        return n;
+      }
+
       function openCat(cat) {
-        curCat = cat;
+        // Push onto nav stack (unless already the top)
+        if (!navStack.length || navStack[navStack.length - 1] !== cat) {
+          navStack.push(cat);
+        }
         document.getElementById("cat-lbl").textContent =
-          cat.name + " // " + cat.desc;
-        document.getElementById("cat-cnt").textContent = cat.tasks.length
-          ? cat.tasks.length + " TASKS"
-          : "NO TASKS";
+          cat.name + (cat.desc ? " // " + cat.desc : "");
+        const taskN = (cat.tasks || []).length;
+        const subN = (cat.children || []).length;
+        const meta =
+          [taskN ? taskN + " TASKS" : "", subN ? subN + " FOLDERS" : ""]
+            .filter(Boolean)
+            .join(", ") || "EMPTY";
+        document.getElementById("cat-cnt").textContent = meta;
         // Reset cat search
         const catSrch = document.getElementById("cat-srch");
-        if (catSrch) {
-          catSrch.value = "";
-        }
+        if (catSrch) catSrch.value = "";
         _vsQuery = "";
         _vsMatches = [];
         clearTimeout(_catsrchTimer);
-        renderTaskList(cat);
+        // Update breadcrumb
+        updateCatBreadcrumb();
+        renderCatContent(cat);
         showView("category");
+      }
+
+      function updateCatBreadcrumb() {
+        // Show path: HOME / ALGO / SORTING
+        const parts = navStack.map((n, i) => {
+          const isLast = i === navStack.length - 1;
+          return isLast
+            ? `<span class="act">${n.name}</span>`
+            : `<span style="cursor:pointer;color:var(--cd)" onclick="navTo(${i})">${n.name}</span>`;
+        });
+        const el = document.getElementById("cat-breadc");
+        if (el)
+          el.innerHTML = parts.join(
+            ' <span style="color:var(--txd)">/</span> ',
+          );
+      }
+
+      // Navigate to a specific depth in the stack (click on breadcrumb ancestor)
+      function navTo(idx) {
+        navStack = navStack.slice(0, idx + 1);
+        openCat(navStack[navStack.length - 1]);
+      }
+
+      // Render the current category node:
+      // - subcategory cards (if any children)
+      // - task list via virtual scroll (if any tasks)
+      function renderCatContent(cat) {
+        const subcats = cat.children || [];
+        const tasks = cat.tasks || [];
+
+        // Subcat cards
+        const subArea = document.getElementById("subcat-area");
+        if (subArea) {
+          if (subcats.length) {
+            subArea.style.display = "";
+            subArea.innerHTML = "";
+            subcats.forEach((sub) => {
+              const el = document.createElement("div");
+              el.className = "subcat-card";
+              const icon = ICONSTORE[sub.folder] || FALLBACK_SVG;
+              const n = countTasks(sub);
+              el.innerHTML = `<div class="subcat-icon">${icon}</div>
+                <div><div class="subcat-name">${sub.name}</div>
+                <div class="subcat-meta">${n ? n + " TASKS" : "EMPTY"}</div></div>`;
+              el.onclick = () => {
+                playNav();
+                openCat(sub);
+              };
+              subArea.appendChild(el);
+            });
+          } else {
+            subArea.style.display = "none";
+          }
+        }
+
+        // Tasks
+        renderTaskList(cat);
       }
 
       // ── Virtual scroll constants ──
@@ -2590,13 +2795,21 @@
       document.getElementById("bk-cat").onclick = (e) => {
         e.stopPropagation();
         playClick();
-        showView("home");
+        navStack.pop();
+        if (navStack.length) {
+          openCat(navStack[navStack.length - 1]);
+        } else {
+          showView("home");
+        }
       };
 
       // ═══════════ TASK ═══════════
       async function openTask(cat, task) {
-        curCat = cat;
         curTask = task;
+        // Ensure cat is on the navStack
+        if (!navStack.length || navStack[navStack.length - 1] !== cat) {
+          navStack.push(cat);
+        }
         curTab = "ed";
         // Strict: lock if task.strict===true
         _strictLocked = task.strict === true;
@@ -2638,7 +2851,7 @@
         setTabs(t);
         hideSolOverlay();
         if (!editor || !curTask) return;
-        const files = FILECACHE[`${curCat.id}/${curTask.id}`];
+        const files = FILECACHE[`${curCat().id}/${curTask.id}`];
         _editorLoading = true;
         if (t === "ed") {
           editor.setValue(solCode);
@@ -2665,13 +2878,13 @@
       function doShowSolution() {
         playClick();
         closeModal();
-        const files = FILECACHE[`${curCat.id}/${curTask.id}`];
+        const files = FILECACHE[`${curCat().id}/${curTask.id}`];
         setTabs("sol");
         document.getElementById("sol-code").textContent =
           files?.sol ||
           "// No reference solution available.\n// Run build.sh to generate task files.";
         document.getElementById("sol-note").textContent = files?.sol
-          ? `// grid/${curCat.folder}/${curTask.file}.sol.js`
+          ? `// grid/${curTask._folder || curCat().folder}/${curTask.file}.sol.js`
           : "";
         document.getElementById("sol-overlay").classList.add("show");
       }
@@ -2679,7 +2892,7 @@
         playClick();
         if (editor && curTask && !_editorLoading) {
           solCode = editor.getValue();
-          CODE[`${curCat.id}/${curTask.id}`] = solCode;
+          CODE[`${curCat().id}/${curTask.id}`] = solCode;
         }
         closeMobResults();
         hideSolOverlay();
@@ -2802,7 +3015,7 @@
         editor.onDidChangeModelContent(() => {
           if (!_editorLoading && curTab === "ed" && curTask) {
             solCode = editor.getValue();
-            CODE[`${curCat.id}/${curTask.id}`] = solCode;
+            CODE[`${curCat().id}/${curTask.id}`] = solCode;
           }
           if (!_editorLoading) playType();
         });
@@ -2930,7 +3143,7 @@
       // ═══════════ FORMAT & RUN ═══════════
       async function formatAndRun() {
         if (!curTask || view !== "task") return;
-        const key = `${curCat.id}/${curTask.id}`;
+        const key = `${curCat().id}/${curTask.id}`;
         const files = FILECACHE[key];
         if (!files) {
           setStatus("⚠ Files not loaded", "err");
@@ -3096,7 +3309,7 @@
           _strictOn &&
           !benchData &&
           files &&
-          FILECACHE[`${curCat.id}/${curTask.id}`]?.sol == null
+          FILECACHE[`${curCat().id}/${curTask.id}`]?.sol == null
         ) {
           strictBanner = `<div style="padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--txd);border-bottom:1px solid var(--bd)">⚡ STRICT: no .sol.js found — skipped</div>`;
         }
