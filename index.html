@@ -541,6 +541,7 @@
       /* Subcategory cards inside a category */
       .subcat-area {
         display: flex;
+        flex-direction: column;
         flex-wrap: wrap;
         gap: 6px;
         padding: 8px 10px 4px;
@@ -1510,7 +1511,6 @@
               id="cat-cnt"
             ></div>
           </div>
-          <div class="subcat-area" id="subcat-area" style="display: none"></div>
           <div class="cat-search-wrap">
             <input
               id="cat-srch"
@@ -1520,6 +1520,7 @@
               spellcheck="false"
             />
           </div>
+          <div class="subcat-area" id="subcat-area" style="display: none"></div>
           <div class="task-list" id="task-list"></div>
         </div>
       </div>

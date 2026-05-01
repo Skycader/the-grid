@@ -4,7 +4,7 @@ window.CFG_algo = [
   {
     type: "Folder",
     path: "algo/search",
-    name: "Search algorithms",
+    name: "Search",
     files: [
       {
         id: "binary_search",
@@ -18,7 +18,7 @@ window.CFG_algo = [
   {
     type: "Folder",
     path: "algo/logic",
-    name: "Logic algorithms",
+    name: "Logic",
     files: [
       {
         id: "police_station",
@@ -32,7 +32,7 @@ window.CFG_algo = [
   {
     type: "Folder",
     path: "algo/sorting",
-    name: "Sorting algorithms",
+    name: "Sorting",
     files: [
       {
         id: "selection_sort",
@@ -46,7 +46,7 @@ window.CFG_algo = [
   {
     type: "Folder",
     path: "algo/functional",
-    name: "Functional algorithms",
+    name: "Functional",
     files: [
       {
         id: "currying",
