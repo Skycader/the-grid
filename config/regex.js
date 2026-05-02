@@ -216,4 +216,11 @@ window.CFG_regex = [
     desc: "Find valid HEX codes (#RGB, #RGBA, #RRGGBB, etc.)",
     file: "ex31",
   },
+  {
+    id: "regex_32",
+    title: "Flares!",
+    diff: 3,
+    desc: "Find the real target",
+    file: "ex32",
+  },
 ];
