@@ -1686,20 +1686,38 @@
         return{suites,describe,it,test,expect};
       }
 
+      // ── compileSol: execute solution JS, return module.exports ─────
+      // Fully Node.js-compatible: module.exports, exports, require all work.
+      // require('./anything') returns the compiled exports so specs can do:
+      //   const f = require('./ex1.js')         → module.exports directly
+      //   const [r1,r2,r3] = require('./ex27.js') → destructured
+      //   const { fn } = require('./util.js')   → property access
+      function compileSol(sol) {
+        const mod = { exports: {} };
+        const requireFn = () => mod.exports;
+        new Function('module', 'exports', 'require', sol)(mod, mod.exports, requireFn);
+        return mod.exports;
+      }
+
       // ── Single run ────────────────────────────────────────────────────
-      function singleRun(sol,spec){
-        const{suites,describe,it,test,expect}=makeRunner();
-        const t0=self.performance.now();
+      // No cleanSpec stripping, no injected `f` param — clean Node.js semantics.
+      // Each call has its own fresh context: no scope bleed between ref and user runs.
+      function singleRun(sol, spec) {
+        const {suites, describe, it, test, expect} = makeRunner();
+        const t0 = self.performance.now();
         let ex;
-        try{const mod={exports:{}};new Function('module','exports','require',sol)(mod,mod.exports,()=>mod.exports);ex=mod.exports;}
-        catch(err){return{error:'SYNTAX/RUNTIME:\n'+err.message,suites:{},total:0};}
-        // Strip "const f = require(...)" / "f = require(...)" lines — the module
-        // is already loaded as `ex` and passed in as `f`. Redeclaring causes
-        // "Identifier 'f' has already been declared" in strict-mode functions.
-        const cleanSpec = spec.replace(/^.*\brequire\s*\(['"]\.[^'"]*['"]\s*\).*$/gm, '');
-        try{new Function('describe','it','test','expect','f','require',cleanSpec)(describe,it,test,expect,ex,()=>ex);}
-        catch(err){if(!suites['__root__'])suites['__root__']=[];suites['__root__'].push({name:'spec error',status:'error',error:err.message,time:0,mem:null});}
-        return{suites,total:self.performance.now()-t0};
+        try { ex = compileSol(sol); }
+        catch(err) { return {error: 'SYNTAX/RUNTIME:\n' + err.message, suites: {}, total: 0}; }
+        const requireFn = () => ex;
+        try {
+          new Function('describe', 'it', 'test', 'expect', 'require', spec)(
+            describe, it, test, expect, requireFn
+          );
+        } catch(err) {
+          if (!suites['__root__']) suites['__root__'] = [];
+          suites['__root__'].push({name: 'spec error', status: 'error', error: err.message, time: 0, mem: null});
+        }
+        return {suites, total: self.performance.now() - t0};
       }
 
       // ── Benchmark: run up to maxRuns times, stop at timeLimit ms ──────

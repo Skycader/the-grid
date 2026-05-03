@@ -70,55 +70,39 @@ describe("Граничные случаи", () => {
   });
 });
 
-// ... базовые и граничные тесты без изменений ...
+// =============== ТЕСТЫ НА КАТАСТРОФИЧЕСКИЙ ОТКАТ ===============
+describe("Проверка на устойчивость к ReDoS", () => {
+  // Генерируем длинную строку из букв, которая НЕ заканчивается цифрой
+  // Плохая регулярка с вложенными повторами будет проверять все комбинации
+  // пробелов/букв перед тем как сдаться.
+  const longEvilString = "a".repeat(10000) + "!";
 
-// =============== ТЕСТЫ НА ПРОИЗВОДИТЕЛЬНОСТЬ (гарантированно быстрые) ===============
-describe("Производительность: ловим катастрофический откат", () => {
-  // Эталонные регулярки (оптимальные)
-  const r1_opt = /^(?:\D*\d){3}\D*$/;
-  const r2_opt = /^(?:\D*\d){0,2}\D*$/;
-  const r3_opt = /(?:\D*\d){3}/;
+  it("r1: не зависает на длинных строках без нужного числа цифр", () => {
+    // Проверяем 2 цифры в начале и бесконечный хвост
+    // Если регулярка использует (.*)* — здесь будет вис
+    expect(f1("1a2" + "b".repeat(5000))).toBe(false);
+    expect(f1(longEvilString)).toBe(false);
+  });
 
-  // 🔥 КРИТИЧЕСКИ ВАЖНО: 70 символов на сегмент — безопасная длина для ЛЮБОГО CPU
-  // При 400+ символах — зависание на мощных ПК. При 70 — всегда < 800мс даже для плохих регулярок.
-  const segLen = 70;
-  const r1_bad =
-    "x".repeat(segLen) + "1" + "x".repeat(segLen) + "2" + "x".repeat(segLen); // 2 цифры → должно быть false
-  const r2_bad =
-    "x".repeat(segLen) +
-    "1" +
-    "x".repeat(segLen) +
-    "2" +
-    "x".repeat(segLen) +
-    "3" +
-    "x".repeat(segLen); // 3 цифры → должно быть false (классический откат!)
-  const r3_bad =
-    "x".repeat(segLen) + "1" + "x".repeat(segLen) + "2" + "x".repeat(segLen); // 2 цифры → должно быть false
+  it("r2: не виснет, если цифр слишком много в конце длинной строки", () => {
+    // Создаем строку, где много повторов букв и цифры в самом конце
+    // Это заставляет движок делать много откатов, если группы пересекаются
+    const manyDigitsAtEnd = "abc".repeat(3000) + "12345";
+    expect(f2(manyDigitsAtEnd)).toBe(false);
+  });
 
-  const measure = (fn, input) => {
-    const start = performance.now();
-    fn(input);
-    return performance.now() - start;
-  };
+  it("r3: быстро находит совпадение в начале огромной строки", () => {
+    // Даже если строка — миллион символов, r3 должна найти "123" мгновенно
+    const giantString = "123" + "x".repeat(100000);
+    expect(f3(giantString)).toBe(true);
+  });
 
-  it("r1: время ≤ 3× от эталона (строка с 2 цифрами, ожидается false)", () => {
-    expect(f1(r1_bad)).toBe(false);
-    const baseline = measure((t) => r1_opt.test(t), r1_bad);
-    const tested = measure(f1, r1_bad);
-    expect(tested).toBeLessThanOrEqual(baseline * 3.0);
-  }, 1000); // Таймаут 1000 мс — больше не нужно
-
-  it("r2: время ≤ 3× от эталона (строка с 3 цифрами, ожидается false)", () => {
-    expect(f2(r2_bad)).toBe(false);
-    const baseline = measure((t) => r2_opt.test(t), r2_bad);
-    const tested = measure(f2, r2_bad);
-    expect(tested).toBeLessThanOrEqual(baseline * 3.0);
-  }, 1000);
-
-  it("r3: время ≤ 3× от эталона (строка с 2 цифрами, ожидается false)", () => {
-    expect(f3(r3_bad)).toBe(false);
-    const baseline = measure((t) => r3_opt.test(t), r3_bad);
-    const tested = measure(f3, r3_bad);
-    expect(tested).toBeLessThanOrEqual(baseline * 3.0);
-  }, 1000);
+  it("r1 & r2: исключаем 'ловушку пересечения' (\d* против \D*)", () => {
+    // Тест на "амбивалентность": когда движок не знает, какой звездочке отдать символ
+    const trickyPattern = "1 2 " + " ".repeat(5000) + " 3";
+    // r1: ровно 3 (true)
+    // r2: меньше 3 (false)
+    expect(f1(trickyPattern)).toBe(true);
+    expect(f2(trickyPattern)).toBe(false);
+  });
 });
