@@ -1071,6 +1071,66 @@
         color: var(--txd);
         font-size: 0.61rem;
       }
+      /* ── Expandable assertions ── */
+      .r-item {
+        cursor: pointer;
+        user-select: none;
+      }
+      .r-expand {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--txd);
+        margin-left: auto;
+        padding-left: 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .r-item.fail .r-expand,
+      .r-item.error .r-expand {
+        color: #dc322f;
+      }
+      .r-assertions {
+        display: none;
+        padding: 5px 6px 5px 22px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .r-item.open > .r-assertions {
+        display: block;
+      }
+      .r-assert {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        padding: 2px 0;
+        display: flex;
+        gap: 6px;
+        align-items: baseline;
+        flex-wrap: wrap;
+      }
+      .r-assert.pass .r-a-ico {
+        color: #859900;
+      }
+      .r-assert.fail .r-a-ico {
+        color: #dc322f;
+      }
+      .r-a-ico {
+        font-size: 0.72rem;
+        flex-shrink: 0;
+        width: 12px;
+      }
+      .r-a-matcher {
+        color: #268bd2;
+        flex-shrink: 0;
+      }
+      .r-a-exp {
+        color: #859900;
+      }
+      .r-a-got {
+        color: #dc322f;
+      }
+      .r-a-sep {
+        color: var(--txd);
+        flex-shrink: 0;
+      }
       .r-err {
         color: #cb4b16;
         font-size: 0.69rem;
@@ -1653,34 +1713,77 @@
       // ── Jest-compatible mini test runner ──────────────────────────────
       function makeRunner(){
         const suites={};let curSuite='__root__';
-        function describe(n,fn){curSuite=n;if(!suites[n])suites[n]=[];try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null});}}
+        let _asserts=null; // soft assertion collector, active during it()
+
+        function describe(n,fn){
+          curSuite=n;if(!suites[n])suites[n]=[];
+          try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null,assertions:[]});}
+        }
+
         function it(name,fn){
           const s=curSuite;if(!suites[s])suites[s]=[];
+          const assertions=[];
+          _asserts=assertions;
           const mb=self.performance?.memory?.usedJSHeapSize??-1,t0=self.performance.now();
-          try{fn();const dt=self.performance.now()-t0,ma=self.performance?.memory?.usedJSHeapSize??-1;
-            suites[s].push({name,status:'pass',time:dt,mem:ma>=0?ma-mb:null});}
-          catch(e){suites[s].push({name,status:'fail',error:e.message,time:self.performance.now()-t0,mem:null});}
+          let runtimeErr=null;
+          try{fn();}
+          catch(e){runtimeErr=e.message;}
+          const dt=self.performance.now()-t0,ma=self.performance?.memory?.usedJSHeapSize??-1;
+          _asserts=null;
+          const failed=assertions.filter(a=>a.status==='fail');
+          const status=runtimeErr?'error':failed.length?'fail':'pass';
+          suites[s].push({
+            name,status,time:dt,mem:ma>=0?ma-mb:null,assertions,
+            error:runtimeErr||(failed.length?failed.length+' assertion(s) failed':null)
+          });
         }
         const test=it;
+
         function expect(v){
-          function a(ok,msg){if(!ok)throw new Error(msg);}
+          function soft(ok,matcher,expected,received){
+            const entry={status:ok?'pass':'fail',matcher,
+              expected:expected!==undefined?trunc(JSON.stringify(expected)):undefined,
+              received:received!==undefined?trunc(JSON.stringify(received)):trunc(JSON.stringify(v))};
+            if(_asserts){_asserts.push(entry);}
+            else if(!ok){throw new Error(matcher+': expected '+JSON.stringify(expected)+' got '+JSON.stringify(v));}
+          }
+          function trunc(s){return s&&s.length>120?s.slice(0,117)+'...':s;}
           const m={
-            toBe:(e)=>a(Object.is(v,e),'Expected '+JSON.stringify(e)+' got '+JSON.stringify(v)),
-            toEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'exp '+JSON.stringify(e)+' got '+JSON.stringify(v)),
-            toStrictEqual:(e)=>a(JSON.stringify(v)===JSON.stringify(e),'toStrictEqual failed'),
-            toMatch:(r)=>{const re=typeof r==='string'?new RegExp(r):r;a(re.test(String(v)),'toMatch failed');},
-            toBeTruthy:()=>a(!!v,'Expected truthy'),toBeFalsy:()=>a(!v,'Expected falsy'),
-            toBeNull:()=>a(v===null,'Expected null'),toBeUndefined:()=>a(v===undefined,'Expected undefined'),
-            toBeDefined:()=>a(v!==undefined,'Expected defined'),
-            toContain:(i)=>a(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'toContain failed'),
-            toHaveLength:(n)=>a(v!=null&&v.length===n,'Expected length '+n+' got '+(v?.length??'N/A')),
-            toBeGreaterThan:(n)=>a(v>n,v+'>'+n+' failed'),toBeLessThan:(n)=>a(v<n,v+'<'+n+' failed'),
-            toBeGreaterThanOrEqual:(n)=>a(v>=n,v+'>='+n+' failed'),toBeLessThanOrEqual:(n)=>a(v<=n,v+'<='+n+' failed'),
-            toThrow:()=>{try{v();a(false,'Expected to throw');}catch(e){}}
+            toBe:(e)=>soft(Object.is(v,e),'toBe',e,v),
+            toEqual:(e)=>soft(JSON.stringify(v)===JSON.stringify(e),'toEqual',e,v),
+            toStrictEqual:(e)=>soft(JSON.stringify(v)===JSON.stringify(e),'toStrictEqual',e,v),
+            toMatch:(r)=>{const re=typeof r==='string'?new RegExp(r):r;soft(re.test(String(v)),'toMatch',String(r),v);},
+            toBeTruthy:()=>soft(!!v,'toBeTruthy',true,v),
+            toBeFalsy:()=>soft(!v,'toBeFalsy',false,v),
+            toBeNull:()=>soft(v===null,'toBeNull',null,v),
+            toBeUndefined:()=>soft(v===undefined,'toBeUndefined',undefined,v),
+            toBeDefined:()=>soft(v!==undefined,'toBeDefined','defined',v),
+            toContain:(i)=>soft(Array.isArray(v)?v.includes(i):String(v).includes(String(i)),'toContain',i,v),
+            toHaveLength:(n)=>soft(v!=null&&v.length===n,'toHaveLength',n,v?.length),
+            toBeGreaterThan:(n)=>soft(v>n,'toBeGreaterThan',n,v),
+            toBeLessThan:(n)=>soft(v<n,'toBeLessThan',n,v),
+            toBeGreaterThanOrEqual:(n)=>soft(v>=n,'toBeGreaterThanOrEqual',n,v),
+            toBeLessThanOrEqual:(n)=>soft(v<=n,'toBeLessThanOrEqual',n,v),
+            toThrow:()=>{let threw=false;try{v();}catch(e){threw=true;}soft(threw,'toThrow','throws','did not throw');},
           };
-          m.not={};Object.keys(m).forEach(k=>{if(k==='not')return;
-            m.not[k]=(...args)=>{let ok=false;try{m[k](...args);}catch(e){ok=true;}
-              if(!ok)throw new Error('NOT expected: '+k);};});
+          m.not={};
+          Object.keys(m).forEach(k=>{
+            if(k==='not')return;
+            m.not[k]=(...args)=>{
+              if(!_asserts){// outside it() — old behaviour
+                let ok=false;try{m[k](...args);}catch(e){ok=true;}
+                if(!ok)throw new Error('NOT expected: '+k);
+                return;
+              }
+              const before=_asserts.length;
+              m[k](...args);
+              if(_asserts.length>before){
+                const last=_asserts[_asserts.length-1];
+                last.status=last.status==='pass'?'fail':'pass';
+                last.matcher='not.'+last.matcher;
+              }
+            };
+          });
           return m;
         }
         return{suites,describe,it,test,expect};
@@ -3349,10 +3452,52 @@
           tests.forEach((t) => {
             const memD =
               t.mem != null ? (t.mem >= 0 ? "+" : "") + fmtB(t.mem) : "";
-            h += `<div class="r-item ${t.status}"><div class="r-nr">
-        <span class="r-ico">${t.status === "pass" ? "●" : "✗"}</span><span class="r-nm">${esc(t.name)}</span>
-        <span class="r-ms">${t.time.toFixed(2)}ms</span>${memD ? `<span class="r-mem" style="color:#2aa198">${memD}</span>` : ""}
-      </div>${t.error ? `<div class="r-err">${esc(t.error)}</div>` : ""}</div>`;
+            const asts = t.assertions || [];
+            const astFail = asts.filter((a) => a.status === "fail").length;
+            const hasAsts = asts.length > 0;
+            // expand indicator
+            const ico =
+              t.status === "pass" ? "●" : t.status === "error" ? "⚠" : "✗";
+            let expandLabel = "";
+            if (hasAsts) {
+              const all = asts.length;
+              if (t.status === "pass")
+                expandLabel = `<span class="r-expand">${all} ✓ ▸</span>`;
+              else if (t.status === "fail")
+                expandLabel = `<span class="r-expand">${astFail}/${all} failed ▸</span>`;
+            }
+            // assertion rows
+            let astHtml = "";
+            if (hasAsts) {
+              astHtml = '<div class="r-assertions">';
+              asts.forEach((a) => {
+                const gotPart =
+                  a.received !== undefined
+                    ? `<span class="r-a-sep">→ received</span><span class="r-a-got">${esc(a.received)}</span>`
+                    : "";
+                const expPart =
+                  a.expected !== undefined && a.status === "fail"
+                    ? `<span class="r-a-sep">expected</span><span class="r-a-exp">${esc(a.expected)}</span>`
+                    : "";
+                astHtml += `<div class="r-assert ${a.status}">
+                  <span class="r-a-ico">${a.status === "pass" ? "✓" : "✗"}</span>
+                  <span class="r-a-matcher">.${esc(a.matcher)}</span>
+                  ${expPart}${gotPart}
+                </div>`;
+              });
+              // runtime error if any
+              if (t.error && t.status === "error")
+                astHtml += `<div class="r-assert fail"><span class="r-a-ico">⚠</span><span style="color:#dc322f">${esc(t.error)}</span></div>`;
+              astHtml += "</div>";
+            } else if (t.error) {
+              astHtml = `<div class="r-err">${esc(t.error)}</div>`;
+            }
+            h += `<div class="r-item ${t.status}" onclick="this.classList.toggle('open')"><div class="r-nr">
+              <span class="r-ico">${ico}</span><span class="r-nm">${esc(t.name)}</span>
+              <span class="r-ms">${t.time.toFixed(2)}ms</span>
+              ${memD ? `<span class="r-mem" style="color:#2aa198">${memD}</span>` : ""}
+              ${expandLabel}
+            </div>${astHtml}</div>`;
           });
           h += `</div>`;
         });
