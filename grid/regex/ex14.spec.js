@@ -1,3 +1,5 @@
+const f = require("./ex14.js");
+
 describe("Regexp 14 - Detailed analysis", () => {
   // [1] Basic transformation check
   it("[1] should replace standard social media links", () => {
