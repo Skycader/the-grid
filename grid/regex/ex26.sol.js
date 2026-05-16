@@ -1,1 +1,1 @@
-module.exports = /\b(?<!\$)\d+\b/g;
+module.exports = /\b(?<![$.])\d+\b/g;

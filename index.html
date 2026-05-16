@@ -2421,8 +2421,10 @@
         if (!q) {
           hideSrch();
           renderCats("");
+          document.querySelector(".cat-grid-wrap").style.display = "";
           return;
         }
+        document.querySelector(".cat-grid-wrap").style.display = "none";
         _srchTimer = setTimeout(() => doSearch(q), 270);
       });
       document.getElementById("srch").addEventListener("keydown", (e) => {
@@ -2471,6 +2473,7 @@
         _srchFocusIdx = -1;
         hideSrch();
         renderCats("");
+        document.querySelector(".cat-grid-wrap").style.display = "";
         document.getElementById("srch").blur();
       }
       function hideSrch() {
