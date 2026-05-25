@@ -786,6 +786,15 @@
       .breadc .act {
         color: var(--c);
       }
+      .breadc-stars {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+        margin-left: 8px;
+        opacity: 0.9;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
       .tab-grp {
         display: flex;
         gap: 2px;
@@ -2853,7 +2862,7 @@
             <div class="t-num">${String(i + 1).padStart(2, "0")}.</div>
             <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
           </div>
-          <div class="stars-wrap"><span class="stars ${dc}">${mkStars(t.diff)}</span><span class="d-lbl">(${t.diff}/10)</span></div>`;
+          <div class="stars-wrap"><span class="stars ${dc}">${mkStars(t.diff)}</span></div>`;
           row.onclick = () => {
             playNav();
             openTask(_vsCat, t);
@@ -2862,10 +2871,13 @@
         });
       }
 
+      // Groups of 3 filled stars, no empty stars.
+      // diff=2 → "★★"   diff=5 → "★★★ ★★"   diff=9 → "★★★ ★★★ ★★★"
       function mkStars(d) {
-        let s = "";
-        for (let i = 1; i <= 10; i++) s += i <= d ? "★" : "☆";
-        return s;
+        if (!d) return "";
+        let stars = "★".repeat(d);
+        // insert space after every 3rd star (but not at the end)
+        return stars.replace(/(★{3})(?=★)/g, "$1 ");
       }
       function diffCls(d) {
         return d <= 2
@@ -2906,8 +2918,11 @@
         updateStrictUI();
         // Font size
         applyFZ();
+        const starsHtml = task.diff
+          ? ` <span class="breadc-stars ${diffCls(task.diff)}" title="Difficulty: ${task.diff}/10">${mkStars(task.diff)}</span>`
+          : "";
         document.getElementById("breadc").innerHTML =
-          `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>`;
+          `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>${starsHtml}`;
         setTabs("ed");
         hideSolOverlay();
         clearResults();
