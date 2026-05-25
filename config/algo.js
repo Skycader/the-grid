@@ -9,7 +9,7 @@ window.CFG_algo = [
       {
         id: "binary_search",
         title: "Binary Search через API",
-        diff: 2,
+        diff: 3,
         desc: "Реализовать бинарный поиск по заданному API с минимальным количеством запросов",
         file: "binary-search",
       },
@@ -51,7 +51,7 @@ window.CFG_algo = [
       {
         id: "currying",
         title: "Create a function add(4)(4)()",
-        diff: 3,
+        diff: 4,
         desc: "Практика каррирования",
         file: "currying",
       },
