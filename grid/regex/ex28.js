@@ -1,6 +1,6 @@
 /**
  * Ex28
- * Write regex, that checks if password is trong enough
+ * Write regex, that checks if password is strong enough
  * - has at least one upper case letter
  * - has at least one lowercase letter
  * - has at least 3 digits
