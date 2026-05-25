@@ -639,24 +639,15 @@
       .task-list {
         flex: 1;
         overflow-y: auto;
-        position: relative;
         padding: 0 10px;
-      }
-      .task-list::-webkit-scrollbar {
-        width: 3px;
-      }
-      .task-vspace {
-        flex-shrink: 0;
-      } /* total height spacer */
-      .task-window {
-        position: absolute;
-        left: 10px;
-        right: 10px;
-        top: 0;
         display: flex;
         flex-direction: column;
         gap: 4px;
       }
+      .task-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      /* virtual scroll removed */
       .task-row {
         display: flex;
         align-items: center;
@@ -2759,13 +2750,9 @@
         renderTaskList(cat);
       }
 
-      // ── Virtual scroll constants ──
-      const ROW_H = 52; // px per row (height + 4px gap)
-      const ROW_OVER = 4; // render extra rows above/below visible area
-      let _vsCat = null,
-        _vsScroll = 0,
-        _vsRaf = 0;
-      let _vsQuery = ""; // current search query (empty = no search)
+      // ── Task list state ──
+      let _vsCat = null;
+      let _vsQuery = ""; // current search query
       let _vsMatches = []; // indices of matching tasks
       let _catsrchTimer = null;
 
@@ -2774,7 +2761,7 @@
         playType();
         clearTimeout(_catsrchTimer);
         const raw = e.target.value.trim();
-        _catsrchTimer = setTimeout(() => applyTaskSearch(raw), 30);
+        _catsrchTimer = setTimeout(() => applyTaskSearch(raw), 300);
       });
       document.getElementById("cat-srch").addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
@@ -2800,11 +2787,20 @@
             }, [])
           : [];
         // Re-render all visible rows (updates dimming)
-        vsRender();
+        renderRows();
         // Scroll to first match
         if (_vsMatches.length) {
           const el = document.getElementById("task-list");
-          if (el) el.scrollTop = _vsMatches[0] * ROW_H;
+          // Scroll to first matching row by finding it in DOM
+          if (el) {
+            const rows = el.querySelectorAll(".task-row");
+            const firstMatchRow = rows[_vsMatches[0]];
+            if (firstMatchRow)
+              firstMatchRow.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+              });
+          }
         }
         // Update count label
         const cnt = document.getElementById("cat-cnt");
@@ -2820,91 +2816,52 @@
       function renderTaskList(cat) {
         _vsCat = cat;
         focusTaskIdx = -1;
+        _vsQuery = "";
+        _vsMatches = [];
+        renderRows();
+      }
+
+      // Simple flat render — no virtual scroll.
+      // For 30–200 tasks this is faster than the virtual scroll overhead.
+      function renderRows() {
         const el = document.getElementById("task-list");
+        if (!el) return;
         el.innerHTML = "";
 
-        if (!cat.tasks.length) {
+        if (!_vsCat || !_vsCat.tasks.length) {
           el.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;color:var(--txd);font-size:.74rem;padding:22px;text-align:center;opacity:.45">// NO TASKS IN THIS CATEGORY YET //</div>`;
           return;
         }
 
-        const total = cat.tasks.length;
-        const spacer = document.createElement("div");
-        spacer.style.height = total * ROW_H + 8 + "px";
-        spacer.style.pointerEvents = "none";
-        el.appendChild(spacer);
-
-        // Absolute-positioned window div
-        const win = document.createElement("div");
-        win.className = "task-window";
-        win.id = "task-window";
-        el.appendChild(win);
-
-        // Listen to scroll
-        el.onscroll = () => {
-          _vsScroll = el.scrollTop;
-          cancelAnimationFrame(_vsRaf);
-          _vsRaf = requestAnimationFrame(vsRender);
-        };
-
-        // Render immediately — use sheet or window height as fallback if el not laid out yet
-        vsRender();
-      }
-
-      function vsRender() {
-        if (!_vsCat) return;
         const tasks = _vsCat.tasks;
-        const el = document.getElementById("task-list");
-        const win = document.getElementById("task-window");
-        if (!el || !win) return;
-
-        const scrollTop = el.scrollTop;
-        let viewH = el.clientHeight;
-        if (viewH < 20) {
-          const sheet = document.getElementById("cat-sheet");
-          viewH = sheet ? Math.max(sheet.clientHeight - 80, 0) : ROW_H * 20;
-          if (viewH < 20) viewH = ROW_H * 20;
-        }
-
-        const firstIdx = Math.max(0, Math.floor(scrollTop / ROW_H) - ROW_OVER);
-        const lastIdx = Math.min(
-          tasks.length - 1,
-          Math.ceil((scrollTop + viewH) / ROW_H) + ROW_OVER,
-        );
-
-        win.style.top = firstIdx * ROW_H + 6 + "px";
-        win.innerHTML = "";
-
         const hasSearch = _vsQuery && _vsMatches.length > 0;
         const matchSet = hasSearch ? new Set(_vsMatches) : null;
 
-        for (let i = firstIdx; i <= lastIdx; i++) {
-          const t = tasks[i];
+        tasks.forEach((t, i) => {
           const st = STATUS[`${_vsCat.id}/${t.id}`] || "";
           const dc = diffCls(t.diff);
           const isMatch = !hasSearch || matchSet.has(i);
           const row = document.createElement("div");
           row.className = "task-row" + (i === focusTaskIdx ? " focused" : "");
-          row.style.animationDelay = Math.min((i - firstIdx) * 18, 200) + "ms";
-          // Dimming: non-matches fade out, matches get a subtle highlight
           if (hasSearch) {
             row.style.opacity = isMatch ? "1" : "0.2";
             if (isMatch) row.style.borderColor = "rgba(0,200,255,.4)";
           }
           row.dataset.idx = i;
           row.innerHTML = `<div class="trow-l">
-      <div class="t-dot${st === "ok" ? " ok" : st === "ng" ? " ng" : ""}"></div>
-      <div class="t-num">${String(i + 1).padStart(2, "0")}.</div>
-      <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
-    </div>
-    <div class="stars-wrap"><span class="stars ${dc}">${mkStars(t.diff)}</span><span class="d-lbl">(${t.diff}/10)</span></div>`;
+            <div class="t-dot${st === "ok" ? " ok" : st === "ng" ? " ng" : ""}"></div>
+            <div class="t-num">${String(i + 1).padStart(2, "0")}.</div>
+            <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
+          </div>
+          <div class="stars-wrap"><span class="stars ${dc}">${mkStars(t.diff)}</span><span class="d-lbl">(${t.diff}/10)</span></div>`;
           row.onclick = () => {
             playNav();
             openTask(_vsCat, t);
           };
-          win.appendChild(row);
-        }
+          el.appendChild(row);
+        });
       }
+
       function mkStars(d) {
         let s = "";
         for (let i = 1; i <= 10; i++) s += i <= d ? "★" : "☆";
