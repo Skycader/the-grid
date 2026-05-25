@@ -7,8 +7,6 @@
  * - has special character
  * - has no whitespaces
  * - has length from 24 to 256 symbols
- * Сложность: ★★★★★★★★★☆ (9/10)
  */
 
-module.exports =
-  //;
+module.exports = r;

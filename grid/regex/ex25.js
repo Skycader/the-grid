@@ -14,9 +14,6 @@
  * https://instagram.com => https
  * http://google.com => http
  * ftp://files.net => ftp
- * Сложность: ★★★★★★★★☆☆ (8/10)
  */
-const r1 = //;
-const r2 = //
-const r3 = //;
-  module.exports = [r1, r2, r3];
+
+module.exports = [r1, r2, r3];

@@ -6,11 +6,12 @@
  * <a href="https://twitter.com/123">instagram</a>
  */
 
-/** First time attempt yet successful WTF
- * 31.05.2025
+/** LATEST SOLUTION:
+ * 25.05.2026
  *
  */
+
 const f = (text) => {
-  const r = /(https?:\/\/)(\w+)(.com\/*)([\w+\/?]*)/g;
-  return text.replace(r, '<a href="$1$2$3$4">$2</a>');
+  const r = /(https?:\/\/)(([\w-]+\.)*)([\w-]+)(\.\w+)((\/[\w.?#=-]+)*)/g;
+  return text.replace(r, '<a href="$1$2$4$5$6">$4</a>');
 };

@@ -10,7 +10,6 @@ wow <b>world</b>
 BTAG
 BTAG BTAG
 wow BTAG
-Сложность: ★★★★★★☆☆☆☆ (6/10)
  */
 
 const f = (text) => {};

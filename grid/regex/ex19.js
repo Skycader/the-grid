@@ -5,7 +5,6 @@
  *
  * Input: password only
  * Output: boolean
- * Сложность: ★★★★★★☆☆☆☆ (6/10)
  */
 
 module.exports = f;

@@ -6,13 +6,6 @@
  * Minimal length is 8 symbols
  * Password must NOT have spaces
  * Find all of them
- * Сложность: ★★★★★★★★★☆ (9/10)
  */
-
-const f = (text) => {
-  const r =
-    //;
-  return;
-};
 
 module.exports = f;

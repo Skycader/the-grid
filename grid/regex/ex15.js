@@ -9,7 +9,6 @@
  * INVALID:
  * <html>...</html><html>...</html>
  * <htmx>...</htmx>
- * Сложность: ★★★★★★★☆☆☆ (7/10)
  */
 
 const r = /^<html>[\w\n\s\p{P}]*<\/html>$/g; //<-- should not have m flag;

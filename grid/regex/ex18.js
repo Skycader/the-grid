@@ -9,7 +9,6 @@
  * 1.1.1.1
  * IN SUMMARY, IT CAN BE ANY LENGTH FROM 4 UNITS TO INFINITY.
  * TASK: COUNT THEM ALL.
- * Сложность: ★★★★★★☆☆☆☆ (6/10)
  *  */
 
 module.exports = f;

@@ -1,0 +1,1859 @@
+/*
+ * Ex 1
+ * Remove all words `cat`
+ * ★Сложность: ★☆☆☆☆☆☆☆☆ (2/10)
+ */
+
+const r = ...;
+const f = (text) => {
+  /*code here */
+  return ...
+};
+module.exports = f;
+/*
+ * Ex 1
+ * Remove all words `cat`
+ */
+
+const r =
+  /cat/g; /*g means findMany and without means findOne*/
+const f = (text) => {
+  /*code here */
+  return text.replace(r, '');
+};
+module.exports = f;
+f = require('./ex1.js');
+
+describe('Regexp', () => {
+  it('Test case for ex1', () => {
+    expect(f('There are no cat left. Cat is gone')).toBe(
+      'There are no  left.  is gone',
+    );
+  });
+});
+/*
+ * Ex10
+ * Find all lol words like lel lil lal and change them to l*l but don't change lol itself
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+const r = //
+const f = (text) => {
+  return 
+};
+module.exports = f;
+/*
+ * Find all lol words like lel lil lal and change them to l*l but don't change lol itself
+ */
+
+const r = /l([a-n]|[p-z])l/gi;
+const f = (text) => {
+  return text.replace(r, 'l*l');
+};
+module.exports = f;
+f = require('./ex10.js');
+
+describe('Regexp 10', () => {
+  it('Test case for ex10', () => {
+    expect(f('lol lal lil lel lol lul')).toBe(
+      'lol l*l l*l l*l lol l*l',
+    );
+  });
+});
+/**
+ * Ex11
+ * Given list of bills:
+ * 100: $120.10
+ * ...
+ * 90550: $550.25
+ *
+ * Count as many bills are more than or equal to $100
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+module.exports = f;
+/**
+ * Given list of bills:
+ * 100: $120.10
+ * ...
+ * 90550: $550.25
+ *
+ * Count as many bills are more than $100
+ */
+
+const f = (text) => {
+  const r = /\d+:\s\$0*[1-9]\d{2,}(\.\d+)*/gm;
+  return text.match(r)?.length || 0;
+};
+
+module.exports = f;
+const f = require("./ex11.js");
+
+describe("Regexp 11", () => {
+  it("[1] Basic case", () => {
+    const text = `1: $1.00
+2: $2.00
+3: $3.00
+10: $25.15
+15: $36.19
+200: $550.16
+500: $680.92
+1001: $1000.00
+1500: $2000.20
+10001: $990.20`;
+    expect(f(text)).toBe(5);
+  });
+
+  it("[2] No values >= 100", () => {
+    const text = `1: $1.00
+2: $2.00
+3: $3.00`;
+    expect(f(text)).toBe(0);
+  });
+
+  it("[3] Edge case: exactly 100", () => {
+    const text = `1: $99.99
+2: $100.00
+3: $100.01`;
+    expect(f(text)).toBe(2);
+  });
+
+  it("[4] Leading zeroes should NOT affect value", () => {
+    const text = `1: $00100.00
+2: $00099.99
+3: $0100
+4: $0000101.50`;
+    expect(f(text)).toBe(3);
+  });
+
+  it("[5] Mixed normal and leading zeroes", () => {
+    const text = `1: $100
+2: $00100
+3: $099.99
+4: $000
+5: $0101`;
+    expect(f(text)).toBe(3);
+  });
+
+  it("[6] Ignores invalid lines", () => {
+    const text = `1: $100.00
+invalid line
+2: $abc
+3: 100.00
+4: $150.00`;
+    expect(f(text)).toBe(2);
+  });
+
+  it("[7] Handles empty input", () => {
+    expect(f("")).toBe(0);
+  });
+
+  it("[8] Large numbers with leading zeroes", () => {
+    const text = `1: $000000100.00
+2: $000000099.99
+3: $000001000.00`;
+    expect(f(text)).toBe(2);
+  });
+});
+/**
+ * Ex12
+ * Given list of bills:
+ * 100: $120.10
+ * ...
+ * 90550: $550.25
+ *
+ * Count as many bills are less than $100
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+r = //;
+const f = (text) => {
+  return
+};
+module.exports = f;
+/**
+ * Given list of bills:
+ * 100: $120.10
+ * ...
+ * 90550: $550.25
+ *
+ * Count as many bills are less than $100
+ */
+
+r = /\d+:\s\$\d{0,2}\.\d+/g;
+const f = (text) => {
+  return text.match(r).length;
+};
+module.exports = f;
+f = require("./ex12.js");
+
+const text = `
+1: $1.00
+2: $2.00
+3: $3.00
+8: $44.00
+9: $55.77
+10: $25.15
+15: $36.19
+200: $550.16
+500: $680.92
+1001: $1000.00
+1500: $2000.20
+10001: $990.20
+`;
+describe("Regexp 12", () => {
+  it("Test case for ex12", () => {
+    expect(f(text)).toBe(7);
+  });
+});
+/**
+ * Ex13
+ * Given list of bills:
+ * 100: $120.10
+ * ...
+ * 90550: $550.25
+ *
+ * Count as many bills are in between $100 and $9999
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+r = //;
+const f = (text) => {
+  return
+};
+module.exports = f;
+/**
+ * Given list of bills:
+ * 100: $120.10
+ * ...
+ * 90550: $550.25
+ *
+ * Count as many bills are in between $100 and $9999
+ */
+
+r = /\d+:\s\$\d{3,4}\.\d+/g;
+const f = (text) => {
+  return text.match(r).length;
+};
+module.exports = f;
+f = require("./ex13.js");
+
+const text = `
+1: $1.00
+2: $2.00
+3: $3.00
+8: $44.00
+9: $55.77
+10: $25.15
+15: $36.19
+200: $550.16
+500: $680.92
+1001: $1000.00
+1500: $2000.20
+10001: $990.20
+`;
+describe("Regexp 13", () => {
+  it("Test case for ex13", () => {
+    expect(f(text)).toBe(5);
+  });
+});
+/* Ex14
+ * Given text containing one or more URLs, transform each URL into an anchor
+ * tag where href is the full URL and link text is the second-level domain.
+ *
+ * Examples:
+ *   "Follow us on https://twitter.com/user/axl" → 'Follow us on <a href="https://twitter.com/user/axl">twitter</a>'
+ *   "and https://instagram.com/user/axl" → 'and <a href="https://instagram.com/user/axl">instagram</a>'
+ *   "Visit http://example.com" → 'Visit <a href="http://example.com">example</a>'
+ *   "Go to https://www.instagram.com/user/axl" → 'Go to <a href="https://www.instagram.com/user/axl">instagram</a>'
+ *   "go to https://sub.example.com/path" → 'go to <a href="https://sub.example.com/path">example</a>'
+ *   "see https://example.com/some-page" → 'see <a href="https://example.com/some-page">example</a>'
+ *   "hello world" → "hello world"
+ *   "" → ""
+ *
+ * Сложность: ★★★★★☆☆☆☆☆ (5/10)
+ */
+
+module.exports = f;
+/* Given text, such as
+ * Follow us on https://twitter.com/123
+ * and https://instagram.com/user/123
+ *
+ * Transform the instances of urls into
+ * <a href="https://twitter.com/123">instagram</a>
+ */
+
+/** LATEST SOLUTION:
+ * 25.05.2026
+ *
+ */
+
+const f = (text) => {
+  const r = /(https?:\/\/)(([\w-]+\.)*)([\w-]+)(\.\w+)((\/[\w.?#=-]+)*)/g;
+  return text.replace(r, '<a href="$1$2$4$5$6">$4</a>');
+};
+/* Ex14
+ * Given text containing one or more URLs, such as:
+ *   Follow us on https://twitter.com/user/axl
+ *   and https://instagram.com/user/axl
+ *
+ * Transform each URL into an anchor tag where:
+ *   - href contains the full URL (protocol + domain + path)
+ *   - link text is the second-level domain name only
+ *
+ * Example:
+ *   https://twitter.com/user/axl  →  <a href="https://twitter.com/user/axl">twitter</a>
+ *
+ * Scope:
+ *   ✓ http and https protocols
+ *   ✓ subdomains (www, account, sub, etc.)
+ *   ✓ paths with hyphens
+ *   ✗ query strings (?key=value)  — known limitation
+ *   ✗ fragments (#section)        — known limitation
+ *   ✗ paths with extensions       — known limitation
+ *   ✗ multi-level TLD (co.uk)     — requires Public Suffix List, out of scope
+ *
+ * Сложность: ★★★★★★★★☆☆ (8/10)
+ */
+
+const f = require("./ex14.js");
+
+describe("Regexp 14 - URL to anchor", () => {
+  // --- Базовые ---
+
+  test("[1] стандартная ссылка на соцсеть", () => {
+    expect(f("Check https://instagram.com")).toBe(
+      'Check <a href="https://instagram.com">instagram</a>',
+    );
+  });
+
+  test("[2] twitter с путём", () => {
+    expect(f("Follow us on https://twitter.com/user/axl")).toBe(
+      'Follow us on <a href="https://twitter.com/user/axl">twitter</a>',
+    );
+  });
+
+  test("[3] instagram с путём", () => {
+    expect(f("and https://instagram.com/user/axl")).toBe(
+      'and <a href="https://instagram.com/user/axl">instagram</a>',
+    );
+  });
+
+  test("[4] два url в одном тексте", () => {
+    expect(
+      f(
+        "Follow us on https://twitter.com/user/axl and https://instagram.com/user/axl",
+      ),
+    ).toBe(
+      'Follow us on <a href="https://twitter.com/user/axl">twitter</a> and <a href="https://instagram.com/user/axl">instagram</a>',
+    );
+  });
+
+  // --- Протокол ---
+
+  test("[5] https протокол", () => {
+    expect(f("Visit https://twitter.com")).toBe(
+      'Visit <a href="https://twitter.com">twitter</a>',
+    );
+  });
+
+  test("[6] http без s", () => {
+    expect(f("Visit http://twitter.com")).toBe(
+      'Visit <a href="http://twitter.com">twitter</a>',
+    );
+  });
+
+  test("[7] http с путём", () => {
+    expect(f("visit http://example.com/page")).toBe(
+      'visit <a href="http://example.com/page">example</a>',
+    );
+  });
+
+  // --- Субдомены ---
+
+  test("[8] www субдомен не попадает в текст ссылки", () => {
+    expect(f("Go to https://www.instagram.com/user/axl")).toBe(
+      'Go to <a href="https://www.instagram.com/user/axl">instagram</a>',
+    );
+  });
+
+  test("[9] произвольный субдомен", () => {
+    expect(f("go to https://sub.example.com/path")).toBe(
+      'go to <a href="https://sub.example.com/path">example</a>',
+    );
+  });
+
+  test("[10] вложенный субдомен (account.google.com)", () => {
+    expect(f("Go to https://account.google.com")).toContain(
+      '<a href="https://account.google.com">google</a>',
+    );
+  });
+
+  // --- Путь ---
+
+  test("[11] дефис в пути", () => {
+    expect(f("see https://example.com/some-page")).toBe(
+      'see <a href="https://example.com/some-page">example</a>',
+    );
+  });
+
+  test("[12] дефис в домене", () => {
+    expect(f("Visit https://my-site.com")).toBe(
+      'Visit <a href="https://my-site.com">my-site</a>',
+    );
+  });
+
+  // --- Прочее ---
+
+  test("[13] текст без url не меняется", () => {
+    expect(f("hello world")).toBe("hello world");
+  });
+
+  test("[14] пустая строка", () => {
+    expect(f("")).toBe("");
+  });
+
+  // --- Известные ограничения (ожидается падение) ---
+
+  test("[15] query string — known limitation", () => {
+    expect(f("Search https://twitter.com/search?q=foo")).toBe(
+      'Search <a href="https://twitter.com/search?q=foo">twitter</a>',
+    );
+  });
+
+  test("[16] fragment — known limitation", () => {
+    expect(f("See https://github.com/user/repo#readme")).toBe(
+      'See <a href="https://github.com/user/repo#readme">github</a>',
+    );
+  });
+
+  test("[17] путь с расширением — known limitation", () => {
+    expect(f("Docs at https://example.com/page.html")).toBe(
+      'Docs at <a href="https://example.com/page.html">example</a>',
+    );
+  });
+
+  test("[18] два субдомена — href сломан", () => {
+    expect(f("https://sub.www.twitter.com/path")).toBe(
+      '<a href="https://sub.www.twitter.com/path">twitter</a>',
+    );
+  });
+});
+/* ex15
+ * Check if the give text is a valid HTML document
+ *
+ * VALID:
+ * <html>
+ * ...
+ * </html>
+ *
+ * INVALID:
+ * <html>...</html><html>...</html>
+ * <htmx>...</htmx>
+ * Сложность: ★★★★★★★☆☆☆ (7/10)
+ */
+
+const r = /^<html>[\w\n\s\p{P}]*<\/html>$/g; //<-- should not have m flag;
+const f = (text) => {
+  console.log(`${text} => ${r.test(text)}`);
+  return r.test(text.trim());
+};
+
+module.exports = f;
+f = require("./ex15.js");
+
+const valid1 = `
+<html>
+  Hello, world!
+</html>
+`;
+
+const invalid1 = `
+<html>
+Here goes html 1
+</html>
+<html>
+And also in the same file html 2
+</html>
+`;
+
+const invalid2 = `
+<htmx> Sounds cool? </htmx>
+`;
+
+const valid2 = `
+<html>
+<p>123</p>
+</html>
+`;
+
+const invalid3 = `
+<html>Is a lot of fun</html></html>
+`;
+
+describe("Regexp 15", () => {
+  it("Test case for ex15 #1", () => {
+    expect(f(valid1)).toBe(true);
+  });
+  it("Test case for ex15 #2", () => {
+    expect(f(valid2)).toBe(true);
+  });
+  it("Test case for ex15 #3", () => {
+    expect(f(invalid1)).toBe(false);
+  });
+  it("Test case for ex15 #4", () => {
+    expect(f(invalid2)).toBe(false);
+  });
+  it("Test case for ex15 #5", () => {
+    expect(f(invalid3)).toBe(false);
+  });
+});
+/* Ex16
+ * Count all comments from the JS code
+ *
+ * Hint: including both single line and multi line comments.
+ * Сложность: ★★★★★★★☆☆☆ (7/10)
+ */
+
+const r = //;
+
+const f = (text) => {
+  return;
+};
+
+module.exports = f;
+/* Count all comments from the JS code
+ *
+ * Hint: including both single line and multi line comments.
+ *
+ */
+
+const r = /(^\/\*[\w\n\s\p{P}]*\*\/$|^\/\/.*$)/gm;
+
+const f = (text) => {
+  return text.match(r).length;
+};
+
+module.exports = f;
+f = require('./ex16.js');
+
+const code = `
+/*
+Importing many
+many many things
+*/
+
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+ 
+/*
+Async function to bootstrap nestjs app
+*/
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+//Choosing port for app
+  await app.listen(3000);
+}
+
+//Bootstrapping app
+bootstrap();
+`;
+
+describe('Regexp 16', () => {
+  it('Test case for ex16', () => {
+    expect(f(code)).toBe(4);
+  });
+});
+/**
+ * Ex17
+ * Trim &nbsp; (non-break space) in the given text.
+ * Сложность: ★★★★★☆☆☆☆☆ (5/10)
+ */
+
+const r = //;
+const f = (text) => {
+  return text.replace(r, "&nbsp;");
+};
+module.exports = f;
+/**
+ * Trim &nbsp; (non-break space) in the given text.
+ */
+
+const r = /(&nbsp;){2,}/g;
+const f = (text) => {
+  return text.replace(r, '&nbsp;');
+};
+module.exports = f;
+f = require('./ex17.js');
+
+const code = `
+Hello, this&nbsp;is my text
+Now that&nbsp;&nbsp;know me well,
+we can&nbsp;continue.
+`;
+
+const done = `
+Hello, this&nbsp;is my text
+Now that&nbsp;know me well,
+we can&nbsp;continue.
+`;
+
+describe('Regexp 17', () => {
+  it('Test case for ex17', () => {
+    expect(f(code)).toBe(done);
+  });
+});
+/**
+ * Ex18
+ * Count SPECIAL* ip addresses in the given text.
+ * *SPECIAL IP ADDRESS LOOKS LIKE: 192.168.92.102...55.34.204
+ * THEY ARE PLACED IN A FORM OF LIST:
+ * 192.168.92.102
+ * 255.255.255.255
+ * ...
+ * 1.1.1.1
+ * IN SUMMARY, IT CAN BE ANY LENGTH FROM 4 UNITS TO INFINITY.
+ * TASK: COUNT THEM ALL.
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ *  */
+
+module.exports = f;
+/**
+ * Count SPECIAL* ip addresses in the given text.
+ * *SPECIAL IP ADDRESS LOOKS LIKE: 192.168.92.102...55.34.204
+ * IN SUMMARY, IT CAN BE ANY LENGTH FROM 4 UNITS TO INFINITY.
+ * TASK: FIND THEM ALL.
+ *  */
+
+/**
+ * 03 march 2025 quick solution
+ */
+const f = (text) => {
+  const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+  return text.match(r)?.length || 0;
+};
+
+/** 23 september 2024 10:26 took me 30 seconds ti write it down */
+const f = (text) => {
+  const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+  return text.match(r)?.length || 0;
+};
+
+const f = (text) => {
+  const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+  return text.match(r)?.length || 0;
+};
+
+const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+const f = (text) => {
+  return text.match(r)?.length || 0;
+};
+
+module.exports = f;
+f = require('./ex18.js');
+
+const text = `
+192.168.92.102
+1.1.1.1
+0.0.0.0
+23.23.23.4.
+55.16.43.21.56
+92.132.46.312.63.46.1.23.5
+92.132.46.312.63.46.1.23.5.3456634
+92.132.46.312.63.46.1.23.5.345
+2.2.2
+90.10.20.50.10.23
+`;
+
+const text2 = `
+0.0.0
+1.1.1
+`;
+
+describe('it should find all ip addresses', () => {
+  it('should find all special ip addresses', () => {
+    expect(f(text)).toBe(7);
+  });
+  it('should return 0 if found none', () => {
+    expect(f(text2)).toBe(0);
+  });
+});
+/**
+ * Ex19
+ * Make sure the password consist of only ASCII symbols,
+ * which is A-Z a-z 0-9 all special symbols including $
+ *
+ * Input: password only
+ * Output: boolean
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+module.exports = f;
+/**
+ * Make sure the password consist of only ASCII symbols
+ */
+
+const f = (password) => {
+  const r = /^[A-Za-z0-9_$\-\p{P}]+$/g;
+  return r.test(password);
+};
+
+const f = (password) => {
+  const r = /^[A-Za-z0-9\p{P}$]+$/gu;
+  return r.test(password);
+};
+module.exports = f;
+const f = require("./ex19.js");
+
+describe("test for ex19", () => {
+  it("should allow only correct ascii password", () => {
+    expect(f("asciipassword")).toBe(true);
+    expect(f("12345")).toBe(true);
+    expect(f("$Raxon123_")).toBe(true);
+  });
+
+  it("should allow only correct ascii password with some additional symbols", () => {
+    expect(f("ascii-password")).toBe(true);
+  });
+
+  it("should not allow non ascii password", () => {
+    expect(f("пароль")).toBe(false);
+    expect(f("очень!сложный!пароль!")).toBe(false);
+    expect(f("мудамуда!")).toBe(false);
+  });
+
+  it("should work correctly with wrong passwords", () => {
+    expect(f(" $Raxon123_")).toBe(false);
+    expect(f(" $Raxon123_ ")).toBe(false);
+    expect(f(" $Raxon 123_ ")).toBe(false);
+  });
+});
+/*
+ * Ex2
+ * Remove all Mr. and Mrs. from text.
+ * Сложность: ★★★☆☆☆☆☆☆☆ (3/10)
+ */
+
+const r = //
+  const f = (text) => {
+  return
+};
+module.exports = f;
+/*
+ * Remove all Mr. and Mrs.
+ */
+
+const r =
+  /Mrs\./g; /*s? means that to find one s is optional*/
+const r2 = /(Mr|Mrs)\./g;
+const f = (text) => {
+  return text.replace(r, '');
+};
+module.exports = f;
+f = require('./ex2.js');
+
+describe('Regexp', () => {
+  it('Test case for ex2', () => {
+    expect(f('Mr. and Mrs. Lucky')).toBe(' and  Lucky');
+  });
+});
+/**
+ * Ex20
+ * Make all texts within h1,2,3...6 tags CAPITAL
+ * Сложность: ★★★★★★★★☆☆ (8/10)
+ */
+
+module.exports = f;
+/**
+ * Make all texts within h1,2,3...6 tags CAPITAL
+ */
+
+// const f = (text) => {
+//   const r = /<(h[1-6])>(.*?)<\/\1>/g;
+//   return text.replace(
+//     r,
+//     (match, m1, m2) => `<${m1}>${m2.toUpperCase()}</${m1}>`
+//   );
+// };
+
+// /** Solution 31.05.2024 00:02 */
+
+// const f = (text) => {
+//   const r = /<(h[1-6])>(.*?)<\/\1>/g;
+//   return text.replace(r, (matrch, $1, $2) => {
+//     return `<${$1}>${$2.toUpperCase()}</${$1}>`;
+//   });
+// };
+
+// /** A better solution using back reference
+//  * 17 may 2024 12:38
+//  * */
+// const f3 = (text) => {
+//   const r = /<h([1-6])>(.*?)<\/h\1>/g;
+//   return text.replace(r, (match, $1, $2) => {
+//     return "<h" + $1 + ">" + $2.toUpperCase() + "</h" + $1 + ">";
+//   });
+// };
+
+// const f2 = (text) => {
+//   const r = /(<h[1-6]>)(.*?)(<\/h[1-6]>)/gm;
+//   return text.replace(r, function (match, $1, $2, $3) {
+//     return $1 + $2.toUpperCase() + $3;
+//   });
+// };
+
+//22.10.2025
+const f = (text) => {
+  const r = /<(h[1-6])>(.*?)<\/(\1)>/g;
+  return text.replace(
+    r,
+    (match, r1, r2, r3) => `<${r1}>${r2.toUpperCase()}</${r3}>`,
+  );
+};
+
+module.exports = f;
+const f = require('./ex20.js');
+
+const test1 = `
+<h1>hello</h1>
+<h2>world</h2>
+`;
+
+const expect1 = `
+<h1>HELLO</h1>
+<h2>WORLD</h2>
+`;
+
+const test2 = '<h1>hello world!</h1>';
+const expect2 = '<h1>HELLO WORLD!</h1>';
+
+const test3 = '<h1>invalid html</h2>';
+const expect3 = '<h1>invalid html</h2>';
+
+const test4 = `
+<h1>valid html</h1>
+<h3>invalid html</h6>
+`;
+
+const expect4 = `
+<h1>VALID HTML</h1>
+<h3>invalid html</h6>
+`;
+
+describe('test 20', () => {
+  it('should work fine', () => {
+    expect(f(test1)).toBe(expect1);
+  });
+
+  it('should work fine #2', () => {
+    expect(f(test2)).toBe(expect2);
+  });
+
+  it('should omit invalid html', () => {
+    expect(f(test3)).toBe(expect3);
+  });
+
+  it('should render complex states', () => {
+    expect(f(test4)).toBe(expect4);
+  });
+});
+/**
+ * Ex21
+ * Count words that
+ * end with the same letter
+ * they start with
+ * I.e. aqua, astra, mom, text, roar, etc.
+ * Сложность: ★★★★★★★☆☆☆ (7/10)
+ */
+
+const f = (text) => {};
+
+module.exports = f;
+/**
+ * Count words that
+ * end with the same letter
+ * they start with
+ * I.e. aqua, astra, mom, text, roar, etc.
+ */
+
+/** 08 08 2025 10:34 */
+const f = (text) => text.match(/\b(.)(.*?)\1\b/g)?.length || 0;
+
+const f = (text) => {
+  const r = /\b(\w)(\w*)\1\b/gm;
+  return text.match(r)?.length || 0;
+};
+
+module.exports = f;
+const f = require('./ex21.js');
+const text = `
+aqua astra mom text roar
+car level map
+`;
+
+const text2 = `
+dynomite bobr
+`;
+describe('test for ex21, testing backreference', () => {
+  it('should find and count all the required words', () => {
+    expect(f(text)).toBe(6);
+  });
+  it('should work fine with zero income', () => {
+    expect(f(text2)).toBe(0);
+  });
+});
+/**
+ * Ex22
+ * Replace all <b> tags
+ * to BTAG
+ *
+<b>Hello world</b>
+<b>Hello world and is wrong</b> <b>This</b>
+wow <b>world</b>
+===>
+BTAG
+BTAG BTAG
+wow BTAG
+Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+const f = (text) => {};
+
+module.exports = f;
+/**
+ *
+ * Replace all texts within <b></b> tags
+ * to BTAG
+ */
+
+/** 16 MAY 2024 18:34 */
+const f = (text) => {
+  const r = /<b>[\w\W]*?<\/b>/g;
+  return text.replace(r, "BTAG");
+};
+
+const f = (text) => {
+  const r = /<b>.*?<\/b>/gm;
+  return text.replace(r, "BTAG");
+};
+
+module.exports = f;
+const f = require("./ex22.js");
+const text = `
+<b>Hello world</b>
+<b>Hello world and is wrong</b> <b>This</b>
+wow <b>world</b>
+`;
+const expected = `
+BTAG
+BTAG BTAG
+wow BTAG
+`;
+
+describe("running test for ex22", () => {
+  it("should repalce all b tags with BTAG", () => {
+    expect(f(text)).toBe(expected);
+  });
+});
+/*
+ * Ex23
+ * Find all words like lel lil lal but not lol itself
+ * Export r
+ * NOTE: use exclude marker for regexp
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+const r = //;
+  (module.exports = r);
+/*
+ * Find all lol words like lel lil lal and change them to l*l but don't change lol itself
+ * Export r
+ * NOTE: use exclude marker for regexp
+ */
+
+const r = /\bl[^o]l\b/gi;
+
+module.exports = r;
+r = require("./ex23.js");
+
+console.log(r);
+
+const f = (text) => {
+  return text.replace(r, "l*l");
+};
+describe("Regexp 10", () => {
+  it("Test case for ex10", () => {
+    expect(f("lol lal lil lel lol lul")).toBe("lol l*l l*l l*l lol l*l");
+  });
+});
+/**
+ * Ex24
+ * Given any telephone number format,
+ * transform it into gigits only format.
+ * +7 987 231 45 23 => 79872314523
+ * +7 (987) 231 45-23 => 79872314523
+ * etc.
+ * Сложность: ★★★★★★★☆☆☆ (7/10)
+ */
+
+module.exports = f;
+const f = (text) => {
+  return text.replace(/\D/g, "");
+};
+const f = require("./ex24.js");
+
+describe("Running test cases for ex24", () => {
+  it("should transform format 1 to digits only", () => {
+    expect(f("+7 923 168 59 41")).toBe("79231685941");
+  });
+
+  it("should transform format 2 to digits only", () => {
+    expect(f("+7 (923) 168 59-41")).toBe("79231685941");
+  });
+});
+/**
+ * Ex25
+ * Here are 3 tasks for Positive Lookahead and Positive Lookbehind
+ * 1) From
+ * RHX: $431.41
+ * MTG: $651.22
+ * RTT: $300.00
+ * return regex that makes an array of prices, so is 431.41, 651.22 and 300.00
+ *
+ * 2) Extract title from html
+ * Given <title>Main title</title> return Main title
+ *
+ * 3) Given url, extract protocol
+ * https://instagram.com => https
+ * http://google.com => http
+ * ftp://files.net => ftp
+ * Сложность: ★★★★★★★★☆☆ (8/10)
+ */
+const r1 = //;
+const r2 = //
+const r3 = //;
+  module.exports = [r1, r2, r3];
+/**
+ *
+ * Here are 3 tasks for Positive Lookahead and Positive Lookbehind
+ * 1) From
+ * RHX: $431.41
+ * MTG: $651.22
+ * RTT: $300.00
+ * return regex that makes an array of prices, so is 431.41, 651.22 and 300.00
+ *
+ * 2) Extract title from html
+ * Given <title>Main title</title> return Main title
+ *
+ * 3) Given url, extract protocol
+ * https://instagram.com => https
+ * http://google.com => http
+ * ftp://files.net => ftp
+ */
+const r1 = /(?<=\$)[0-9.]+/g;
+const r2 = /(?<=<title>)(.*)(?=<\/title)/g;
+const r3 = /\b.+(?=:)/g;
+
+module.exports = [r1, r2, r3];
+
+/**
+ * Some other solutions
+ */
+
+//13.10.2025
+const xr1 = /(?<=\$)\d+\.\d+/g;
+const xr2 = /(?<=<title>)(?:.*)(?=<\/title>)/g;
+const xr3 = /(\w+)(?=:\/\/)/g;
+const [r1, r2, r3] = require("./ex25.js");
+
+const text1 = `
+AGX: $23.50
+TTX: $54.30
+ARG: $90.00
+`;
+
+const f1 = (text) => text.match(r1);
+
+const text2 = "<title>Website title</title>";
+const f2 = (text) => text.match(r2);
+
+const text3 = `
+  https://wikipedia.org
+  http://website.ru
+  ftp://aloga.top
+`;
+const f3 = (text) => text.match(r3);
+
+describe("Running test cases for ex25", () => {
+  it("test cast for task 1", () => {
+    expect(f1(text1)).toEqual(["23.50", "54.30", "90.00"]);
+  });
+
+  it("test case for task 2", () => {
+    expect(f2(text2)).toEqual(["Website title"]);
+  });
+
+  it("test case for task 3", () => {
+    expect(f3(text3)).toEqual(["https", "http", "ftp"]);
+  });
+});
+/**
+ * Ex26
+ * In given text,  for example
+ * === I paid $30 for 30 apples and 80 oranges ===
+ * Find the quantifiers of products, such as 30 and 80
+ * And omit the prices
+ * Сложность: ★★★★★★★★☆☆ (8/10)
+ */
+
+module.exports = //;
+module.exports = /\b(?<![$.])\d+\b/g;
+const r = require("./ex26.js");
+
+const f = (text) => text.match(r) || [];
+
+describe("Running test cases for ex26", () => {
+  it("[1] Basic case: separate price and quantities", () => {
+    const text = "I paid $30 for 30 apples and 80 oranges";
+    expect(f(text)).toEqual(["30", "80"]);
+  });
+
+  it("[2] Decimals case: ignore prices with cents, find integer quantities", () => {
+    const text = "The price is $10.99 for 5 liters and 2 packs";
+    // Игнорируем $10.99 целиком, забираем 5 и 2
+    expect(f(text)).toEqual(["5", "2"]);
+  });
+
+  it("[3] Large numbers and edge positions", () => {
+    const text = "1000 users spent $5000 to buy 200 units";
+    expect(f(text)).toEqual(["1000", "200"]);
+  });
+
+  it("[4] Price at the end of string", () => {
+    const text = "Quantity is 50, price is $10";
+    expect(f(text)).toEqual(["50"]);
+  });
+
+  it("[5] Only prices in text: should return empty array", () => {
+    const text = "Costs are $10, $20 and $30.50";
+    expect(f(text)).toEqual([]);
+  });
+
+  it("[6] Quantities with nearby symbols: should not be confused", () => {
+    const text = "Buy 5 items (ref: 123) for $99 each";
+    expect(f(text)).toEqual(["5", "123"]);
+  });
+});
+/**
+ * Ex27
+ * Write regex to test if there is
+ * 1) exactly 3 digits in a given string
+ * 2) less than 3 digits in a given string
+ * 3) 3 or more digits in a given string
+ * Сложность: ★★★★★★★★★☆ (9/10)
+ */
+
+const r1 = //;
+const r2 = //;
+const r3 = //;
+module.exports = [r1, r2, r3];
+/**
+ * Write regex to test if there is
+ * 1) exactly 3 digits in a given string
+ * 2) less than 3 digits in a given string
+ * 3) 3 or more digits in a given string
+ */
+
+const r1 = /^(?:\D*\d){3}\D*$/;
+const r2 = /^(?:\D*\d){0,2}\D*$/;
+const r3 = /^(?:\D*\d){3,}\D*$/;
+module.exports = [r1, r2, r3];
+const [r1, r2, r3] = require("./ex27.js");
+
+const f1 = (text) => r1.test(text);
+const f2 = (text) => r2.test(text);
+const f3 = (text) => r3.test(text);
+
+// =============== БАЗОВЫЕ ТЕСТЫ ===============
+describe("Базовые тесты для ex27", () => {
+  it("ровно 3 цифры", () => {
+    expect(f1("has_1_exact_2_ly_3_digits")).toBe(true);
+    expect(f1("1234")).toBe(false);
+    expect(f1("has_1_notex2act_2_ly_3_dig_4_its")).toBe(false);
+  });
+
+  it("меньше 3 цифр", () => {
+    expect(f2("1234")).toBe(false);
+    expect(f2("12")).toBe(true);
+    expect(f2("has1_less_than_2_digits")).toBe(true);
+    expect(f2("has1_not_4_less_than_2_di_4gits")).toBe(false);
+  });
+
+  it("3 или более цифр", () => {
+    expect(f3("h_1_as_mo_2_re_than_3_digits_4")).toBe(true);
+    expect(f3("has_1_exact_2_ly_3_digits")).toBe(true);
+    expect(f3("1452")).toBe(true);
+    expect(f3("12")).toBe(false);
+  });
+});
+
+// =============== ГРАНИЧНЫЕ СЛУЧАИ ===============
+describe("Граничные случаи", () => {
+  it("r1: ровно 3 цифры — крайние значения", () => {
+    expect(f1("")).toBe(false);
+    expect(f1("abc")).toBe(false);
+    expect(f1("a1b")).toBe(false);
+    expect(f1("a1b2c")).toBe(false);
+    expect(f1("123")).toBe(true);
+    expect(f1("000")).toBe(true);
+    expect(f1("a1!b2@c3#")).toBe(true);
+    expect(f1("1234")).toBe(false);
+    expect(f1("a1b2c3d")).toBe(true);
+    expect(f1("a1b2c3d4")).toBe(false);
+  });
+
+  it("r2: меньше 3 цифр — крайние значения", () => {
+    expect(f2("")).toBe(true);
+    expect(f2("!!!")).toBe(true);
+    expect(f2("0")).toBe(true);
+    expect(f2("99")).toBe(true);
+    expect(f2("a9b")).toBe(true);
+    expect(f2("x1y2z")).toBe(true);
+    expect(f2("123")).toBe(false);
+    expect(f2("000")).toBe(false);
+    expect(f2("a1b2c3")).toBe(false);
+    expect(f2("1 2")).toBe(true);
+  });
+
+  it("r3: 3+ цифр — крайние значения", () => {
+    expect(f3("")).toBe(false);
+    expect(f3("ab")).toBe(false);
+    expect(f3("7")).toBe(false);
+    expect(f3("55")).toBe(false);
+    expect(f3("000")).toBe(true);
+    expect(f3("9999")).toBe(true);
+    expect(f3("a5b6c7")).toBe(true);
+    expect(f3("1a2b3c4d")).toBe(true);
+    expect(f3("!!!123!!!")).toBe(true);
+    expect(f3("1 2 3")).toBe(true);
+    expect(f3("1".repeat(100))).toBe(true);
+  });
+});
+
+// =============== ТЕСТЫ НА КАТАСТРОФИЧЕСКИЙ ОТКАТ ===============
+describe("Проверка на устойчивость к ReDoS", () => {
+  // Генерируем длинную строку из букв, которая НЕ заканчивается цифрой
+  // Плохая регулярка с вложенными повторами будет проверять все комбинации
+  // пробелов/букв перед тем как сдаться.
+  const longEvilString = "a".repeat(10000) + "!";
+
+  it("r1: не зависает на длинных строках без нужного числа цифр", () => {
+    // Проверяем 2 цифры в начале и бесконечный хвост
+    // Если регулярка использует (.*)* — здесь будет вис
+    expect(f1("1a2" + "b".repeat(5000))).toBe(false);
+    expect(f1(longEvilString)).toBe(false);
+  });
+
+  it("r2: не виснет, если цифр слишком много в конце длинной строки", () => {
+    // Создаем строку, где много повторов букв и цифры в самом конце
+    // Это заставляет движок делать много откатов, если группы пересекаются
+    const manyDigitsAtEnd = "abc".repeat(3000) + "12345";
+    expect(f2(manyDigitsAtEnd)).toBe(false);
+  });
+
+  it("r3: быстро находит совпадение в начале огромной строки", () => {
+    // Даже если строка — миллион символов, r3 должна найти "123" мгновенно
+    const giantString = "123" + "x".repeat(100000);
+    expect(f3(giantString)).toBe(true);
+  });
+
+  it("r1 & r2: исключаем 'ловушку пересечения' (\d* против \D*)", () => {
+    // Тест на "амбивалентность": когда движок не знает, какой звездочке отдать символ
+    const trickyPattern = "1 2 " + " ".repeat(5000) + " 3";
+    // r1: ровно 3 (true)
+    // r2: меньше 3 (false)
+    expect(f1(trickyPattern)).toBe(true);
+    expect(f2(trickyPattern)).toBe(false);
+  });
+});
+/**
+ * Ex28
+ * Write regex, that checks if password is trong enough
+ * - has at least one upper case letter
+ * - has at least one lowercase letter
+ * - has at least 3 digits
+ * - has special character
+ * - has no whitespaces
+ * - has length from 24 to 256 symbols
+ * Сложность: ★★★★★★★★★☆ (9/10)
+ */
+
+module.exports =
+  //;
+/**
+ * Write regex, that checks if password is trong enough
+ * - has at least one upper case letter
+ * - has at least one lowercase letter
+ * - has at least 3 digits
+ * - has special character
+ * - has no whitespaces
+ * - has length from 12 to 24 symbols
+ */
+
+//27.11.2025 00:43
+//(?=\S*[A-Z]\S*)(?=\S*[a-z]\S*)(?=\S*[0-9]\S*)(?=\S*[\p{P}\p{S}]\S*)[A-Z-a-z0-9\p{P}\p{S}]{24,256}
+
+const f = (text) => {
+  const r =
+    /^(?=\S*[A-Z]\S*)(?=\S*[a-z]\S*)(?=(?:\S*[0-9]\S*){3,})(?=\S*[\p{S}\p{P}]\S*)[A-Za-z0-9\p{S}\p{P}]{24,256}$/u;
+  return r.test(text);
+};
+
+module.exports = f;
+const f = require("./ex28.js");
+
+describe("Running test cases for ex25", () => {
+  it("...running test case #1", () => {
+    expect(f("$MySup3erHard0Pass0wor0d")).toBe(true);
+  });
+
+  it("...running test case #2", () => {
+    expect(f("MySuperHardPassword")).toBe(false);
+  });
+
+  it("...running test case #3", () => {
+    expect(f("$mysuperhardpassword")).toBe(false);
+  });
+
+  it("...running test case #4", () => {
+    expect(f("$$$MMMoney")).toBe(false);
+  });
+
+  it("...running test case #5", () => {
+    expect(f("$TooShort3000")).toBe(false);
+  });
+
+  it("...running test case #6", () => {
+    expect(f("$SpaceBarsAre Forbidden")).toBe(false);
+  });
+});
+/**
+ * Ex29
+ * Make a regex that finds all the correct dates in format DD/MM/YYYY
+ * Сложность: ★★★★★★★☆☆☆ (7/10)
+ */
+
+const f = (text) => {
+  const r = //;
+  return ...;
+};
+
+module.exports = f;
+const f = (text) => {
+  const r = /\b(0[1-9]|1\d|2\d|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}\b/g;
+  return text.match(r) || [];
+};
+
+module.exports = f;
+const f = require("./ex29.js");
+
+describe(":: Test case EX29 — regex date extraction", () => {
+  it("should find valid dates in standard text", () => {
+    const text = `
+      Alan: 22/04/2001;
+      Max: 01/08/2005;
+      Rachel: 55/22/3333;
+    `;
+    const result = ["22/04/2001", "01/08/2005"];
+    expect(f(text)).toEqual(result);
+  });
+
+  it("should ignore clearly invalid day or month numbers", () => {
+    const text = `
+      00/01/2020;
+      32/12/1999;
+      15/13/2020;
+      12/00/2000;
+      10/10/2010;
+    `;
+    const result = ["10/10/2010"];
+    expect(f(text)).toEqual(result);
+  });
+
+  it("should find multiple dates in one line", () => {
+    const text = "Dates: 01/01/2000 02/02/2022 33/03/2022 12/12/2012";
+    const result = ["01/01/2000", "02/02/2022", "12/12/2012"];
+    expect(f(text)).toEqual(result);
+  });
+
+  it("should return an empty array if no dates match the pattern", () => {
+    const text = "No dates here: 2020/01/01, 1/1/2020, 99/99/9999.";
+    expect(f(text)).toEqual([]);
+  });
+
+  it("should handle messy spacing and punctuation", () => {
+    const text = `
+      John:03/03/2003, Mary - 09/09/1999; Tim=30/11/2010!
+    `;
+    const result = ["03/03/2003", "09/09/1999", "30/11/2010"];
+    expect(f(text)).toEqual(result);
+  });
+});
+/*
+ * Ex3
+ * Replace all possible Google,Goooogle,goooooooooooogle with Yandex
+ * Сложность: ★★★★☆☆☆☆☆☆ (4/10)
+ */
+
+const r = //;
+const f = (text) => {
+  return;
+};
+module.exports = f;
+/*
+ * Replace all possible Google,Goooogle,goooooooooooogle with Yandex
+ */
+
+const r = /Gooo*gle/gi;
+const f = (text) => {
+  return text.replace(r, 'Yandex');
+};
+module.exports = f;
+f = require("./ex3.js");
+
+describe("Regexp", () => {
+  it("Test case for ex3", () => {
+    expect(f("Google Gooooooogle Gogle goooooooooooogle Yandex Googl")).toBe(
+      "Yandex Yandex Gogle Yandex Yandex Googl",
+    );
+  });
+});
+/**
+ * Ex30
+ * Among the given text,
+ * find all the strings that could be good passwords,
+ * that must have capital and lower case, one digit and one of !@#$%^&*
+ * Minimal length is 8 symbols
+ * Password must NOT have spaces
+ * Find all of them
+ * Сложность: ★★★★★★★★★☆ (9/10)
+ */
+
+const f = (text) => {
+  const r =
+    //;
+  return;
+};
+
+module.exports = f;
+const f = (text) => {
+  const r =
+    /(?=\S*[A-Z]\S*)(?=\S*[a-z]\S*)(?=\S*[0-9]\S*)(?=\S*[!@#$%^&*]\S*)[A-Za-z0-9!@#$%^&*]{8,}/g;
+  return text.match(r) || [];
+};
+
+module.exports = f;
+const f = require("./ex30.js");
+
+describe(":: Running test case for EX30", () => {
+  it("1️⃣ should find all the correct passwords in the text", () => {
+    const text =
+      "My passwords: pass123, Strong#Pass123, weak, StrongPass123#, P@ssw0rd!, HelloWorld, 12345678!, aB3#4567, passWORD123#, #Qwerty123, Small#1, SHORT#1a";
+
+    const result = f(text);
+
+    expect(result).toEqual([
+      "Strong#Pass123",
+      "StrongPass123#",
+      "P@ssw0rd!",
+      "aB3#4567",
+      "passWORD123#",
+      "#Qwerty123",
+      "SHORT#1a",
+    ]);
+  });
+
+  it("2️⃣ should not match words that lack a required character type", () => {
+    const invalids = [
+      "passwords", // нет цифры и спецсимвола
+      "pass123", // нет заглавной буквы и спецсимвола
+      "StrongPass", // нет цифры и спецсимвола
+      "12345678", // нет букв
+      "!!!!!!!!", // нет букв и цифр
+      "Abcdefgh", // нет цифры и спецсимвола
+      "Abcdefg1", // нет спецсимвола
+    ];
+
+    for (const word of invalids) {
+      const res = f(word);
+      expect(res).toEqual([]);
+    }
+  });
+
+  it("3️⃣ should correctly handle multiple valid passwords in one line", () => {
+    const text = "Try these: XyZ#1234 Abc#1234 Strong#Pass123";
+    const result = f(text);
+    expect(result).toEqual(["XyZ#1234", "Abc#1234", "Strong#Pass123"]);
+  });
+
+  it("4️⃣ should handle punctuation and boundaries correctly", () => {
+    const text = "Password: P@ssw0rd!; another one is Pass#1234.";
+    const result = f(text);
+    expect(result).toEqual(["P@ssw0rd!", "Pass#1234"]);
+  });
+
+  it("5️⃣ should not cross spaces or punctuation boundaries", () => {
+    const text = "Invalid combos: P@ss w0rd!, Pass#12 34, Stron gPass1";
+    const result = f(text);
+    expect(result).toEqual([]); // ни одно невалидное не должно совпасть
+  });
+
+  it("6️⃣ should return an empty array when no matches found", () => {
+    const text = "noValidPasswordsHere!";
+    const result = f(text);
+    expect(result).toEqual([]);
+  });
+});
+/**
+ * Ex31
+ * Найдите в тексте все валидные HEX-коды цветов.
+ * Цвет может быть в формате #RGB, #RGBA, #RRGGBB или #RRGGBBAA.
+ * Символы: 0-9, a-f, A-F.
+ * Перед кодом не должно быть букв/цифр, после него — тоже.
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+const f = (text) => {
+  const r = //;
+  return 0;
+};
+
+module.exports = f;
+/**
+ * Ex31
+ * Найдите в тексте все валидные HEX-коды цветов.
+ * Цвет может быть в формате #RGB, #RGBA, #RRGGBB или #RRGGBBAA.
+ * Символы: 0-9, a-f, A-F.
+ * Перед кодом не должно быть букв/цифр, после него — тоже.
+ * Сложность: ★★★★★★☆☆☆☆ (6/10)
+ */
+
+const f = (text) => {
+  const r = /(#[A-Fa-f0-9]{3,4}\b)|(#[A-Fa-f0-9]{6}\b)|(#[A-Fa-f0-9]{8}\b)/gi;
+  return text.match(r) || [];
+};
+
+module.exports = f;
+const f = require("./ex31.js");
+
+describe(":: Running test case for EX31 (#RGB HEX Colors)", () => {
+  it("1️⃣ should find standard 3 and 6 digit HEX codes", () => {
+    const text = "Colors: #fff, #000000, #F0A, #abcdef, #123456";
+    const result = f(text);
+    expect(result).toEqual(["#fff", "#000000", "#F0A", "#abcdef", "#123456"]);
+  });
+
+  it("2️⃣ should find HEX codes with alpha channel (4 and 8 digits)", () => {
+    const text = "Transparent colors: #ff00ffaa, #f00f";
+    const result = f(text);
+    expect(result).toEqual(["#ff00ffaa", "#f00f"]);
+  });
+
+  it("3️⃣ should not match invalid HEX strings", () => {
+    const text = "Invalid: #ff, #12345, #1234567, #gggggg, #z12, #123456789";
+    const result = f(text);
+    expect(result).toEqual([]);
+  });
+
+  it("4️⃣ should respect boundaries (no partial matches inside words)", () => {
+    const text = "Example: id#abc, width:100#fff, my#color#is#f00";
+    // Здесь #abc и #fff не должны захватиться, если они прилипли к буквам
+    // (зависит от логики \b, в данном случае ожидаем чистые совпадения)
+    const result = f(text);
+    expect(result).toEqual(["#abc", "#fff", "#f00"]);
+  });
+
+  it("5️⃣ should pick multiple codes from a sentence with punctuation", () => {
+    const text = "Check #abc; then #112233. Also #AABBCCDD!";
+    const result = f(text);
+    expect(result).toEqual(["#abc", "#112233", "#AABBCCDD"]);
+  });
+
+  it("6️⃣ should be case-insensitive", () => {
+    const text = "Mixed: #aBc, #Def0, #1a2B3c";
+    const result = f(text);
+    expect(result).toEqual(["#aBc", "#Def0", "#1a2B3c"]);
+  });
+});
+/*
+
+- Ex 32
+- Extract only "clean" targets (wrapped in symbols like #, *, &)
+- and ignore targets containing any digits.
+- #danger! *missile* @fake@ &target# ===> missle fake
+- ★Сложность: ★★★☆☆☆☆☆☆ (3/10)  
+
+*/
+
+module.exports = f;
+const r = /(\p{P})([a-z]+)\1/gimu;
+const f = (text) => {
+  const matches = [...text.matchAll(r)];
+  return matches.map((m) => m[2]);
+};
+
+module.exports = f;
+
+//Sol #2
+// const rFull = /([\p{P}])[a-z]+\1/giu; // Ищет симметричные куски: #danger#
+// const rClean = /[a-z]+/gi; // Вырезает только буквы
+
+// const f = (text) => {
+//   const targets = text.match(rFull) || [];
+//   // Очищаем каждый найденный кусок от символов
+//   return targets.map((t) => t.match(rClean)[0]);
+// };
+f = require("./ex32.js");
+
+describe("Regexp: Target Acquisition System", () => {
+  it("[1] Standard scenario: capture clean targets and ignore traps with numbers", () => {
+    const input = "#danger# %dummy1% *missile* @fake99@ &intercept& !shadow77!";
+    expect(f(input)).toEqual(["danger", "missile", "intercept"]);
+  });
+
+  it("[2] Symmetry check: delimiters must be identical", () => {
+    // #target! — разные знаки (игнор), @target@ — одинаковые (захват)
+    const input = "#danger! *missile* @fake@ &target#";
+    expect(f(input)).toEqual(["missile", "fake"]);
+  });
+
+  it("[3] Strict filtering: ignore targets with digits in any position", () => {
+    // 1abc, abc2, a3bc — все должны быть проигнорированы
+    const input = "*1danger* #missile2# @t3rget@ &clean&";
+    expect(f(input)).toEqual(["clean"]);
+  });
+
+  it("[4] Case sensitivity: should capture both UPPER and lower case", () => {
+    const input = "#DANGER# *Missile* &intercept&";
+    const result = f(input).map((s) => s.toLowerCase());
+    expect(result).toEqual(["danger", "missile", "intercept"]);
+  });
+
+  it("[5] Noise resistance: ignore targets with internal spaces or underscores", () => {
+    // Регулярка должна искать "чистое" слово [a-z]+
+    const input = "#broken target# *target_one* !valid!";
+    expect(f(input)).toEqual(["valid"]);
+  });
+
+  it("[6] Edge case: empty input or no valid matches", () => {
+    expect(f("no targets here")).toEqual([]);
+    expect(f("!!! $$$ %123%")).toEqual([]);
+    expect(f("")).toEqual([]);
+  });
+
+  it("[7] Unicode support: handle various punctuation markers", () => {
+    // Если используешь \p{P}, это должно работать
+    const input = "§rocket§ ¿alpha¿ ¡bravo!";
+    expect(f(input)).toEqual(["rocket", "alpha"]);
+  });
+});
+/*
+  * Ex4
+  * Find all lol lal lil and so on with dots and replace the mid letter with *
+  * lel. lol lil. => l*l. lol l*l.
+  * Сложность: ★★★★☆☆☆☆☆☆ (4/10)
+*/
+
+const r = //
+const f = (text) => {
+  return;
+}
+module.exports = f
+/*
+ * lel. lol lil. => l*l. lol l*l.
+ */
+
+const r = /l.l\./g;
+const r2 = /l(o|i)l\./g;
+const f = (text) => {
+  return text.replace(r, 'l*l.');
+};
+module.exports = f;
+f = require('./ex4.js');
+
+describe('Regexp', () => {
+  it('Test case for ex4', () => {
+    expect(f('lil. lol lel.')).toBe(
+      'l*l. lol l*l.',
+    );
+  });
+});
+/*
+ * Ex5
+ * Find people who own rat or cat and their name is just 4 letters length
+ * -> Jane's cat and Mike's rat and Naomi's dog and Alex's cat and John's dog => Jane Mike Alex (3)
+ * Сложность: ★★★★★☆☆☆☆☆ (5/10)
+ */
+
+module.exports = f;
+/*
+ * Find people who own rat or cat and their name is just 4 letters length
+ * -> Jane's cat and Mike's rat and Naomi's dog and -> Alex's cat and John's dog => Jane Mike Alex (3)
+ */
+const r = /\w{4,4}'s\s[cr]at/gi;
+const r2 = /.{4,4}'s .at/g;
+
+const f = (text) => {
+  return text.match(r).length;
+};
+module.exports = f;
+f = require('./ex5.js');
+
+describe('Regexp', () => {
+  it('Test case for ex5', () => {
+    expect(f(`Jane's cat and Mike's rat and Naomi's dog and Alex's cat and John's dog`)).toBe(
+      3,
+    );
+  });
+});
+/*
+ * Ex6
+ * remove digits 0-5 and capitals from a string
+ * Сложность: ★★★★☆☆☆☆☆☆ (4/10)
+*/
+
+const r = //
+const f = text => {
+  return;
+}
+module.exports = f
+/*
+ * remove digits 0-5 and capitals fro ma string
+*/
+
+const r = /([A-Z]|[0-5])/g
+const f = text => {
+  return text.replace(r, '')
+}
+module.exports = f
+f = require('./ex6.js');
+
+describe('Regexp', () => {
+  it('Test case for ex6', () => {
+    expect(f(`THEstring1234567890`)).toBe(
+      'string6789',
+    );
+  });
+});
+/*
+ * Ex7
+ * Replace all the and The with a 
+ * Сложность: ★★★☆☆☆☆☆☆☆ (3/10)
+*/
+
+const r = //
+const f = text => {
+  return;
+}
+
+module.exports = f
+/*
+ * Replace all the and The with a 
+*/
+
+const r = /(t|T)he/g
+const f = text => {
+  return text.replace(r, 'a')
+}
+
+module.exports = f
+f = require('./ex7.js');
+
+describe('Regexp', () => {
+  it('Test case for ex7', () => {
+    expect(f(`The cat and the dog and a rat`)).toBe(
+      'a cat and a dog and a rat',
+    );
+  });
+});
+/*
+ * Ex8
+ * Check if a message is valid: it should contain xo 2 or 3 times (xoxo or xoxoxo)
+ * Сложность: ★★★★★☆☆☆☆☆ (5/10)
+*/
+
+const r = //
+const f = (text) => {
+  return;
+}
+module.exports = f
+/*
+ * Check if a message is valid: it should contain xo 2 or 3 times (xoxo or xoxoxo)
+*/
+
+const r = /(^|\s)(xo){2,3}(\s|$)/
+const f = (text) => {
+  return Boolean(text.match(r));
+}
+module.exports = f
+f = require('./ex8.js');
+
+describe('Regexp', () => {
+  it('Test case for ex8 #1', () => {
+    expect(f(`I love you xoxo`)).toBe(
+      true,
+    );
+  });
+
+  it('Test case for ex8 #2', () => {
+    expect(f(`I love you xoxoxo`)).toBe(
+      true,
+    );
+  });
+
+  it('Test case for ex8 #3', () => {
+    expect(f(`I love you xo`)).toBe(
+      false,
+    );
+  });
+});
+/*
+ * Ex9
+ * Count how many lines start with The
+ * Сложность: ★★★★☆☆☆☆☆☆ (4/10)
+ */
+
+const r = //;
+const f = (text) => {
+  return;
+};
+module.exports = f;
+/*
+ * Count how many lines start with The
+*/
+
+const r = /^The/gmi
+const f = (text) => {
+  return text.match(r).length
+}
+module.exports = f
+f = require("./ex9.js");
+
+describe("Regexp", () => {
+  it("Test case for ex9", () => {
+    expect(
+      f(
+        `The most imprtant part\nIs to be yourself\nA true hero doesn't wear a cape\nThe world needs us\nYou may know the The article`,
+      ),
+    ).toBe(2);
+  });
+});
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="3" y="3" width="42" height="42" rx="2" stroke="currentColor" stroke-width="1.5"/>
+  <text x="7" y="27" font-family="monospace" font-size="18" fill="currentColor" font-weight="bold">.*</text>
+  <line x1="3" y1="32" x2="45" y2="32" stroke="currentColor" stroke-width="1" opacity=".35"/>
+  <text x="7" y="41" font-family="monospace" font-size="7" fill="currentColor" opacity=".5" letter-spacing="2">REGEX ENGINE</text>
+</svg>
