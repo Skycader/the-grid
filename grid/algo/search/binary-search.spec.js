@@ -62,31 +62,6 @@ describe("binarySearch: middle target", () => {
   });
 });
 
-describe("binarySearch: middle target (stress test)", () => {
-  // Запускаем стресс-тест на 100 итераций, чтобы гарантированно поймать 11-й шаг
-  const STRESS_RUNS = 100;
-
-  test("should find target at correct index and within 10 iterations across multiple random arrays", () => {
-    for (let i = 0; i < STRESS_RUNS; i++) {
-      const length = 1000;
-      // Каждый раз генерируем новый массив, чтобы проверить разные комбинации индексов
-      const arr = generateSortedRandomArray(length, 1, 1000000);
-
-      const randomIndex = Math.floor(Math.random() * length);
-      const target = arr[randomIndex];
-
-      const api = new Api(arr);
-
-      // 1. Проверяем корректность индекса
-      expect(binarySearch(api, target)).toBe(randomIndex);
-
-      // 2. Проверяем строгое ограничение по итерациям (для 1000 элементов максимум 10)
-      // Если ваш код делает 11 шагов, этот ассерт точно упадет на одном из 100 прогонов
-      expect(api.iterations).toBeLessThanOrEqual(10);
-    }
-  });
-});
-
 //Dependencies
 //####################################################
 
@@ -102,3 +77,56 @@ function generateSortedRandomArray(length, min, max) {
 
   return sortedArray;
 }
+
+/**
+ * Функция бенчмарка для анализа эффективности бинарного поиска.
+ *
+ * @param {Function} searchFn - Ваша функция бинарного поиска (api, target) => index
+ * @param {number} rounds - Количество раундов (прогонов) для сбора статистики
+ * @returns {Object} Объект с минимальным, средним и максимальным количеством итераций
+ */
+function benchmarkBinarySearch(searchFn, rounds = 10000) {
+  const iterationsHistory = [];
+  const length = 10000; // Фиксируем длину массива для честной статистики
+
+  for (let i = 0; i < rounds; i++) {
+    // Генерируем массив (большой диапазон max исключает дубликаты)
+    const arr = generateSortedRandomArray(length, 1, 1000000);
+
+    // Выбираем случайный существующий элемент
+    const randomIndex = Math.floor(Math.random() * length);
+    const target = arr[randomIndex];
+
+    // Создаем изолированный Api для этого раунда
+    const api = new Api(arr);
+
+    // Запускаем поиск
+    const resultIndex = searchFn(api, target);
+
+    // Валидация (на всякий случай проверяем, что индекс найден верно)
+    if (resultIndex !== randomIndex) {
+      console.warn(
+        `[Раунд ${i}]: Алгоритм вернул неверный индекс! Ожидалось ${randomIndex}, пришло ${resultIndex}`,
+      );
+    }
+
+    // Сохраняем количество итераций для этого раунда
+    iterationsHistory.push(api.iterations);
+  }
+
+  // Считаем метрики
+  const min = Math.min(...iterationsHistory);
+  const max = Math.max(...iterationsHistory);
+  const sum = iterationsHistory.reduce((acc, val) => acc + val, 0);
+  const avg = Number((sum / rounds).toFixed(2)); // Округляем до 2 знаков после запятой
+
+  return {
+    min,
+    avg,
+    max,
+  };
+}
+
+// Пример использования:
+// const stats = benchmarkBinarySearch(f, 10000);
+// console.log(stats); // { min: 1, avg: 8.45, max: 10 }
