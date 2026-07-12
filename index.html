@@ -272,22 +272,88 @@
     <script id="wk" type="x/worker">
       // ── Jest-compatible mini test runner ──────────────────────────────
       function makeRunner(){
-        const suites={};let curSuite='__root__';
+        const suites={};
         let _asserts=null; // soft assertion collector, active during it()
 
+        // ── suite stack: root frame always present, describe() pushes/pops ──
+        // hooks are per-frame so beforeEach/afterEach/beforeAll/afterAll declared
+        // at top level (outside any describe) apply to every test in the file,
+        // while hooks declared inside a describe() only apply to that suite.
+        function newHooks(){
+          return {beforeEach:[],afterEach:[],beforeAll:[],afterAll:[],beforeAllRan:false};
+        }
+        const suiteStack=[{name:'__root__',hooks:newHooks()}];
+        const curFrame=()=>suiteStack[suiteStack.length-1];
+
+        function runHooks(list,suiteName,label){
+          for(const h of list){
+            try{h();}
+            catch(e){
+              if(!suites[suiteName])suites[suiteName]=[];
+              suites[suiteName].push({name:'('+label+')',status:'error',error:e.message,time:0,mem:null,assertions:[]});
+            }
+          }
+        }
+
         function describe(n,fn){
-          curSuite=n;if(!suites[n])suites[n]=[];
+          if(!suites[n])suites[n]=[];
+          const frame={name:n,hooks:newHooks()};
+          suiteStack.push(frame);
           try{fn();}catch(e){suites[n].push({name:'(setup)',status:'error',error:e.message,time:0,mem:null,assertions:[]});}
+          runHooks(frame.hooks.afterAll,n,'afterAll');
+          suiteStack.pop();
+        }
+
+        function beforeEach(fn){curFrame().hooks.beforeEach.push(fn);}
+        function afterEach(fn){curFrame().hooks.afterEach.push(fn);}
+        function beforeAll(fn){curFrame().hooks.beforeAll.push(fn);}
+        function afterAll(fn){curFrame().hooks.afterAll.push(fn);}
+
+        // root's afterAll never fires from describe() (root is never popped) —
+        // singleRun calls this once the whole spec has finished registering.
+        function finalizeRoot(){
+          runHooks(suiteStack[0].hooks.afterAll,'__root__','afterAll');
         }
 
         function it(name,fn){
-          const s=curSuite;if(!suites[s])suites[s]=[];
+          const frame=curFrame(),s=frame.name;
+          if(!suites[s])suites[s]=[];
+          const chain=suiteStack.slice(); // root → current
+          let hookErr=null;
+
+          // beforeAll: once per suite level, lazily, right before its first test
+          for(const f of chain){
+            if(f.hooks.beforeAllRan)continue;
+            f.hooks.beforeAllRan=true;
+            for(const h of f.hooks.beforeAll){
+              try{h();}catch(e){hookErr='beforeAll: '+e.message;break;}
+            }
+            if(hookErr)break;
+          }
+          // beforeEach: root → current, before every test
+          if(!hookErr){
+            for(const f of chain){
+              for(const h of f.hooks.beforeEach){
+                try{h();}catch(e){hookErr='beforeEach: '+e.message;break;}
+              }
+              if(hookErr)break;
+            }
+          }
+
           const assertions=[];
           _asserts=assertions;
           const mb=self.performance?.memory?.usedJSHeapSize??-1,t0=self.performance.now();
-          let runtimeErr=null;
-          try{fn();}
-          catch(e){runtimeErr=e.message;}
+          let runtimeErr=hookErr;
+          if(!hookErr){
+            try{fn();}
+            catch(e){runtimeErr=e.message;}
+          }
+          // afterEach: current → root, always runs (even after a failed test/hook)
+          for(const f of [...chain].reverse()){
+            for(const h of f.hooks.afterEach){
+              try{h();}catch(e){if(!runtimeErr)runtimeErr='afterEach: '+e.message;}
+            }
+          }
           const dt=self.performance.now()-t0,ma=self.performance?.memory?.usedJSHeapSize??-1;
           _asserts=null;
           const failed=assertions.filter(a=>a.status==='fail');
@@ -346,7 +412,7 @@
           });
           return m;
         }
-        return{suites,describe,it,test,expect};
+        return{suites,describe,it,test,expect,beforeEach,afterEach,beforeAll,afterAll,finalizeRoot};
       }
 
       // ── compileSol: execute solution JS, return module.exports ─────
@@ -366,20 +432,21 @@
       // No cleanSpec stripping, no injected `f` param — clean Node.js semantics.
       // Each call has its own fresh context: no scope bleed between ref and user runs.
       function singleRun(sol, spec) {
-        const {suites, describe, it, test, expect} = makeRunner();
+        const {suites, describe, it, test, expect, beforeEach, afterEach, beforeAll, afterAll, finalizeRoot} = makeRunner();
         const t0 = self.performance.now();
         let ex;
         try { ex = compileSol(sol); }
         catch(err) { return {error: 'SYNTAX/RUNTIME:\n' + err.message, suites: {}, total: 0}; }
         const requireFn = () => ex;
         try {
-          new Function('describe', 'it', 'test', 'expect', 'require', spec)(
-            describe, it, test, expect, requireFn
+          new Function('describe', 'it', 'test', 'expect', 'require', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll', spec)(
+            describe, it, test, expect, requireFn, beforeEach, afterEach, beforeAll, afterAll
           );
         } catch(err) {
           if (!suites['__root__']) suites['__root__'] = [];
           suites['__root__'].push({name: 'spec error', status: 'error', error: err.message, time: 0, mem: null});
         }
+        finalizeRoot();
         return {suites, total: self.performance.now() - t0};
       }
 
