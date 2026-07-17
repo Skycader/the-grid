@@ -55,6 +55,13 @@ window.CFG_algo = [
         desc: "Практика каррирования",
         file: "currying",
       },
+      {
+        id: "errors",
+        title: "Process an object into array",
+        diff: 2,
+        desc: "Практика работы с объектами",
+        file: "errors",
+      },
     ],
   },
 ];
