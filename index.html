@@ -439,8 +439,10 @@
         catch(err) { return {error: 'SYNTAX/RUNTIME:\n' + err.message, suites: {}, total: 0}; }
         const requireFn = () => ex;
         try {
-          new Function('describe', 'it', 'test', 'expect', 'require', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll', spec)(
-            describe, it, test, expect, requireFn, beforeEach, afterEach, beforeAll, afterAll
+          // __source: raw pre-compile solution text — lets specs assert on
+          // the code itself (e.g. ban loops) via expect(__source).not.toMatch(...)
+          new Function('describe', 'it', 'test', 'expect', 'require', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll', '__source', spec)(
+            describe, it, test, expect, requireFn, beforeEach, afterEach, beforeAll, afterAll, sol
           );
         } catch(err) {
           if (!suites['__root__']) suites['__root__'] = [];
