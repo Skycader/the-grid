@@ -282,10 +282,6 @@
         color: var(--c);
         box-shadow: var(--glow);
       }
-      .rnd-gear {
-        opacity: 0.6;
-        font-size: 0.8rem;
-      }
       .rnd-panel {
         position: absolute;
         top: calc(100% + 6px);
@@ -296,13 +292,27 @@
         box-shadow: var(--glowb);
         backdrop-filter: blur(14px);
         padding: 12px 13px 13px;
-        display: none;
+        display: flex;
         flex-direction: column;
         gap: 6px;
         z-index: 40;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-3px);
+        transition:
+          opacity 0.15s ease,
+          transform 0.15s ease;
       }
-      .rnd-wrap:hover .rnd-panel {
-        display: flex;
+      /* .open is toggled by JS (js/random.js) on mouseenter/mouseleave with a
+         setTimeout grace period — a plain CSS :hover trigger hides the panel
+         the instant the cursor leaves the button, before it can reach the
+         panel below it. */
+      .rnd-wrap.open .rnd-panel {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
       }
       .rnd-panel-title {
         font-family: "JetBrains Mono", monospace;

@@ -2,6 +2,27 @@
       // Button next to the home search bar: hover reveals a filter panel
       // (difficulty range + top-level categories), click opens a random
       // task matching the currently selected filters.
+
+      // Panel visibility is JS-driven (not plain CSS :hover) so leaving the
+      // button for the panel below it has a grace period instead of the
+      // panel vanishing the instant the cursor crosses the gap between them.
+      const _rndWrap = document.getElementById("rnd-wrap");
+      let _rndHideTimer = null;
+      function rndShowPanel() {
+        clearTimeout(_rndHideTimer);
+        _rndWrap.classList.add("open");
+      }
+      function rndScheduleHidePanel() {
+        clearTimeout(_rndHideTimer);
+        _rndHideTimer = setTimeout(() => {
+          _rndWrap.classList.remove("open");
+        }, 500);
+      }
+      _rndWrap.addEventListener("mouseenter", rndShowPanel);
+      _rndWrap.addEventListener("mouseleave", rndScheduleHidePanel);
+      _rndWrap.addEventListener("focusin", rndShowPanel);
+      _rndWrap.addEventListener("focusout", rndScheduleHidePanel);
+
       function rndBuildCats() {
         const wrap = document.getElementById("rnd-cats");
         if (!wrap) return;
