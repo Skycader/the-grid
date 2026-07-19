@@ -72,7 +72,7 @@ window.CFG_regex = [
   {
     id: "regex_11",
     title: "Bills >= $100",
-    diff: 7,
+    diff: 4,
     desc: "Count bills that are more than or equal to $100",
     file: "ex11",
   },
