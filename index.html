@@ -34,14 +34,34 @@
             </div>
             <div class="vtag">v1.3.0 — CYBERNETIC BUILD</div>
           </div>
-          <div class="search-wrap">
-            <input
-              id="srch"
-              type="text"
-              placeholder="SEARCH_PROTOCOL... [F]"
-              autocomplete="off"
-              spellcheck="false"
-            />
+          <div class="search-row">
+            <div class="search-wrap">
+              <input
+                id="srch"
+                type="text"
+                placeholder="SEARCH_PROTOCOL... [F]"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <div class="rnd-wrap" id="rnd-wrap">
+              <button class="rnd-btn" id="rnd-btn" title="Открыть случайную задачу">
+                <span>RANDOM</span></span>
+              </button>
+              <div class="rnd-panel" id="rnd-panel">
+                <div class="rnd-panel-title">СЛОЖНОСТЬ</div>
+                <div class="rnd-diff-row">
+                  <span id="rnd-diff-val">1 – 10</span>
+                </div>
+                <div class="rnd-slider-wrap">
+                  <input type="range" id="rnd-diff-min" min="1" max="10" value="1" step="1" />
+                  <input type="range" id="rnd-diff-max" min="1" max="10" value="10" step="1" />
+                </div>
+                <div class="rnd-panel-title">КАТЕГОРИИ</div>
+                <div class="rnd-cats" id="rnd-cats"></div>
+                <div class="rnd-empty" id="rnd-empty">// НЕТ ЗАДАЧ ПОД ФИЛЬТР //</div>
+              </div>
+            </div>
           </div>
           <div id="srch-results"></div>
           <div class="cat-grid-wrap">
@@ -499,6 +519,7 @@
     <script src="js/background-fx.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/search.js"></script>
+    <script src="js/random.js"></script>
     <script src="js/home.js"></script>
     <script src="js/category.js"></script>
     <script src="js/task-view.js"></script>
