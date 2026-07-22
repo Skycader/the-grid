@@ -10,9 +10,9 @@ const f = (text) => {
   return text.replace(r, "BTAG");
 };
 
-const f = (text) => {
-  const r = /<b>.*?<\/b>/gm;
-  return text.replace(r, "BTAG");
-};
+// const f = (text) => {
+//   const r = /<b>.*?<\/b>/gm;
+//   return text.replace(r, "BTAG");
+// };
 
 module.exports = f;

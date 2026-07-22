@@ -13,20 +13,20 @@ const f = (text) => {
   return text.match(r)?.length || 0;
 };
 
-/** 23 september 2024 10:26 took me 30 seconds ti write it down */
-const f = (text) => {
-  const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
-  return text.match(r)?.length || 0;
-};
+// /** 23 september 2024 10:26 took me 30 seconds ti write it down */
+// const f = (text) => {
+//   const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+//   return text.match(r)?.length || 0;
+// };
 
-const f = (text) => {
-  const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
-  return text.match(r)?.length || 0;
-};
+// const f = (text) => {
+//   const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+//   return text.match(r)?.length || 0;
+// };
 
-const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
-const f = (text) => {
-  return text.match(r)?.length || 0;
-};
+// const r = /^(\d{1,3}\.){3,}\d{1,3}$/gm;
+// const f = (text) => {
+//   return text.match(r)?.length || 0;
+// };
 
 module.exports = f;
