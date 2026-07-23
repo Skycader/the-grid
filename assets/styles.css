@@ -755,9 +755,44 @@
         color: var(--c);
       }
 
-      .cat-search-wrap {
+      .cat-search-row {
+        display: flex;
+        align-items: stretch;
+        gap: 6px;
         padding: 5px 10px 4px;
         flex-shrink: 0;
+      }
+      .cat-search-row .cat-search-wrap {
+        flex: 1 1 90%;
+        min-width: 0;
+      }
+      .sort-btn {
+        flex: 0 0 10%;
+        min-width: 38px;
+        background: rgba(0, 14, 24, 0.9);
+        border: 1px solid var(--bd);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          border-color 0.18s,
+          box-shadow 0.18s;
+      }
+      .sort-btn:hover {
+        border-color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .sort-btn.sort-easy {
+        color: #859900;
+      }
+      .sort-btn.sort-hard {
+        color: #dc322f;
+      }
+      .cat-search-wrap {
         position: relative;
       }
       .cat-search-wrap::before {

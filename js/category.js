@@ -108,8 +108,40 @@
       // ── Task list state ──
       let _vsCat = null;
       let _vsQuery = ""; // current search query
-      let _vsMatches = []; // indices of matching tasks
+      let _vsMatches = []; // indices of matching tasks (into getDisplayTasks())
       let _catsrchTimer = null;
+      let _taskSortDir = "easy"; // "easy" | "hard" — sort by diff, toggled by #sort-btn
+
+      // Current category's tasks in display order (sorted by difficulty).
+      // All rendering/search indices are relative to THIS array, not cat.tasks.
+      function getDisplayTasks() {
+        if (!_vsCat || !_vsCat.tasks) return [];
+        return _vsCat.tasks
+          .slice()
+          .sort((a, b) =>
+            _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff,
+          );
+      }
+
+      function toggleTaskSort() {
+        playClick();
+        _taskSortDir = _taskSortDir === "easy" ? "hard" : "easy";
+        updateSortBtn();
+        renderRows();
+      }
+      function updateSortBtn() {
+        const btn = document.getElementById("sort-btn");
+        if (!btn) return;
+        const easy = _taskSortDir === "easy";
+        btn.classList.toggle("sort-easy", easy);
+        btn.classList.toggle("sort-hard", !easy);
+        btn.innerHTML = easy ? "★▼" : "★▲";
+        btn.title = easy
+          ? "Сортировка: сначала лёгкие"
+          : "Сортировка: сначала сложные";
+      }
+      document.getElementById("sort-btn").onclick = toggleTaskSort;
+      updateSortBtn();
 
       // Wire up cat search — debounce 30ms, scroll+dim, no filter
       document.getElementById("cat-srch").addEventListener("input", (e) => {
@@ -129,7 +161,7 @@
       function applyTaskSearch(q) {
         _vsQuery = q.toLowerCase();
         if (!_vsCat) return;
-        const tasks = _vsCat.tasks;
+        const tasks = getDisplayTasks();
         _vsMatches = q
           ? tasks.reduce((acc, t, i) => {
               if (
@@ -188,7 +220,7 @@
           return;
         }
 
-        const tasks = _vsCat.tasks;
+        const tasks = getDisplayTasks();
         const hasSearch = _vsQuery && _vsMatches.length > 0;
         const matchSet = hasSearch ? new Set(_vsMatches) : null;
 
