@@ -4,6 +4,10 @@ const f = (text) => {
   return matches.map((m) => m[2]);
 };
 
+/**
+ * Сложность: 5 — backreference \1; \p{P} тут просто класс символов (тир 2),
+ *            не отдельная сложность — решает backreference
+ */
 module.exports = f;
 
 //Sol #2

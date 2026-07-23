@@ -11,10 +11,14 @@
  * <htmx>...</htmx>
  */
 
-const r = /^<html>[\w\n\s\p{P}]*<\/html>$/g; //<-- should not have m flag;
+const r = /^\s*<html>(?:(?!<\/?html>)[\s\S])*<\/html>\s*$/u;
 const f = (text) => {
-  console.log(`${text} => ${r.test(text)}`);
   return r.test(text.trim());
 };
 
+/**
+ * Сложность: 8 — tempered greedy token: (?!<\/?html>) проверяется
+ *            на КАЖДОЙ итерации (?:...)* , а не один раз — запрещает
+ *            встретить ещё один <html>/</html> посередине текста
+ */
 module.exports = f;

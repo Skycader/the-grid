@@ -45,4 +45,7 @@ const f = (text) => {
   );
 };
 
+/**
+ * Сложность: 5 — backreference (\1) + non-greedy (.*?) вместе
+ */
 module.exports = f;

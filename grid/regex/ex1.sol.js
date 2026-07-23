@@ -9,4 +9,8 @@ const f = (text) => {
   /*code here */
   return text.replace(r, '');
 };
+
+/**
+ * Сложность: 1 — голый литерал, никаких метасимволов кроме флага /g
+ */
 module.exports = f;

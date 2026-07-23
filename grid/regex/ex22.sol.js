@@ -15,4 +15,8 @@ const f = (text) => {
 //   return text.replace(r, "BTAG");
 // };
 
+/**
+ * Сложность: 5 — non-greedy *? на [\w\W] (без groups/backreference, но non-greedy
+ *            сам по себе уже тир 5 — как и backreference, это одна ступень)
+ */
 module.exports = f;

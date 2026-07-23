@@ -1,33 +1,21 @@
 f = require("./ex15.js");
 
-const valid1 = `
-<html>
+const valid1 = `<html>
   Hello, world!
-</html>
-`;
+</html>`;
 
-const invalid1 = `
-<html>
+const invalid1 = `<html>
 Here goes html 1
 </html>
 <html>
 And also in the same file html 2
-</html>
-`;
+</html>`;
 
-const invalid2 = `
-<htmx> Sounds cool? </htmx>
-`;
+const invalid2 = `<htmx> Sounds cool? </htmx>`;
 
-const valid2 = `
-<html>
-<p>123</p>
-</html>
-`;
+const valid2 = `<html><p>123</p></html>`;
 
-const invalid3 = `
-<html>Is a lot of fun</html></html>
-`;
+const invalid3 = `<html>Is a lot of fun</html></html>`;
 
 describe("Regexp 15", () => {
   it("Test case for ex15 #1", () => {

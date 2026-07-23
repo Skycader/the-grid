@@ -13,4 +13,7 @@ const f = (text) => text.match(/\b(.)(.*?)\1\b/g)?.length || 0;
 //   return text.match(r)?.length || 0;
 // };
 
+/**
+ * Сложность: 5 — backreference (\1) + non-greedy (.*?) вместе
+ */
 module.exports = f;
