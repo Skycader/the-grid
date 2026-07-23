@@ -921,25 +921,35 @@
       }
       .stars {
         font-size: 0.67rem;
+      }
+      /* Star grid/row shapes — diff 1-10 each has its own fixed layout,
+         see STAR_ROWS in js/category.js. Works at any font-size since
+         it inherits from the wrapping .stars/.breadc-stars/.srch-st. */
+      .star-grid {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        vertical-align: middle;
+      }
+      .star-row {
+        display: flex;
+        line-height: 1;
         letter-spacing: -1px;
       }
-      .d12 {
+      .dg-green {
         color: #859900;
         text-shadow: 0 0 5px #859900;
       }
-      .d34 {
-        color: #2aa198;
-        text-shadow: 0 0 5px #2aa198;
+      .dg-blue {
+        color: #268bd2;
+        text-shadow: 0 0 5px #268bd2;
       }
-      .d56 {
+      .dg-yellow {
         color: #b58900;
         text-shadow: 0 0 5px #b58900;
       }
-      .d78 {
-        color: #cb4b16;
-        text-shadow: 0 0 5px #cb4b16;
-      }
-      .d910 {
+      .dg-red {
         color: #dc322f;
         text-shadow: 0 0 5px #dc322f;
       }

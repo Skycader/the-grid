@@ -251,24 +251,37 @@
         });
       }
 
-      // Groups of 3 filled stars, no empty stars.
-      // diff=2 → "★★"   diff=5 → "★★★ ★★"   diff=9 → "★★★ ★★★ ★★★"
+      // Fixed row-shape per difficulty (1–10) — not a flat repeat, each
+      // number has its own deliberate grid: 4=2x2 square, 5=4-square with a
+      // 1-star capstone, 6=2x3 tower, 7=1/3/3 capstone pyramid, 8=same
+      // pyramid with a 2-star cap, 9=3x3 square, 10=9 + 1-star capstone.
+      const STAR_ROWS = {
+        1: [1],
+        2: [2],
+        3: [3],
+        4: [2, 2],
+        5: [1, 2, 2],
+        6: [2, 2, 2],
+        7: [1, 3, 3],
+        8: [2, 3, 3],
+        9: [3, 3, 3],
+        10: [1, 3, 3, 3],
+      };
       function mkStars(d) {
-        if (!d) return "";
-        let stars = "★".repeat(d);
-        // insert space after every 3rd star (but not at the end)
-        return stars.replace(/(★{3})(?=★)/g, "$1 ");
+        const rows = STAR_ROWS[d];
+        if (!rows) return "";
+        return (
+          '<span class="star-grid">' +
+          rows
+            .map(
+              (n) => `<span class="star-row">${"★".repeat(n)}</span>`,
+            )
+            .join("") +
+          "</span>"
+        );
       }
       function diffCls(d) {
-        return d <= 2
-          ? "d12"
-          : d <= 4
-            ? "d34"
-            : d <= 6
-              ? "d56"
-              : d <= 8
-                ? "d78"
-                : "d910";
+        return d <= 3 ? "dg-green" : d === 4 ? "dg-blue" : d <= 6 ? "dg-yellow" : "dg-red";
       }
       document.getElementById("bk-cat").onclick = (e) => {
         e.stopPropagation();
