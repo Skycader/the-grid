@@ -275,6 +275,13 @@
         return `<span class="need-meter n-${lvl}" title="${tip}"><i><b style="width:${pct}%"></b></i></span>`;
       }
 
+      // Net reward one solve of this task would pay right now (0 if never solved —
+      // the first solve is free). Used for sorting by reward.
+      function walletReward(key, diff) {
+        const d = walletNeedDays(key);
+        return d == null ? 0 : walletPayout(diff || 1, d).net;
+      }
+
       // Coins harvestable from this task right now (net of the commission), shown
       // right of the meter in the task list. Never-solved tasks → empty placeholder
       // (keeps the columns aligned).

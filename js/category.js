@@ -115,14 +115,25 @@
       //   easy / hard — by difficulty
       //   need / calm — by "need" (days since lastSolved): most / least needy first.
       //                 Never-solved tasks don't need a repeat → least needy.
+      //   rich / poor — by the reward one solve would pay right now (walletReward):
+      //                 highest / lowest first. Never-solved pay 0 (first solve is free).
       let _taskSortDir = "easy";
       const SORT_MODES = {
         easy: { icon: "★▼", label: "Easiest first" },
         hard: { icon: "★▲", label: "Hardest first" },
         need: { icon: "◷▲", label: "Most needy first" },
         calm: { icon: "◷▼", label: "Least needy first" },
+        rich: { icon: coinSvg(13) + "▲", label: "Highest reward first" },
+        poor: { icon: coinSvg(13) + "▼", label: "Lowest reward first" },
       };
-      const SORT_NEXT = { easy: "hard", hard: "need", need: "calm", calm: "easy" };
+      const SORT_NEXT = {
+        easy: "hard",
+        hard: "need",
+        need: "calm",
+        calm: "rich",
+        rich: "poor",
+        poor: "easy",
+      };
 
       // Current category's tasks in display order.
       // All rendering/search indices are relative to THIS array, not cat.tasks.
@@ -134,6 +145,11 @@
             const na = walletNeedSort(key(a)),
               nb = walletNeedSort(key(b));
             return _taskSortDir === "need" ? nb - na : na - nb;
+          }
+          if (_taskSortDir === "rich" || _taskSortDir === "poor") {
+            const ra = walletReward(key(a), a.diff),
+              rb = walletReward(key(b), b.diff);
+            return _taskSortDir === "rich" ? rb - ra : ra - rb;
           }
           return _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff;
         });

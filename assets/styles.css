@@ -804,6 +804,23 @@
       .sort-btn.sort-calm {
         color: #2aa198;
       }
+      .sort-btn.sort-rich,
+      .sort-btn.sort-poor {
+        color: #ffd84a;
+        gap: 2px;
+      }
+      .sort-btn svg,
+      .sort-ico svg {
+        display: block;
+      }
+      .sort-ico.sort-rich,
+      .sort-ico.sort-poor {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        color: #ffd84a;
+      }
       /* hover dropdown with all sort modes (opened by attachHoverMenu → .open) */
       .sort-menu {
         position: absolute;
