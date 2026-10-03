@@ -240,7 +240,7 @@
       /* ── SEARCH ROW (search input 90% + random button 10%) ── */
       .search-row {
         width: 100%;
-        max-width: 580px;
+        max-width: 700px;
         display: flex;
         align-items: stretch;
         gap: 7px;
@@ -766,9 +766,15 @@
         flex: 1 1 90%;
         min-width: 0;
       }
-      .sort-btn {
+      .sort-wrap {
+        position: relative;
+        display: flex;
         flex: 0 0 10%;
         min-width: 38px;
+      }
+      .sort-btn {
+        flex: 1 1 auto;
+        min-width: 0;
         background: rgba(0, 14, 24, 0.9);
         border: 1px solid var(--bd);
         font-family: "JetBrains Mono", monospace;
@@ -794,6 +800,126 @@
       }
       .sort-btn.sort-need {
         color: #cb4b16;
+      }
+      .sort-btn.sort-calm {
+        color: #2aa198;
+      }
+      /* hover dropdown with all sort modes (opened by attachHoverMenu → .open) */
+      .sort-menu {
+        position: absolute;
+        top: calc(100% + 4px);
+        right: 0;
+        min-width: 170px;
+        z-index: 60;
+        display: flex;
+        flex-direction: column;
+        background: rgba(0, 20, 35, 0.97);
+        border: 1px solid var(--bd);
+        box-shadow: var(--glowb);
+        backdrop-filter: blur(14px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-3px);
+        transition:
+          opacity 0.15s ease,
+          transform 0.15s ease;
+      }
+      .sort-wrap.open .sort-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+      .sort-opt {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--tx);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+      }
+      .sort-opt:hover {
+        background: rgba(0, 255, 255, 0.07);
+        color: var(--c);
+      }
+      .sort-opt.active {
+        background: rgba(0, 255, 255, 0.05);
+        box-shadow: inset 2px 0 0 var(--c);
+      }
+      .sort-ico {
+        width: 26px;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+      .sort-ico.sort-easy {
+        color: #859900;
+      }
+      .sort-ico.sort-hard {
+        color: #dc322f;
+      }
+      .sort-ico.sort-need {
+        color: #cb4b16;
+      }
+      .sort-ico.sort-calm {
+        color: #2aa198;
+      }
+      /* harvestable coins, right of the need meter in the task list */
+      .hv-row {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
+        min-width: 66px;
+        margin-right: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.66rem;
+        color: #ffd84a;
+      }
+      .hv-row b {
+        font-weight: 400;
+      }
+      .hv-row.zero {
+        opacity: 0.4;
+      }
+      /* HARVEST button (home): reuses .rnd-btn / .rnd-panel from RANDOM */
+      .hv-btn {
+        gap: 7px;
+      }
+      .hv-amt {
+        color: var(--txd);
+        font-variant-numeric: tabular-nums;
+      }
+      .hv-btn.has-yield {
+        border-color: rgba(255, 200, 40, 0.5);
+      }
+      .hv-btn.has-yield .hv-amt {
+        color: #ffd84a;
+        text-shadow: 0 0 6px rgba(255, 200, 40, 0.5);
+      }
+      .hv-coin {
+        display: flex;
+      }
+      .hv-coin svg {
+        display: block;
+      }
+      .hv-num {
+        width: 100%;
+        background: rgba(0, 14, 24, 0.9);
+        border: 1px solid var(--bd);
+        color: var(--c);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        outline: none;
+      }
+      .hv-num:focus {
+        border-color: var(--c);
       }
       .cat-search-wrap {
         position: relative;
@@ -1047,6 +1173,24 @@
       }
       .breadc .act {
         color: var(--c);
+      }
+      /* reward for solving the open task, right of the difficulty stars */
+      .breadc-reward {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 10px;
+        vertical-align: middle;
+        font-size: 0.68rem;
+        color: #ffd84a;
+        white-space: nowrap;
+      }
+      .breadc-reward b {
+        font-weight: 400;
+      }
+      .breadc-reward.zero,
+      .breadc-reward.off {
+        opacity: 0.45;
       }
       .breadc-stars {
         font-size: 0.65rem;

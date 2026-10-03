@@ -27,6 +27,8 @@
         g.title = _strictLocked
           ? "STRICT MODE locked — required by this task"
           : `STRICT MODE ${_strictOn ? "ON" : "OFF"}: compare timing vs reference (±${(STRICT_TOLERANCE * 100).toFixed(0)}%)`;
+        // the breadcrumb reward is dimmed while STRICT is off
+        if (typeof walletRenderTaskReward === "function") walletRenderTaskReward();
       }
 
       // ═══════════ MOBILE RESULTS SHEET ═══════════

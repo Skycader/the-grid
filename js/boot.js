@@ -61,6 +61,7 @@
           id === "home" ? "flex" : "none";
         if (id === "home") {
           focusCatIdx = -1;
+          if (typeof hvRefresh === "function") hvRefresh();
         }
         if (id === "category") {
           focusTaskIdx = -1;
@@ -151,6 +152,7 @@
       (async () => {
         await Promise.all(MENU.map(bootNode));
         renderCats("");
+        if (typeof hvRefresh === "function") hvRefresh(); // tasks are loaded now
         // After boot: try to restore state from URL query params
         restoreRoute();
       })();

@@ -1,6 +1,8 @@
       // ═══════════ WALLET / COINS ═══════════
-      // Награда за решение = diff × (дней с прошлого удачного решения этой задачи).
-      // Первое решение бесплатное (только ставит метку), потолка нет.
+      // Награда за решение = diff × (дней с прошлого удачного решения этой задачи),
+      // минус комиссия (10 − diff) × 10 %: diff 1 → 90 %, diff 9 → 10 %, diff 10 → 0 %.
+      // Чем сложнее задача, тем меньше комиссия. Потолка нет.
+      // Первое решение бесплатное (только ставит метку).
       // "Удачное" = все тесты зелёные при включённом STRICT (и STRICT не провален).
       // Просмотр решения ("SHOW") считается проигрышем: lastSolved = now.
       // Хранится в localStorage: gr_wallet (баланс), gr_solved ({ "cat/task": ms }).
@@ -19,11 +21,26 @@
       _walletShown = _balance;
 
       const round2 = (n) => Math.round(n * 100) / 100;
+
+      // Выплата: gross = diff × дни; комиссия = (10 − diff) × 10 % (в [0..100]);
+      // net = gross − комиссия. Пример: diff 9, 100 дн → 900 − 10 % = 810;
+      // diff 1, 100 дн → 100 − 90 % = 10.
+      function walletPayout(diff, days) {
+        const gross = diff * days;
+        const feePct = Math.max(0, Math.min(100, (10 - diff) * 10));
+        return {
+          gross: round2(gross),
+          feePct,
+          net: round2(gross * (1 - feePct / 100)),
+        };
+      }
       function saveWallet() {
         try {
           localStorage.setItem(WALLET_KEY, String(_balance));
           localStorage.setItem(SOLVED_KEY, JSON.stringify(_solved));
         } catch (e) {}
+        if (typeof hvRefresh === "function") hvRefresh(); // harvest button total
+        if (typeof walletRenderTaskReward === "function") walletRenderTaskReward();
       }
       const fmtCoins = (n) =>
         n.toLocaleString("en-US", {
@@ -86,7 +103,7 @@
       }
 
       // ── Монетки летят из кнопки в баланс ──
-      function walletFlyCoins(fromEl, amount) {
+      function walletFlyCoins(fromEl, amount, payout) {
         const dest = document.getElementById("wallet-coin");
         if (!dest || !fromEl) {
           _walletShown = _balance;
@@ -138,7 +155,12 @@
             renderWallet();
             walletBump();
             playCoin();
-            if (landed === n) walletToast("+" + fmtCoins(amount));
+            if (landed === n)
+              walletToast(
+                "+" +
+                  fmtCoins(amount) +
+                  (payout ? ` (fee ${payout.feePct}%)` : ""),
+              );
           };
         }
         // страховка, если вкладка была в фоне и анимации не доиграли
@@ -172,14 +194,14 @@
           walletToast("FIRST CLEAR");
           return;
         }
-        const reward = round2(diff * ((now - prev) / DAY_MS));
-        if (reward <= 0) {
+        const payout = walletPayout(diff, (now - prev) / DAY_MS);
+        if (payout.net <= 0) {
           saveWallet();
           return;
         }
-        _balance = round2(_balance + reward);
+        _balance = round2(_balance + payout.net);
         saveWallet();
-        walletFlyCoins(fromEl, reward);
+        walletFlyCoins(fromEl, payout.net, payout);
       }
 
       // "Смотреть решение" = проиграл: таймер идёт заново с этого момента
@@ -208,6 +230,7 @@
         }
         _walletShown = _balance;
         renderWallet();
+        if (typeof hvRefresh === "function") hvRefresh();
       }
 
       // Клик по балансу → «Хотите обнулить баланс?» (lastSolved не трогаем)
@@ -234,10 +257,10 @@
         const t = _solved[key];
         return t == null ? null : Math.max(0, (Date.now() - t) / DAY_MS);
       }
-      // для сортировки: ни разу не решённые — самые "нужные"
+      // для сортировки: ни разу не решённые НЕ нуждаются в повторе — самый низ нужды (-1)
       const walletNeedSort = (key) => {
         const d = walletNeedDays(key);
-        return d == null ? Infinity : d;
+        return d == null ? -1 : d;
       };
       function mkNeedMeter(key, diff) {
         const d = walletNeedDays(key);
@@ -247,9 +270,50 @@
         const lvl = d >= NEED_DAYS ? "crit" : d >= 5 ? "hot" : d >= 3 ? "warn" : "ok";
         const pct = Math.min(100, (d / NEED_DAYS) * 100).toFixed(1);
         const days = d.toFixed(1);
-        const worth = fmtCoins(round2(diff * d));
-        return `<span class="need-meter n-${lvl}" title="Решена ${days} дн. назад · сейчас принесла бы +${worth}"><i><b style="width:${pct}%"></b></i></span>`;
+        const p = walletPayout(diff, d);
+        const tip = `Решена ${days} дн. назад · сейчас принесла бы +${fmtCoins(p.net)} (${fmtCoins(p.gross)} − комиссия ${p.feePct}%)`;
+        return `<span class="need-meter n-${lvl}" title="${tip}"><i><b style="width:${pct}%"></b></i></span>`;
       }
+
+      // Coins harvestable from this task right now (net of the commission), shown
+      // right of the meter in the task list. Never-solved tasks → empty placeholder
+      // (keeps the columns aligned).
+      function mkHarvestAmount(key, diff) {
+        const d = walletNeedDays(key);
+        if (d == null) return '<span class="hv-row"></span>';
+        const p = walletPayout(diff, d);
+        const cls = p.net < 0.01 ? "hv-row zero" : "hv-row";
+        return `<span class="${cls}" title="Harvestable now: +${fmtCoins(p.net)}">${coinSvg(12)}<b>${fmtCoins(p.net)}</b></span>`;
+      }
+
+      // Reward the player would get right now for solving the OPEN task, shown right
+      // of the difficulty stars in the task breadcrumb (#task-reward). First solve is
+      // free (0); without STRICT there is no payout, so the amount is dimmed.
+      function walletRenderTaskReward() {
+        const el = document.getElementById("task-reward");
+        if (!el || typeof curTask === "undefined" || !curTask) return;
+        const cat = curCat();
+        if (!cat) return;
+        const d = walletNeedDays(`${cat.id}/${curTask.id}`);
+        let net = 0,
+          tip;
+        if (d == null) {
+          tip = "First solve is free — it only starts the timer";
+        } else {
+          const p = walletPayout(curTask.diff || 1, d);
+          net = p.net;
+          tip = `Reward for solving now: +${fmtCoins(p.net)} (${fmtCoins(p.gross)} − ${p.feePct}% fee)`;
+        }
+        if (!_strictOn) tip += " · STRICT is off: no reward";
+        el.className =
+          "breadc-reward" + (net < 0.01 ? " zero" : "") + (_strictOn ? "" : " off");
+        el.title = tip;
+        el.innerHTML = `${coinSvg(12)}<b>${fmtCoins(net)}</b>`;
+      }
+      // the reward grows with time — keep it fresh while a task is open
+      setInterval(() => {
+        if (view === "task") walletRenderTaskReward();
+      }, 5000);
 
       // init
       (function () {

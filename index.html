@@ -62,6 +62,30 @@
                 <div class="rnd-empty" id="rnd-empty">// НЕТ ЗАДАЧ ПОД ФИЛЬТР //</div>
               </div>
             </div>
+            <div class="rnd-wrap hv-wrap" id="hv-wrap">
+              <button class="rnd-btn hv-btn" id="hv-btn" title="Open the most overdue task">
+                <span>HARVEST</span>
+                <span class="hv-amt" id="hv-amt">0</span>
+                <span class="hv-coin" id="hv-coin"></span>
+              </button>
+              <div class="rnd-panel" id="hv-panel">
+                <div class="rnd-panel-title">DIFFICULTY</div>
+                <div class="rnd-diff-row">
+                  <span id="hv-diff-val">1 – 10</span>
+                </div>
+                <div class="rnd-slider-wrap">
+                  <input type="range" id="hv-diff-min" min="1" max="10" value="1" step="1" />
+                  <input type="range" id="hv-diff-max" min="1" max="10" value="10" step="1" />
+                </div>
+                <div class="rnd-panel-title">CATEGORIES</div>
+                <div class="rnd-cats" id="hv-cats"></div>
+                <div class="rnd-panel-title">MIN DAYS SINCE SOLVED</div>
+                <input type="number" class="hv-num" id="hv-days" min="0" step="1" value="0" />
+                <div class="rnd-panel-title">MIN REWARD (COINS)</div>
+                <input type="number" class="hv-num" id="hv-reward" min="0" step="1" value="0" />
+                <div class="rnd-empty" id="hv-empty">// NOTHING TO HARVEST //</div>
+              </div>
+            </div>
           </div>
           <div id="srch-results"></div>
           <div class="cat-grid-wrap">
@@ -151,7 +175,10 @@
                 spellcheck="false"
               />
             </div>
-            <button class="sort-btn sort-easy" id="sort-btn" title="Сортировка: сначала лёгкие">★▼</button>
+            <div class="sort-wrap" id="sort-wrap">
+              <button class="sort-btn sort-easy" id="sort-btn" title="Sort: easiest first">★▼</button>
+              <div class="sort-menu" id="sort-menu"></div>
+            </div>
           </div>
           <div class="subcat-area" id="subcat-area" style="display: none"></div>
           <div class="task-list" id="task-list"></div>
@@ -541,11 +568,13 @@
     <script src="js/config.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/wallet.js"></script>
+    <script src="js/hovermenu.js"></script>
     <script src="js/db.js"></script>
     <script src="js/background-fx.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/search.js"></script>
     <script src="js/random.js"></script>
+    <script src="js/harvest.js"></script>
     <script src="js/home.js"></script>
     <script src="js/category.js"></script>
     <script src="js/task-view.js"></script>

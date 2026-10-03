@@ -110,14 +110,19 @@
       let _vsQuery = ""; // current search query
       let _vsMatches = []; // indices of matching tasks (into getDisplayTasks())
       let _catsrchTimer = null;
-      // "easy" | "hard" (по diff) | "need" (сначала самые забытые) — кнопка #sort-btn
+      // Sort modes of the task list. #sort-btn click cycles them; the hover menu
+      // (#sort-menu) picks one directly.
+      //   easy / hard — by difficulty
+      //   need / calm — by "need" (days since lastSolved): most / least needy first.
+      //                 Never-solved tasks don't need a repeat → least needy.
       let _taskSortDir = "easy";
       const SORT_MODES = {
-        easy: { icon: "★▼", title: "Сортировка: сначала лёгкие" },
-        hard: { icon: "★▲", title: "Сортировка: сначала сложные" },
-        need: { icon: "◷▼", title: "Сортировка: сначала самые забытые" },
+        easy: { icon: "★▼", label: "Easiest first" },
+        hard: { icon: "★▲", label: "Hardest first" },
+        need: { icon: "◷▲", label: "Most needy first" },
+        calm: { icon: "◷▼", label: "Least needy first" },
       };
-      const SORT_NEXT = { easy: "hard", hard: "need", need: "easy" };
+      const SORT_NEXT = { easy: "hard", hard: "need", need: "calm", calm: "easy" };
 
       // Current category's tasks in display order.
       // All rendering/search indices are relative to THIS array, not cat.tasks.
@@ -125,29 +130,52 @@
         if (!_vsCat || !_vsCat.tasks) return [];
         const key = (t) => `${_vsCat.id}/${t.id}`;
         return _vsCat.tasks.slice().sort((a, b) => {
-          if (_taskSortDir === "need") {
+          if (_taskSortDir === "need" || _taskSortDir === "calm") {
             const na = walletNeedSort(key(a)),
               nb = walletNeedSort(key(b));
-            if (na === nb) return 0; // Infinity === Infinity — ни разу не решённые
-            return na < nb ? 1 : -1;
+            return _taskSortDir === "need" ? nb - na : na - nb;
           }
           return _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff;
         });
       }
 
-      function toggleTaskSort() {
-        playClick();
-        _taskSortDir = SORT_NEXT[_taskSortDir];
+      function setTaskSort(mode) {
+        _taskSortDir = mode;
         updateSortBtn();
         renderRows();
+      }
+      function toggleTaskSort() {
+        playClick();
+        setTaskSort(SORT_NEXT[_taskSortDir]);
       }
       function updateSortBtn() {
         const btn = document.getElementById("sort-btn");
         if (!btn) return;
         for (const m in SORT_MODES) btn.classList.toggle("sort-" + m, m === _taskSortDir);
         btn.innerHTML = SORT_MODES[_taskSortDir].icon;
-        btn.title = SORT_MODES[_taskSortDir].title;
+        btn.title = "Sort: " + SORT_MODES[_taskSortDir].label.toLowerCase();
+        document.querySelectorAll("#sort-menu .sort-opt").forEach((o) => {
+          o.classList.toggle("active", o.dataset.mode === _taskSortDir);
+        });
       }
+
+      // Hover menu with all four modes — no more clicking through the cycle
+      const _sortHover = attachHoverMenu(document.getElementById("sort-wrap"), 450);
+      (function buildSortMenu() {
+        const menu = document.getElementById("sort-menu");
+        for (const m in SORT_MODES) {
+          const o = document.createElement("div");
+          o.className = "sort-opt";
+          o.dataset.mode = m;
+          o.innerHTML = `<span class="sort-ico sort-${m}">${SORT_MODES[m].icon}</span><span>${SORT_MODES[m].label}</span>`;
+          o.onclick = () => {
+            playClick();
+            setTaskSort(m);
+            _sortHover.close();
+          };
+          menu.appendChild(o);
+        }
+      })();
       document.getElementById("sort-btn").onclick = toggleTaskSort;
       updateSortBtn();
 
@@ -244,7 +272,7 @@
             <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
           </div>
           <div class="stars-wrap">
-${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.diff)}<span class="stars ${dc}">${mkStars(t.diff)}</span>
+${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.diff)}${mkHarvestAmount(`${_vsCat.id}/${t.id}`, t.diff)}<span class="stars ${dc}">${mkStars(t.diff)}</span>
           </div>`;
           row.onclick = () => {
             playNav();
