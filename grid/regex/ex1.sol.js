@@ -4,13 +4,13 @@
  */
 
 const r =
-  /cat/g; /*g means findMany and without means findOne*/
+  /cat/gi; /*g means findMany and without means findOne; i = case-insensitive (spec has "Cat")*/
 const f = (text) => {
   /*code here */
   return text.replace(r, '');
 };
 
 /**
- * Сложность: 1 — голый литерал, никаких метасимволов кроме флага /g
+ * Сложность: 1 — голый литерал, никаких метасимволов кроме флагов /gi
  */
 module.exports = f;

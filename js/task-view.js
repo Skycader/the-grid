@@ -84,6 +84,7 @@
       function doShowSolution() {
         playClick();
         closeModal();
+        walletMarkSolutionViewed(`${curCat().id}/${curTask.id}`);
         const files = FILECACHE[`${curCat().id}/${curTask.id}`];
         setTabs("sol");
         document.getElementById("sol-code").textContent =
@@ -105,6 +106,7 @@
         if (cat) setQueryParams({ cat: cat.id });
         closeMobResults();
         hideSolOverlay();
+        renderRows(); // обновить шкалы "нужды" после решения/просмотра решения
         showView("category");
       };
       document.getElementById("modal").addEventListener("click", (e) => {

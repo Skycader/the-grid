@@ -110,35 +110,43 @@
       let _vsQuery = ""; // current search query
       let _vsMatches = []; // indices of matching tasks (into getDisplayTasks())
       let _catsrchTimer = null;
-      let _taskSortDir = "easy"; // "easy" | "hard" — sort by diff, toggled by #sort-btn
+      // "easy" | "hard" (по diff) | "need" (сначала самые забытые) — кнопка #sort-btn
+      let _taskSortDir = "easy";
+      const SORT_MODES = {
+        easy: { icon: "★▼", title: "Сортировка: сначала лёгкие" },
+        hard: { icon: "★▲", title: "Сортировка: сначала сложные" },
+        need: { icon: "◷▼", title: "Сортировка: сначала самые забытые" },
+      };
+      const SORT_NEXT = { easy: "hard", hard: "need", need: "easy" };
 
-      // Current category's tasks in display order (sorted by difficulty).
+      // Current category's tasks in display order.
       // All rendering/search indices are relative to THIS array, not cat.tasks.
       function getDisplayTasks() {
         if (!_vsCat || !_vsCat.tasks) return [];
-        return _vsCat.tasks
-          .slice()
-          .sort((a, b) =>
-            _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff,
-          );
+        const key = (t) => `${_vsCat.id}/${t.id}`;
+        return _vsCat.tasks.slice().sort((a, b) => {
+          if (_taskSortDir === "need") {
+            const na = walletNeedSort(key(a)),
+              nb = walletNeedSort(key(b));
+            if (na === nb) return 0; // Infinity === Infinity — ни разу не решённые
+            return na < nb ? 1 : -1;
+          }
+          return _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff;
+        });
       }
 
       function toggleTaskSort() {
         playClick();
-        _taskSortDir = _taskSortDir === "easy" ? "hard" : "easy";
+        _taskSortDir = SORT_NEXT[_taskSortDir];
         updateSortBtn();
         renderRows();
       }
       function updateSortBtn() {
         const btn = document.getElementById("sort-btn");
         if (!btn) return;
-        const easy = _taskSortDir === "easy";
-        btn.classList.toggle("sort-easy", easy);
-        btn.classList.toggle("sort-hard", !easy);
-        btn.innerHTML = easy ? "★▼" : "★▲";
-        btn.title = easy
-          ? "Сортировка: сначала лёгкие"
-          : "Сортировка: сначала сложные";
+        for (const m in SORT_MODES) btn.classList.toggle("sort-" + m, m === _taskSortDir);
+        btn.innerHTML = SORT_MODES[_taskSortDir].icon;
+        btn.title = SORT_MODES[_taskSortDir].title;
       }
       document.getElementById("sort-btn").onclick = toggleTaskSort;
       updateSortBtn();
@@ -241,7 +249,7 @@
             <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
           </div>
           <div class="stars-wrap">
-<span class="stars ${dc}">${mkStars(t.diff)}</span>
+${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.diff)}<span class="stars ${dc}">${mkStars(t.diff)}</span>
           </div>`;
           row.onclick = () => {
             playNav();

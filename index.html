@@ -213,6 +213,11 @@
           <button class="run-btn" id="run-btn" onclick="formatAndRun()">
             ▶ RUN
           </button>
+          <!-- WALLET: баланс виден только внутри открытой задачи, справа от RUN -->
+          <div id="wallet" class="wallet" title="Баланс">
+            <span class="wallet-val" id="wallet-val">0</span>
+            <span class="wallet-coin" id="wallet-coin"></span>
+          </div>
         </div>
         <div class="editor-area">
           <div class="ed-panel">
@@ -519,6 +524,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/audio.js"></script>
+    <script src="js/wallet.js"></script>
     <script src="js/background-fx.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/search.js"></script>
@@ -534,5 +540,6 @@
     <script src="js/routing.js"></script>
     <script src="js/ranks.js"></script>
     <script src="js/keyboard.js"></script>
+    <script src="js/cli.js"></script>
   </body>
 </html>

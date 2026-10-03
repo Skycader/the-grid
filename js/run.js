@@ -2,6 +2,7 @@
       async function formatAndRun() {
         if (!curTask || view !== "task") return;
         const key = `${curCat().id}/${curTask.id}`;
+        const diff = curTask.diff;
         const files = FILECACHE[key];
         if (!files) {
           setStatus("⚠ Files not loaded", "err");
@@ -68,8 +69,10 @@
                 ? "ng"
                 : "";
           if (st) STATUS[key] = st;
-          if (st === "ok") playAllPass();
-          else if (st === "ng") playFail();
+          if (st === "ok") {
+            playAllPass();
+            walletOnSolved(key, diff, !!files.sol, benchData, btn);
+          } else if (st === "ng") playFail();
         } else playError();
         setStatus("");
       }
