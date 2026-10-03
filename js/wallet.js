@@ -215,10 +215,9 @@
         askConfirm(
           {
             icon: coinSvg(30),
-            title: "ХОТИТЕ ОБНУЛИТЬ БАЛАНС?",
-            body: `Сейчас на счету: ${fmtCoins(_balance)}. Даты решений (lastSolved) останутся.`,
-            yes: "ДА",
-            no: "НЕТ",
+            title: "RESET YOUR BALANCE?",
+            yes: "YES",
+            no: "NO",
           },
           () => {
             _balance = 0;

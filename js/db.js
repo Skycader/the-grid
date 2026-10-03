@@ -7,7 +7,10 @@
       function askConfirm({ icon = "", title, body, yes = "ДА", no = "НЕТ" }, onYes) {
         document.getElementById("confirm-ico").innerHTML = icon;
         document.getElementById("confirm-title").textContent = title;
-        document.getElementById("confirm-body").textContent = body;
+        const bodyEl = document.getElementById("confirm-body");
+        bodyEl.textContent = body || "";
+        bodyEl.style.display = body ? "" : "none"; // title-only modals (balance reset)
+        document.getElementById("confirm-modal").classList.toggle("no-body", !body);
         document.getElementById("confirm-yes").textContent = yes;
         document.getElementById("confirm-no").textContent = no;
         _confirmYes = onYes;

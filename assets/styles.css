@@ -1981,6 +1981,10 @@
         margin-bottom: 18px;
         opacity: 0.8;
       }
+      /* title-only confirm modal: no body text, so give the title the body's gap */
+      #confirm-modal.no-body .m-title {
+        margin-bottom: 22px;
+      }
       .m-acts {
         display: flex;
         gap: 8px;
