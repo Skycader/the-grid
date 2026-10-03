@@ -37,8 +37,19 @@
           return;
         }
 
-        // Don't intercept when typing in search or editor
-        if (e.target === document.getElementById("srch")) return;
+        // Don't intercept when typing in ANY text field (home search, category
+        // search, mem limit, monaco…) — WASD navigation used to swallow
+        // a/s/d/w (and Shift+A, Ctrl+A) in #cat-srch.
+        const tg = e.target;
+        if (
+          tg &&
+          (tg.tagName === "INPUT" ||
+            tg.tagName === "TEXTAREA" ||
+            tg.isContentEditable)
+        )
+          return;
+        // Ctrl/Cmd/Alt combos are never navigation (Ctrl+A = select all, …)
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (
           view === "task" &&
           document.activeElement &&

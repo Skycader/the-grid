@@ -118,18 +118,39 @@
         );
       }
 
+      // Fuzzy task match, shared by global search and in-category search:
+      //  1) plain substring in id/title/desc/file
+      //  2) same on id/title/file with ALL separators dropped — "ex 15" / "ex15"
+      //     finds regex_15 (id has an underscore, file is "ex15")
+      //  3) multi-word query: every word found somewhere ("15 regex")
+      const _srchNorm = (s) =>
+        String(s || "")
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N}]+/gu, "");
+      function taskMatchesQuery(t, q) {
+        const ql = q.toLowerCase().trim();
+        if (!ql) return false;
+        const id = String(t.id || "").toLowerCase(),
+          title = String(t.title || "").toLowerCase(),
+          desc = String(t.desc || "").toLowerCase(),
+          file = String(t.file || "").toLowerCase();
+        if ([id, title, desc, file].some((f) => f.includes(ql))) return true;
+        const qn = _srchNorm(ql);
+        if (qn && [id, title, file].some((f) => _srchNorm(f).includes(qn)))
+          return true;
+        const words = ql.split(/\s+/).filter(Boolean);
+        if (words.length < 2) return false;
+        const hay = [id, title, desc, file].join(" ");
+        return words.every((w) => hay.includes(w));
+      }
+
       function doSearch(q) {
         const ql = q.toLowerCase();
         _srchAll = [];
         const all = [];
         MENU.forEach((cat) => gatherAllTasks(cat, all));
         all.forEach(({ cat, task: t }) => {
-          if (
-            t.id.toLowerCase().includes(ql) ||
-            t.title.toLowerCase().includes(ql) ||
-            t.desc.toLowerCase().includes(ql)
-          )
-            _srchAll.push({ cat, task: t });
+          if (taskMatchesQuery(t, ql)) _srchAll.push({ cat, task: t });
         });
         _srchPage = 1;
         _srchFocusIdx = -1;
@@ -139,12 +160,7 @@
           return (
             cat.name.toLowerCase().includes(ql) ||
             cat.desc.toLowerCase().includes(ql) ||
-            cat.tasks.some(
-              (t) =>
-                t.id.toLowerCase().includes(ql) ||
-                t.title.toLowerCase().includes(ql) ||
-                t.desc.toLowerCase().includes(ql),
-            )
+            cat.tasks.some((t) => taskMatchesQuery(t, ql))
           );
         });
         catPage = 0;

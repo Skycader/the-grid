@@ -172,12 +172,7 @@
         const tasks = getDisplayTasks();
         _vsMatches = q
           ? tasks.reduce((acc, t, i) => {
-              if (
-                t.id.toLowerCase().includes(_vsQuery) ||
-                t.title.toLowerCase().includes(_vsQuery) ||
-                t.desc.toLowerCase().includes(_vsQuery)
-              )
-                acc.push(i);
+              if (taskMatchesQuery(t, _vsQuery)) acc.push(i);
               return acc;
             }, [])
           : [];
