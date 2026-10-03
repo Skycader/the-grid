@@ -31,67 +31,15 @@
           maximumFractionDigits: 2,
         });
 
-      // ── Pixel-art coin (3D: лицо + боковая грань, рисуется из пикселей) ──
-      let _coinInner = null;
-      function buildCoin() {
-        const N = 17,
-          fc = 7.5, // центр лицевой стороны
-          sc = 9.5, // центр "задней" окружности — даёт толщину справа-снизу
-          R = 6.2;
-        const dist = (x, y, c) => Math.hypot(x + 0.5 - c, y + 0.5 - c);
-        const grid = [];
-        for (let y = 0; y < N; y++) {
-          grid[y] = [];
-          for (let x = 0; x < N; x++) {
-            const df = dist(x, y, fc),
-              ds = dist(x, y, sc);
-            let c = null;
-            if (df <= R) {
-              const s = x + 0.5 - fc + (y + 0.5 - fc);
-              if (Math.abs(x - 7) + Math.abs(y - 7) <= 2)
-                c = x === 7 && y === 7 ? "#ffe27a" : "#a86f00";
-              else if (df > R - 1.1)
-                c = s < -3.2 ? "#fff3a8" : s > 3.2 ? "#e0a000" : "#ffd84a";
-              else if (df > R - 2.2) c = "#c98a00";
-              else c = "#f5b800";
-            } else if (ds <= R) {
-              c = x + y > 17 ? "#6b4400" : "#8a5a00";
-            }
-            grid[y][x] = c;
-          }
-        }
-        for (let y = 0; y < N; y++)
-          for (let x = 0; x < N; x++) {
-            if (grid[y][x]) continue;
-            const nb = [
-              [x - 1, y],
-              [x + 1, y],
-              [x, y - 1],
-              [x, y + 1],
-            ];
-            if (nb.some(([a, b]) => grid[b]?.[a] && grid[b][a] !== "#2b1d00"))
-              grid[y][x] = "#2b1d00";
-          }
-        let out = "";
-        for (let y = 0; y < N; y++) {
-          let x = 0;
-          while (x < N) {
-            const c = grid[y][x];
-            if (!c) {
-              x++;
-              continue;
-            }
-            let w = 1;
-            while (x + w < N && grid[y][x + w] === c) w++;
-            out += `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${c}"/>`;
-            x += w;
-          }
-        }
-        return out;
-      }
+      // ── Coin: вариант №6 «edge-on» (монета с торца: диск + боковая грань) ──
+      // Остальные варианты лежат в assets/coins/*.svg
+      const COIN_SVG_INNER =
+        '<ellipse cx="12" cy="15" rx="9" ry="4" fill="#a06a00"/>' +
+        '<rect x="3" y="9" width="18" height="6" fill="#a06a00"/>' +
+        '<ellipse cx="12" cy="9" rx="9" ry="4" fill="#ffd84a"/>' +
+        '<ellipse cx="12" cy="9" rx="5" ry="2" fill="none" stroke="#a06a00" stroke-width="1.2"/>';
       function coinSvg(px) {
-        if (!_coinInner) _coinInner = buildCoin();
-        return `<svg class="coin" width="${px}" height="${px}" viewBox="0 0 17 17" shape-rendering="crispEdges" aria-hidden="true">${_coinInner}</svg>`;
+        return `<svg class="coin" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true">${COIN_SVG_INNER}</svg>`;
       }
 
       // ── Sound ──
