@@ -197,6 +197,39 @@
         return prev;
       }
 
+      // Перечитать баланс и lastSolved из localStorage (после импорта базы)
+      function walletReloadFromStorage() {
+        try {
+          _balance = parseFloat(localStorage.getItem(WALLET_KEY)) || 0;
+          _solved = JSON.parse(localStorage.getItem(SOLVED_KEY) || "{}") || {};
+        } catch (e) {
+          _balance = 0;
+          _solved = {};
+        }
+        _walletShown = _balance;
+        renderWallet();
+      }
+
+      // Клик по балансу → «Хотите обнулить баланс?» (lastSolved не трогаем)
+      function walletAskReset() {
+        askConfirm(
+          {
+            icon: coinSvg(30),
+            title: "ХОТИТЕ ОБНУЛИТЬ БАЛАНС?",
+            body: `Сейчас на счету: ${fmtCoins(_balance)}. Даты решений (lastSolved) останутся.`,
+            yes: "ДА",
+            no: "НЕТ",
+          },
+          () => {
+            _balance = 0;
+            _walletShown = 0;
+            saveWallet();
+            renderWallet();
+            walletBump();
+          },
+        );
+      }
+
       // ── Шкала "нужды": сколько суток прошло с lastSolved ──
       function walletNeedDays(key) {
         const t = _solved[key];

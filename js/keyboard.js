@@ -7,6 +7,12 @@
         }
 
         if (e.key === "Escape") {
+          if (
+            !document.getElementById("confirm-modal").classList.contains("hide")
+          ) {
+            closeConfirm(false);
+            return;
+          }
           if (!document.getElementById("modal").classList.contains("hide")) {
             closeModal();
             return;

@@ -1678,7 +1678,13 @@
           inset 0 0 12px rgba(255, 190, 0, 0.05);
         backdrop-filter: blur(10px);
         user-select: none;
-        transition: box-shadow 0.25s;
+        cursor: pointer;
+        transition:
+          box-shadow 0.25s,
+          border-color 0.2s;
+      }
+      .wallet:hover {
+        border-color: rgba(255, 200, 40, 0.65);
       }
       .wallet.bump {
         box-shadow:

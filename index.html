@@ -214,7 +214,7 @@
             ▶ RUN
           </button>
           <!-- WALLET: баланс виден только внутри открытой задачи, справа от RUN -->
-          <div id="wallet" class="wallet" title="Баланс">
+          <div id="wallet" class="wallet" title="Баланс · клик, чтобы обнулить" onclick="walletAskReset()">
             <span class="wallet-val" id="wallet-val">0</span>
             <span class="wallet-coin" id="wallet-coin"></span>
           </div>
@@ -279,6 +279,9 @@
     <div id="hud">
       <div class="hud-btn" id="btn-fs" onclick="toggleFS()">⛶ FULLSCREEN</div>
       <div class="hud-btn" id="btn-mute" onclick="toggleMute()">♪ SOUND</div>
+      <div class="hud-btn" id="btn-export" onclick="exportDb()" title="Скачать базу (баланс, даты решений) в JSON">⇩ EXPORT</div>
+      <div class="hud-btn" id="btn-import" onclick="importDb()" title="Загрузить базу из JSON">⇧ IMPORT</div>
+      <input type="file" id="db-file" accept=".json,application/json" hidden />
     </div>
 
     <!-- SOLUTIONS MODAL -->
@@ -292,6 +295,19 @@
         <div class="m-acts">
           <button class="m-btn cancel" onclick="closeModal()">CANCEL</button>
           <button class="m-btn go" onclick="doShowSolution()">SHOW</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIRM MODAL (универсальный: сброс баланса, импорт базы) -->
+    <div class="modal-bg hide" id="confirm-modal">
+      <div class="modal">
+        <div class="m-ico" id="confirm-ico"></div>
+        <div class="m-title" id="confirm-title"></div>
+        <div class="m-body" id="confirm-body"></div>
+        <div class="m-acts">
+          <button class="m-btn go" id="confirm-yes" onclick="closeConfirm(true)">ДА</button>
+          <button class="m-btn cancel" id="confirm-no" onclick="closeConfirm(false)">НЕТ</button>
         </div>
       </div>
     </div>
@@ -525,6 +541,7 @@
     <script src="js/config.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/wallet.js"></script>
+    <script src="js/db.js"></script>
     <script src="js/background-fx.js"></script>
     <script src="js/boot.js"></script>
     <script src="js/search.js"></script>
