@@ -243,17 +243,13 @@
       function mkNeedMeter(key, diff) {
         const d = walletNeedDays(key);
         if (d == null) {
-          return `<span class="need-meter need-new" title="Ещё не решена">${"<i></i>".repeat(NEED_DAYS)}</span>`;
+          return `<span class="need-meter need-new" title="Ещё не решена"><i></i></span>`;
         }
         const lvl = d >= NEED_DAYS ? "crit" : d >= 5 ? "hot" : d >= 3 ? "warn" : "ok";
-        let segs = "";
-        for (let i = 0; i < NEED_DAYS; i++) {
-          const fill = Math.max(0, Math.min(1, d - i));
-          segs += `<i><b style="width:${fill * 100}%"></b></i>`;
-        }
+        const pct = Math.min(100, (d / NEED_DAYS) * 100).toFixed(1);
         const days = d.toFixed(1);
         const worth = fmtCoins(round2(diff * d));
-        return `<span class="need-meter n-${lvl}" title="Решена ${days} дн. назад · сейчас принесла бы +${worth}">${segs}</span>`;
+        return `<span class="need-meter n-${lvl}" title="Решена ${days} дн. назад · сейчас принесла бы +${worth}"><i><b style="width:${pct}%"></b></i></span>`;
       }
 
       // init

@@ -924,6 +924,11 @@
       }
       .stars {
         font-size: 0.67rem;
+        /* фиксированная колонка (макс. 3 звезды в ряд), чтобы шкалы нужды
+           слева от неё выстраивались в одну вертикаль */
+        display: inline-flex;
+        justify-content: center;
+        min-width: 3.2em;
       }
       /* Star grid/row shapes — diff 1-10 each has its own fixed layout,
          see STAR_ROWS in js/category.js. Works at any font-size since
@@ -957,22 +962,21 @@
         text-shadow: 0 0 5px #dc322f;
       }
 
-      /* ── NEED METER: 7 суток, каждая ячейка = 1 день с lastSolved ── */
+      /* ── NEED METER: одна тонкая шкала, 100% = 7 суток с lastSolved ── */
       .need-meter {
         --nc: #859900;
         display: inline-flex;
         align-items: center;
-        gap: 2px;
         margin-right: 12px;
       }
       .need-meter i {
         display: block;
         position: relative;
         overflow: hidden;
-        width: 7px;
-        height: 12px;
+        width: 72px;
+        height: 5px;
         background: rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(255, 255, 255, 0.14);
       }
       .need-meter i b {
         position: absolute;
@@ -1457,7 +1461,7 @@
           font-size: 0.72rem;
         }
         .need-meter i {
-          width: 5px;
+          width: 44px;
         }
         .mem-grp {
           display: none;
