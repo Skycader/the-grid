@@ -8,15 +8,21 @@
       // Хранится в localStorage: gr_wallet (баланс), gr_solved ({ "cat/task": ms }).
       const WALLET_KEY = "gr_wallet";
       const SOLVED_KEY = "gr_solved";
+      const HISTORY_KEY = "gr_history"; // transaction log, its own localStorage item
       const DAY_MS = 86400000;
       const NEED_DAYS = 7; // шкала "нужды" заполняется за 7 суток
 
       let _balance = 0; // реальный баланс
       let _walletShown = 0; // то, что нарисовано (догоняет баланс по мере прилёта монет)
       let _solved = {};
+      let _history = [];
       try {
         _balance = parseFloat(localStorage.getItem(WALLET_KEY)) || 0;
         _solved = JSON.parse(localStorage.getItem(SOLVED_KEY) || "{}") || {};
+      } catch (e) {}
+      try {
+        const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+        if (Array.isArray(h)) _history = h;
       } catch (e) {}
       _walletShown = _balance;
 
@@ -41,6 +47,16 @@
         } catch (e) {}
         if (typeof hvRefresh === "function") hvRefresh(); // harvest button total
         if (typeof walletRenderTaskReward === "function") walletRenderTaskReward();
+      }
+      // Append-only transaction log, kept in its own localStorage item (gr_history):
+      //   solve: { t, type:"solve", task:"cat/task", diff, first, days, gross, feePct, net, balance }
+      //          first = the free first solve (net 0); balance = balance AFTER the entry
+      //   reset: { t, type:"reset", amount, balance:0 }  (amount = what was wiped)
+      function walletLog(entry) {
+        _history.push({ t: Date.now(), ...entry });
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(_history));
+        } catch (e) {}
       }
       const fmtCoins = (n) =>
         n.toLocaleString("en-US", {
@@ -191,17 +207,36 @@
         _solved[key] = now;
         if (prev == null) {
           saveWallet();
+          walletLog({
+            type: "solve",
+            task: key,
+            diff,
+            first: true,
+            days: null,
+            gross: 0,
+            feePct: walletPayout(diff, 0).feePct,
+            net: 0,
+            balance: _balance,
+          });
           walletToast("FIRST CLEAR");
           return;
         }
-        const payout = walletPayout(diff, (now - prev) / DAY_MS);
-        if (payout.net <= 0) {
-          saveWallet();
-          return;
-        }
-        _balance = round2(_balance + payout.net);
+        const days = (now - prev) / DAY_MS;
+        const payout = walletPayout(diff, days);
+        if (payout.net > 0) _balance = round2(_balance + payout.net);
         saveWallet();
-        walletFlyCoins(fromEl, payout.net, payout);
+        walletLog({
+          type: "solve",
+          task: key,
+          diff,
+          first: false,
+          days: Math.round(days * 10000) / 10000,
+          gross: payout.gross,
+          feePct: payout.feePct,
+          net: payout.net,
+          balance: _balance,
+        });
+        if (payout.net > 0) walletFlyCoins(fromEl, payout.net, payout);
       }
 
       // "Смотреть решение" = проиграл: таймер идёт заново с этого момента
@@ -228,6 +263,12 @@
           _balance = 0;
           _solved = {};
         }
+        try {
+          const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+          _history = Array.isArray(h) ? h : [];
+        } catch (e) {
+          _history = [];
+        }
         _walletShown = _balance;
         renderWallet();
         if (typeof hvRefresh === "function") hvRefresh();
@@ -243,9 +284,11 @@
             no: "NO",
           },
           () => {
+            const wiped = _balance;
             _balance = 0;
             _walletShown = 0;
             saveWallet();
+            if (wiped > 0) walletLog({ type: "reset", amount: wiped, balance: 0 });
             renderWallet();
             walletBump();
           },

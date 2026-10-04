@@ -4,7 +4,8 @@
 
       // ── Универсальная модалка подтверждения (Да / Нет) ──
       let _confirmYes = null;
-      function askConfirm({ icon = "", title, body, yes = "ДА", no = "НЕТ" }, onYes) {
+      let _confirmNo = null; // runs ONLY when the NO button is clicked (not on Esc / backdrop)
+      function askConfirm({ icon = "", title, body, yes = "ДА", no = "НЕТ" }, onYes, onNo) {
         document.getElementById("confirm-ico").innerHTML = icon;
         document.getElementById("confirm-title").textContent = title;
         const bodyEl = document.getElementById("confirm-body");
@@ -14,12 +15,16 @@
         document.getElementById("confirm-yes").textContent = yes;
         document.getElementById("confirm-no").textContent = no;
         _confirmYes = onYes;
+        _confirmNo = onNo || null;
         document.getElementById("confirm-modal").classList.remove("hide");
         playClick();
       }
-      function closeConfirm(accept) {
-        const fn = accept ? _confirmYes : null;
+      // accept=true → YES. accept=false + viaNoButton → the NO button (runs onNo);
+      // accept=false alone → cancel (Esc / backdrop): nothing runs.
+      function closeConfirm(accept, viaNoButton) {
+        const fn = accept ? _confirmYes : viaNoButton ? _confirmNo : null;
         _confirmYes = null;
+        _confirmNo = null;
         document.getElementById("confirm-modal").classList.add("hide");
         playClick();
         if (fn) fn();
@@ -39,13 +44,30 @@
       }
 
       // ── Export ──
+      // EXPORT button → "Include transaction history?" → YES / NO both export
+      // (Esc / backdrop cancels the export).
       function exportDb() {
+        const n = _history.length;
+        askConfirm(
+          {
+            icon: "⇩",
+            title: "INCLUDE TRANSACTION HISTORY?",
+            body: `${n} transaction${n === 1 ? "" : "s"} recorded.`,
+            yes: "YES",
+            no: "NO",
+          },
+          () => doExport(true),
+          () => doExport(false),
+        );
+      }
+      function doExport(includeHistory) {
         saveWallet(); // сбросить в localStorage актуальные значения из памяти
         const data = {};
         try {
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
             if (!k || !k.startsWith("gr_")) continue;
+            if (k === HISTORY_KEY && !includeHistory) continue;
             const raw = localStorage.getItem(k);
             try {
               data[k] = JSON.parse(raw);
@@ -58,6 +80,7 @@
           app: "grid-runner",
           version: 1,
           exportedAt: new Date().toISOString(),
+          includesHistory: !!includeHistory,
           data,
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -96,6 +119,14 @@
           if (!s || typeof s !== "object" || Array.isArray(s)) return "bad gr_solved";
           if (!Object.values(s).every((v) => Number.isFinite(v))) return "bad gr_solved";
         }
+        if ("gr_history" in d) {
+          const h = d.gr_history;
+          if (
+            !Array.isArray(h) ||
+            !h.every((e) => e && Number.isFinite(e.t) && typeof e.type === "string")
+          )
+            return "bad gr_history";
+        }
         return null;
       }
 
@@ -104,6 +135,7 @@
           // полная замена: сначала чистим текущую базу, потом пишем импортированную
           localStorage.removeItem(WALLET_KEY);
           localStorage.removeItem(SOLVED_KEY);
+          localStorage.removeItem(HISTORY_KEY); // history is replaced too (empty if the file has none)
           for (const [k, v] of Object.entries(data))
             localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v));
         } catch (e) {}
@@ -130,12 +162,17 @@
         const bad = dbValidate(parsed);
         if (bad) return dbFlash("btn-import", "✗ " + bad.toUpperCase(), 2600);
         const w = parsed.data.gr_wallet,
-          n = Object.keys(parsed.data.gr_solved || {}).length;
+          n = Object.keys(parsed.data.gr_solved || {}).length,
+          h = (parsed.data.gr_history || []).length;
+        const histNote =
+          "gr_history" in parsed.data
+            ? ` История транзакций: ${h}.`
+            : " В файле нет истории транзакций — текущая история будет очищена.";
         askConfirm(
           {
             icon: "⇧",
             title: "ИМПОРТ БАЗЫ",
-            body: `Текущие баланс и даты решений будут заменены данными из файла (баланс: ${w != null ? fmtCoins(w) : "—"}, задач с датой: ${n}). Продолжить?`,
+            body: `Текущие баланс и даты решений будут заменены данными из файла (баланс: ${w != null ? fmtCoins(w) : "—"}, задач с датой: ${n}).${histNote} Продолжить?`,
             yes: "ДА",
             no: "НЕТ",
           },
