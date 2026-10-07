@@ -117,6 +117,7 @@
       //                 Never-solved tasks don't need a repeat → least needy.
       //   rich / poor — by the reward one solve would pay right now (walletReward):
       //                 highest / lowest first. Never-solved pay 0 (first solve is free).
+      //   ranked / novice — by task rank (walletRank): highest / lowest first.
       let _taskSortDir = "easy";
       const SORT_MODES = {
         easy: { icon: "★▼", label: "Easiest first" },
@@ -125,6 +126,8 @@
         calm: { icon: "◷▼", label: "Least needy first" },
         rich: { icon: coinSvg(13) + "▲", label: "Highest reward first" },
         poor: { icon: coinSvg(13) + "▼", label: "Lowest reward first" },
+        ranked: { icon: rankIconSvg(13) + "▲", label: "Highest rank first" },
+        novice: { icon: rankIconSvg(13) + "▼", label: "Lowest rank first" },
       };
       const SORT_NEXT = {
         easy: "hard",
@@ -132,7 +135,9 @@
         need: "calm",
         calm: "rich",
         rich: "poor",
-        poor: "easy",
+        poor: "ranked",
+        ranked: "novice",
+        novice: "easy",
       };
 
       // Current category's tasks in display order.
@@ -150,6 +155,11 @@
             const ra = walletReward(key(a), a.diff),
               rb = walletReward(key(b), b.diff);
             return _taskSortDir === "rich" ? rb - ra : ra - rb;
+          }
+          if (_taskSortDir === "ranked" || _taskSortDir === "novice") {
+            const ra = walletRank(key(a)),
+              rb = walletRank(key(b));
+            return _taskSortDir === "ranked" ? rb - ra : ra - rb;
           }
           return _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff;
         });
@@ -288,7 +298,7 @@
             <div><div class="t-id">${t.id.toUpperCase()}</div><div class="t-desc">${t.desc}</div></div>
           </div>
           <div class="stars-wrap">
-${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.diff)}${mkHarvestAmount(`${_vsCat.id}/${t.id}`, t.diff)}<span class="stars ${dc}">${mkStars(t.diff)}</span>
+${mkRankBadge(`${_vsCat.id}/${t.id}`)}${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.diff)}${mkHarvestAmount(`${_vsCat.id}/${t.id}`, t.diff)}<span class="stars ${dc}">${mkStars(t.diff)}</span>
           </div>`;
           row.onclick = () => {
             playNav();

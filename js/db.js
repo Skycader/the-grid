@@ -119,6 +119,11 @@
           if (!s || typeof s !== "object" || Array.isArray(s)) return "bad gr_solved";
           if (!Object.values(s).every((v) => Number.isFinite(v))) return "bad gr_solved";
         }
+        if ("gr_rank" in d) {
+          const r = d.gr_rank;
+          if (!r || typeof r !== "object" || Array.isArray(r)) return "bad gr_rank";
+          if (!Object.values(r).every((v) => Number.isFinite(v) && v >= 0)) return "bad gr_rank";
+        }
         if ("gr_history" in d) {
           const h = d.gr_history;
           if (
@@ -135,6 +140,7 @@
           // полная замена: сначала чистим текущую базу, потом пишем импортированную
           localStorage.removeItem(WALLET_KEY);
           localStorage.removeItem(SOLVED_KEY);
+          localStorage.removeItem(RANK_KEY);
           localStorage.removeItem(HISTORY_KEY); // history is replaced too (empty if the file has none)
           for (const [k, v] of Object.entries(data))
             localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v));

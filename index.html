@@ -314,10 +314,20 @@
     <!-- SOLUTIONS MODAL -->
     <div class="modal-bg hide" id="modal">
       <div class="modal">
-        <div class="m-ico">📋</div>
+        <div class="m-ico">
+          <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.5 L22.5 20.5 H1.5 Z" fill="#dc322f" stroke="#dc322f" stroke-width="1.6" stroke-linejoin="round" />
+            <rect x="11" y="8.5" width="2" height="6.5" rx="1" fill="#fff" />
+            <circle cx="12" cy="17.7" r="1.2" fill="#fff" />
+          </svg>
+        </div>
         <div class="m-title">SHOW SOLUTION?</div>
         <div class="m-body">
-          Reference solution for this task will be displayed.
+          <!-- filled per task by requestSolutions() -->
+          <div class="m-warn-list">
+            <div class="m-warn-line" id="sol-warn-rank"></div>
+            <div class="m-warn-line" id="sol-warn-reward"></div>
+          </div>
         </div>
         <div class="m-acts">
           <button class="m-btn cancel" onclick="closeModal()">CANCEL</button>

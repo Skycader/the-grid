@@ -809,9 +809,22 @@
         color: #ffd84a;
         gap: 2px;
       }
+      .sort-btn.sort-ranked,
+      .sort-btn.sort-novice {
+        color: #6c71c4;
+        gap: 2px;
+      }
       .sort-btn svg,
       .sort-ico svg {
         display: block;
+      }
+      .sort-ico.sort-ranked,
+      .sort-ico.sort-novice {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        color: #6c71c4;
       }
       .sort-ico.sort-rich,
       .sort-ico.sort-poor {
@@ -1208,6 +1221,31 @@
       .breadc-reward.zero,
       .breadc-reward.off {
         opacity: 0.45;
+      }
+      /* task rank: signal-bars icon + number (accumulated repeat-solve days) */
+      .rank-badge,
+      .breadc-rank .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 3px;
+        min-width: 30px;
+        font-size: 0.68rem;
+        color: #6c71c4;
+        white-space: nowrap;
+      }
+      .rank-badge b {
+        font-weight: 400;
+      }
+      .rank-badge.zero {
+        opacity: 0.35;
+      }
+      .breadc-rank {
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+      .breadc-rank .rank-badge {
+        min-width: 0;
       }
       .breadc-stars {
         font-size: 0.65rem;
@@ -2123,6 +2161,46 @@
         font-size: 1.4rem;
         text-align: center;
         margin-bottom: 7px;
+      }
+      .m-ico svg {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .m-warn-list {
+        display: inline-block;
+        text-align: left;
+      }
+      .m-warn-line {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        margin: 6px 0;
+        color: var(--tx);
+      }
+      .m-warn-line span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .m-warn-line .warn-tri {
+        flex-shrink: 0;
+      }
+      .m-warn-line b {
+        font-weight: 400;
+      }
+      .m-warn-line .w-rank {
+        color: #6c71c4;
+      }
+      .m-warn-line .w-reward {
+        color: #ffd84a;
+      }
+      .m-warn-line svg {
+        display: block;
+      }
+      .m-warn-line .w-rank + svg {
+        color: #6c71c4;
       }
       .m-title {
         font-family: "Orbitron", sans-serif;

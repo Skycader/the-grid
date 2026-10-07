@@ -9,6 +9,7 @@
       const WALLET_KEY = "gr_wallet";
       const SOLVED_KEY = "gr_solved";
       const HISTORY_KEY = "gr_history"; // transaction log, its own localStorage item
+      const RANK_KEY = "gr_rank"; // { "cat/task": accumulated days between counted solves }
       const DAY_MS = 86400000;
       const NEED_DAYS = 7; // шкала "нужды" заполняется за 7 суток
 
@@ -16,9 +17,11 @@
       let _walletShown = 0; // то, что нарисовано (догоняет баланс по мере прилёта монет)
       let _solved = {};
       let _history = [];
+      let _rank = {};
       try {
         _balance = parseFloat(localStorage.getItem(WALLET_KEY)) || 0;
         _solved = JSON.parse(localStorage.getItem(SOLVED_KEY) || "{}") || {};
+        _rank = JSON.parse(localStorage.getItem(RANK_KEY) || "{}") || {};
       } catch (e) {}
       try {
         const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
@@ -44,6 +47,7 @@
         try {
           localStorage.setItem(WALLET_KEY, String(_balance));
           localStorage.setItem(SOLVED_KEY, JSON.stringify(_solved));
+          localStorage.setItem(RANK_KEY, JSON.stringify(_rank));
         } catch (e) {}
         if (typeof hvRefresh === "function") hvRefresh(); // harvest button total
         if (typeof walletRenderTaskReward === "function") walletRenderTaskReward();
@@ -224,6 +228,8 @@
         const days = (now - prev) / DAY_MS;
         const payout = walletPayout(diff, days);
         if (payout.net > 0) _balance = round2(_balance + payout.net);
+        // rank = accumulated days between counted solves (experience; doesn't affect rewards yet)
+        _rank[key] = Math.round(((_rank[key] || 0) + days) * 10000) / 10000;
         saveWallet();
         walletLog({
           type: "solve",
@@ -234,6 +240,7 @@
           gross: payout.gross,
           feePct: payout.feePct,
           net: payout.net,
+          rank: walletRank(key),
           balance: _balance,
         });
         if (payout.net > 0) walletFlyCoins(fromEl, payout.net, payout);
@@ -242,7 +249,25 @@
       // "Смотреть решение" = проиграл: таймер идёт заново с этого момента
       function walletMarkSolutionViewed(key) {
         _solved[key] = Date.now();
+        delete _rank[key]; // peeking at the solution wipes the task's rank
         saveWallet();
+      }
+
+      // Rank of a task = whole days accumulated across its counted repeat solves.
+      function walletRank(key) {
+        return Math.floor(_rank[key] || 0);
+      }
+      // Signal-bars icon (4 ascending bars) followed by the rank number.
+      function rankIconSvg(px) {
+        return `<svg width="${px}" height="${px}" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="11" width="2.6" height="4" rx=".6" fill="currentColor"/><rect x="5" y="8" width="2.6" height="7" rx=".6" fill="currentColor"/><rect x="9" y="5" width="2.6" height="10" rx=".6" fill="currentColor"/><rect x="13" y="1.5" width="2.6" height="13.5" rx=".6" fill="currentColor"/></svg>`;
+      }
+      // Red warning triangle with "!"
+      function warnSvg(px) {
+        return `<svg class="warn-tri" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 L22.5 20.5 H1.5 Z" fill="#dc322f" stroke="#dc322f" stroke-width="1.6" stroke-linejoin="round"/><rect x="11" y="8.5" width="2" height="6.5" rx="1" fill="#fff"/><circle cx="12" cy="17.7" r="1.2" fill="#fff"/></svg>`;
+      }
+      function mkRankBadge(key) {
+        const r = walletRank(key);
+        return `<span class="rank-badge${r ? "" : " zero"}" title="Rank ${r}: days accumulated between repeat solves">${rankIconSvg(11)}<b>${r}</b></span>`;
       }
 
       // Ручная правка lastSolved (CLI). ts = ms | null (= "ни разу не решена")
@@ -259,9 +284,11 @@
         try {
           _balance = parseFloat(localStorage.getItem(WALLET_KEY)) || 0;
           _solved = JSON.parse(localStorage.getItem(SOLVED_KEY) || "{}") || {};
+          _rank = JSON.parse(localStorage.getItem(RANK_KEY) || "{}") || {};
         } catch (e) {
           _balance = 0;
           _solved = {};
+          _rank = {};
         }
         try {
           const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
@@ -359,6 +386,8 @@
           "breadc-reward" + (net < 0.01 ? " zero" : "") + (_strictOn ? "" : " off");
         el.title = tip;
         el.innerHTML = `${coinSvg(12)}<b>${fmtCoins(net)}</b>`;
+        const rk = document.getElementById("task-rank");
+        if (rk) rk.innerHTML = mkRankBadge(`${cat.id}/${curTask.id}`);
       }
       // the reward grows with time — keep it fresh while a task is open
       setInterval(() => {

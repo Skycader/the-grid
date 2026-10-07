@@ -17,6 +17,7 @@
         const starsHtml = task.diff
           ? ` <span class="breadc-stars ${diffCls(task.diff)}">${mkStars(task.diff)}</span>` +
             ` <span class="breadc-reward" id="task-reward"></span>` +
+            ` <span class="breadc-rank" id="task-rank"></span>` +
             ` <button class="ranks-btn visible" onclick="openRanksDrawer()" title="Difficulty scale" style="margin-left:4px">` +
             `<svg width="15" height="15" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">` +
             `<circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.3"/>` +
@@ -77,6 +78,13 @@
       function requestSolutions() {
         playClick();
         if (!curTask) return;
+        // per-task warning: what this peek will wipe, with the current amounts
+        const key = `${curCat().id}/${curTask.id}`;
+        const reward = walletReward(key, curTask.diff);
+        document.getElementById("sol-warn-rank").innerHTML =
+          `${warnSvg(16)}<span>Viewing it will reset your <b class="w-rank">${walletRank(key)}</b> ${rankIconSvg(13)} rank.</span>`;
+        document.getElementById("sol-warn-reward").innerHTML =
+          `${warnSvg(16)}<span>Viewing it will reset your <b class="w-reward">${fmtCoins(reward)}</b> ${coinSvg(13)} reward.</span>`;
         document.getElementById("modal").classList.remove("hide");
       }
       function closeModal() {
