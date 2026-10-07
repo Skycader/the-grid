@@ -355,9 +355,15 @@
       // Coins harvestable from this task right now (net of the commission), shown
       // right of the meter in the task list. Never-solved tasks → empty placeholder
       // (keeps the columns aligned).
-      function mkHarvestAmount(key, diff) {
+      // always=true (global search): never-solved tasks show a dimmed "0" instead of the
+      // empty placeholder.
+      function mkHarvestAmount(key, diff, always) {
         const d = walletNeedDays(key);
-        if (d == null) return '<span class="hv-row"></span>';
+        if (d == null) {
+          return always
+            ? `<span class="hv-row zero" title="First solve is free">${coinSvg(12)}<b>0</b></span>`
+            : '<span class="hv-row"></span>';
+        }
         const p = walletPayout(diff, d);
         const cls = p.net < 0.01 ? "hv-row zero" : "hv-row";
         return `<span class="${cls}" title="Harvestable now: +${fmtCoins(p.net)}">${coinSvg(12)}<b>${fmtCoins(p.net)}</b></span>`;

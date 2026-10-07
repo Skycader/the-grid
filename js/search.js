@@ -183,9 +183,11 @@
           const el = document.createElement("div");
           el.className = "srch-row";
           if (i === _srchFocusIdx) el.classList.add("focused");
+          const key = `${cat.id}/${task.id}`;
           el.innerHTML = `<span class="srch-cat">${cat.name}</span>
       <span class="srch-id">${task.id.toUpperCase()}</span>
       <span class="srch-desc">— ${task.desc}</span>
+      <span class="srch-meta">${mkHarvestAmount(key, task.diff, true)}${mkRankBadge(key)}</span>
       <span class="srch-st ${diffCls(task.diff)}">${mkStars(task.diff)}</span>`;
           el.onclick = () => navigateToTask(cat, task);
           sr.appendChild(el);

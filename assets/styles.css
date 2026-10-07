@@ -469,7 +469,21 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+      /* rank + reward, left of the difficulty stars */
+      .srch-meta {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .srch-meta .hv-row {
+        margin-right: 6px;
+      }
       .srch-st {
+        /* fixed column (max 3 stars per row) so rank/reward line up across rows */
+        display: inline-flex;
+        justify-content: center;
+        min-width: 3.2em;
         font-size: 0.62rem;
         letter-spacing: -1px;
         flex-shrink: 0;
