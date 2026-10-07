@@ -1,16 +1,7 @@
-/*
- * Ex 1
- * Remove all words `cat`
- */
-
-const r =
-  /cat/gi; /*g means findMany and without means findOne; i = case-insensitive (spec has "Cat")*/
 const f = (text) => {
-  /*code here */
-  return text.replace(r, '');
+  const r =
+    /\bcat\b/gi; /*\b = word boundary (whole word only: not scat, cats, cat5, _cat); g = all matches, not only the first; i = case-insensitive (spec has "Cat")*/
+  return text.replace(r, "");
 };
 
-/**
- * Сложность: 1 — голый литерал, никаких метасимволов кроме флагов /gi
- */
 module.exports = f;

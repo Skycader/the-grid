@@ -352,9 +352,54 @@
     <!-- WORKER — runs in a separate thread; all tests are WebWorker-isolated -->
     <script id="wk" type="x/worker">
       // ── Jest-compatible mini test runner ──────────────────────────────
-      function makeRunner(){
+      function makeRunner(spec){
         const suites={};
         let _asserts=null; // soft assertion collector, active during it()
+
+        // ── call-site capture ──
+        // Every assertion row shows WHAT was asserted: the text of the expect(...)
+        // argument, e.g. f("x CAT y"). The spec is compiled with new Function, so a
+        // stack frame reads <anonymous>:LINE:COL, LINE counted from a 2-line header;
+        // COL points at the `expect` identifier. Cached per call site.
+        const _callCache=new Map();
+        let _specLines=null;
+        function callSite(){
+          try{
+            const m=/<anonymous>:(\d+):(\d+)/.exec(new Error().stack||'');
+            if(!m||!spec)return undefined;
+            const key=m[1]+':'+m[2];
+            if(_callCache.has(key))return _callCache.get(key);
+            if(!_specLines)_specLines=spec.split('\n');
+            let off=0;
+            for(let i=0;i<+m[1]-3;i++)off+=_specLines[i].length+1;
+            off+=+m[2]-1;
+            let r;
+            if(spec.startsWith('expect',off))r=extractArg(off+6);
+            _callCache.set(key,r);
+            return r;
+          }catch(e){return undefined;}
+        }
+        // text between the parentheses of expect( … ), brackets balanced, strings skipped
+        function extractArg(i){
+          while(/\s/.test(spec[i]))i++;
+          if(spec[i]!=='(')return undefined;
+          let depth=0,q=null;
+          for(let j=i;j<spec.length;j++){
+            const c=spec[j];
+            if(q){if(c==='\\')j++;else if(c===q)q=null;continue;}
+            if(c==='"'||c==="'"||c==='`'){q=c;continue;}
+            if(c==='('||c==='['||c==='{')depth++;
+            else if(c===')'||c===']'||c==='}'){
+              depth--;
+              if(depth===0){
+                // prettier-style wrapping: "(\n  x,\n)" → "(x)" (only around line breaks)
+                const t=spec.slice(i+1,j).replace(/\(\s*\n\s*/g,'(').replace(/,?\s*\n\s*\)/g,')').replace(/\s+/g,' ').replace(/,\s*$/,'').trim();
+                return t.length>110?t.slice(0,107)+'...':t;
+              }
+            }
+          }
+          return undefined;
+        }
 
         // ── suite stack: root frame always present, describe() pushes/pops ──
         // hooks are per-frame so beforeEach/afterEach/beforeAll/afterAll declared
@@ -447,8 +492,9 @@
         const test=it;
 
         function expect(v){
+          const call=_asserts?callSite():undefined;
           function soft(ok,matcher,expected,received){
-            const entry={status:ok?'pass':'fail',matcher,
+            const entry={status:ok?'pass':'fail',matcher,call,
               expected:expected!==undefined?trunc(JSON.stringify(expected)):undefined,
               received:received!==undefined?trunc(JSON.stringify(received)):trunc(JSON.stringify(v))};
             if(_asserts){_asserts.push(entry);}
@@ -513,7 +559,7 @@
       // No cleanSpec stripping, no injected `f` param — clean Node.js semantics.
       // Each call has its own fresh context: no scope bleed between ref and user runs.
       function singleRun(sol, spec) {
-        const {suites, describe, it, test, expect, beforeEach, afterEach, beforeAll, afterAll, finalizeRoot} = makeRunner();
+        const {suites, describe, it, test, expect, beforeEach, afterEach, beforeAll, afterAll, finalizeRoot} = makeRunner(spec);
         const t0 = self.performance.now();
         let ex;
         try { ex = compileSol(sol); }

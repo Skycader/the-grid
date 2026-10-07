@@ -1588,6 +1588,21 @@
       .r-a-got {
         color: #dc322f;
       }
+      .r-a-ok {
+        color: #859900;
+      }
+      /* keep double spaces / tabs visible — they are often the whole point of a diff */
+      .r-a-exp,
+      .r-a-got,
+      .r-a-ok,
+      .r-a-call {
+        white-space: pre-wrap;
+      }
+      /* what was asserted: the expect(...) argument */
+      .r-a-call {
+        color: var(--tx);
+        overflow-wrap: anywhere;
+      }
       .r-a-sep {
         color: var(--txd);
         flex-shrink: 0;

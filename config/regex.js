@@ -3,7 +3,7 @@ window.CFG_regex = [
     id: "regex_1",
     title: "Remove all words `cat`",
     diff: 1,
-    desc: "Remove all occurrences of 'cat' (case-insensitive)",
+    desc: "Remove every whole word 'cat' (case-insensitive)",
     file: "ex1",
   },
   {

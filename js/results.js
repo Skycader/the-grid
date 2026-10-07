@@ -74,17 +74,26 @@
             if (hasAsts) {
               astHtml = '<div class="r-assertions">';
               asts.forEach((a) => {
-                const gotPart =
-                  a.received !== undefined
-                    ? `<span class="r-a-sep">→ received</span><span class="r-a-got">${esc(a.received)}</span>`
-                    : "";
+                // Always show what was asserted: the expect(...) argument, the matcher and
+                // the expected value. `received` is added only when it adds information
+                // (failure, or a matcher where received ≠ expected, e.g. toBeLessThan).
+                const failed = a.status === "fail";
+                const callPart = a.call
+                  ? `<span class="r-a-call">${esc(a.call)}</span>`
+                  : "";
                 const expPart =
-                  a.expected !== undefined && a.status === "fail"
-                    ? `<span class="r-a-sep">expected</span><span class="r-a-exp">${esc(a.expected)}</span>`
+                  a.expected !== undefined
+                    ? `<span class="r-a-exp">${esc(a.expected)}</span>`
                     : "";
+                const showGot =
+                  a.received !== undefined &&
+                  (failed || a.received !== a.expected);
+                const gotPart = showGot
+                  ? `<span class="r-a-sep">→ received</span><span class="${failed ? "r-a-got" : "r-a-ok"}">${esc(a.received)}</span>`
+                  : "";
                 astHtml += `<div class="r-assert ${a.status}">
-                  <span class="r-a-ico">${a.status === "pass" ? "✓" : "✗"}</span>
-                  <span class="r-a-matcher">.${esc(a.matcher)}</span>
+                  <span class="r-a-ico">${failed ? "✗" : "✓"}</span>
+                  ${callPart}<span class="r-a-matcher">.${esc(a.matcher)}</span>
                   ${expPart}${gotPart}
                 </div>`;
               });
