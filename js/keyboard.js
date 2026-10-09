@@ -7,6 +7,10 @@
         }
 
         if (e.key === "Escape") {
+          if (!document.getElementById("res-lock").classList.contains("hide")) {
+            closeStrictLock();
+            return;
+          }
           if (!document.getElementById("adjust-modal").classList.contains("hide")) {
             walletAdjustClose();
             return;

@@ -7,6 +7,9 @@
       // 0.10 = 10% slower allowed (recommended). 0.0 = exact match required.
       const STRICT_TOLERANCE = 0.1;
       const STRICT_DEFAULT = true; // strict mode on by default
+      // how much slower than the reference the player's run is: 0.153 = +15.3 %
+      const strictRatio = (b) =>
+        b && b.refMinTime > 0 ? (b.userMinTime - b.refMinTime) / b.refMinTime : 0;
 
       // Safe icon on the HARVEST button: a balance above this shows a mountain of gold
       // (0 → empty safe with a cobweb, anything in between → a small pile).

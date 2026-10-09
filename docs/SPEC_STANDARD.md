@@ -19,7 +19,7 @@ Legend: **M** — mandatory, **R** — recommended, **O** — only when it appli
 | Name | `<task-file>.spec.js` next to `<task-file>.js` (stub) and `<task-file>.sol.js` (reference) |
 | Import | `const f = require("./<task-file>.js");` — `const`, never an implicit global |
 | Language | English everywhere: header, `describe`/`it` titles, comments |
-| Runner | the in-browser mini-Jest (see `index.html`, `makeRunner`). Available: `describe`, `it`/`test`, `expect`, `beforeEach`, `afterEach`, `beforeAll`, `afterAll`, `require`, `__source` |
+| Runner | the in-browser mini-Jest (see `index.html`, `makeRunner`). Available: `describe`, `it`/`test`, `it.each`/`test.each`, `expect`, `beforeEach`, `afterEach`, `beforeAll`, `afterAll`, `require`, `__source` |
 | Matchers | `toBe`, `toEqual`, `toStrictEqual`, `toMatch`, `toBeTruthy/Falsy`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toContain`, `toHaveLength`, `toBeGreaterThan(OrEqual)`, `toBeLessThan(OrEqual)`, `toThrow`, and `.not.` of all of them |
 | Assertions | soft: every `expect` in a test is evaluated and reported, the first failure does not hide the rest |
 | Reference | `<task-file>.sol.js` **must pass the whole spec**. A spec that its own reference fails is a bug in the spec |
@@ -74,6 +74,7 @@ use `1️⃣`, `2️⃣`, … directly in the title.
 | D2 | Source constraints through `__source` (e.g. loops forbidden: `expect(__source).not.toMatch(/\b(for\|while)\s*\(/)`) | O |
 | D3 | Operation counting through an `Api` wrapper (reads / writes / iterations) for algorithm tasks | O |
 | D4 | Randomised data — only with a deterministic expectation (value picked from the generated data), never a hard-coded guess | O |
+| D5 | **A timing test** where the reference technique is measurably faster than the wrong-but-correct ones (e.g. a capturing `( )` vs `(?: )`: +22 % in Chrome on 360 000 calls over short strings — long strings give only +12 %, so measure in the browser, not in Node). One test whose loop dominates the run time of the whole spec, with a single `expect` on the result. STRICT mode compares the player's total spec time with the reference's (tolerance 10 %), so this is the ONLY way a technique is enforced | R |
 
 ### E. Technique
 
@@ -83,6 +84,9 @@ use `1️⃣`, `2️⃣`, … directly in the title.
 | E2 | Helpers live at the bottom under a `// Dependencies` banner | O |
 | E3 | A comment above every non-obvious case explaining **why** it exists (what wrong solution it catches) | R |
 | E4 | Make `expect(<argument>)` readable: the argument text is printed in the results row, so write `expect(f("x CAT y"))` rather than hiding the input in a variable named `r` | R |
+| E5 | **A generated (dynamic) case must show the concrete input it failed on.** Do not hide cases in a `for` loop inside one `it`: build a table and use `it.each(table)("N️⃣.N️⃣ %j → expected %s", (input, expected) => …)` so every case is its own row with the string in the title (placeholders: `%s` `%d` `%j` `%#`) | M |
+| E6 | One root cause = one failing test. A structural defect (a global flag, a wrong export) must not turn dozens of unrelated tests red: catch it in ONE dedicated test and make the helpers the other tests use immune to it (e.g. reset `lastIndex` before every `r.test()`) | M |
+| E7 | **Failure rows say WHERE, never HOW.** A row shows the failing line / input and the compared values — nothing else. Do not add explanations, hints or technique advice ("use (?:...)", "remove the g flag"). A technique is judged by speed only: see D5 | M |
 
 ## 3. Annotated template
 
@@ -166,8 +170,11 @@ Every assertion is printed as one row:
 ✓ f(big).length .toBeLessThan  1000  → received 12 ← passed, but received differs from expected
 ```
 
-The argument text is cut out of the spec source, so it is only as informative as the
-spec makes it (E4).
+The argument text (the first argument of `expect`) is cut out of the spec source, so it is
+only as informative as the spec makes it (E4). A generated case shows its input in the row
+title (E5). Nothing else is added to a failure row (E7).
+
+Clicking a test row or an assertion row jumps to it in the SPEC tab and flashes it for 1 s.
 
 ## 5. Definition of done for a spec
 
@@ -180,8 +187,8 @@ spec makes it (E4).
    sentence explaining why it is left open.
 5. Titles, comments and the header are English; numbering follows B4.
 6. Opening any row of the results shows enough to see *why* a test failed without
-   reading the spec file.
-7. **The whole spec runs in under ~10 ms with the reference solution.** In STRICT mode the
+   reading the spec file: the failing input is visible (E4, E5).
+7. **The whole spec runs in about 10 ms or less with the reference solution** (the timing test D5 may take a third of it). In STRICT mode the
    app repeats the entire spec up to 100 times for the reference and 100 times for the
    user's code (1.5 s cap each, so at most ~3 s of waiting), and a single run is killed
    after 3 s (`TIMEOUT (3s)`). A 50 ms spec would use the whole cap on every RUN.

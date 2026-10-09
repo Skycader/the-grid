@@ -91,7 +91,7 @@
                 const gotPart = showGot
                   ? `<span class="r-a-sep">→ received</span><span class="${failed ? "r-a-got" : "r-a-ok"}">${esc(a.received)}</span>`
                   : "";
-                astHtml += `<div class="r-assert ${a.status}">
+                astHtml += `<div class="r-assert ${a.status}${a.line ? " jump" : ""}"${a.line ? ` title="Show in SPEC" onclick="rAssertClick(event, ${a.line})"` : ""}>
                   <span class="r-a-ico">${failed ? "✗" : "✓"}</span>
                   ${callPart}<span class="r-a-matcher">.${esc(a.matcher)}</span>
                   ${expPart}${gotPart}
@@ -104,7 +104,7 @@
             } else if (t.error) {
               astHtml = `<div class="r-err">${esc(t.error)}</div>`;
             }
-            h += `<div class="r-item ${t.status}" onclick="this.classList.toggle('open')"><div class="r-nr">
+            h += `<div class="r-item ${t.status}"><div class="r-nr" title="Show in SPEC" onclick="rTestClick(this, ${t.line || 0})">
               <span class="r-ico">${ico}</span><span class="r-nm">${esc(t.name)}</span>
               <span class="r-ms">${t.time.toFixed(2)}ms</span>
               ${memD ? `<span class="r-mem" style="color:#2aa198">${memD}</span>` : ""}
@@ -137,3 +137,117 @@
         return (b / 1048576).toFixed(1) + "MB";
       }
 
+
+      // ── Jump from a result to the spec ──
+      // Clicking a test row expands it (as before) AND opens the SPEC tab at that test;
+      // clicking one assertion row opens the SPEC tab at that expect(...). The target is
+      // flashed for 1 s. Lines come from the worker (1-based lines of the spec text).
+      function rTestClick(header, line) {
+        header.parentElement.classList.toggle("open");
+        specJump(line);
+      }
+      function rAssertClick(ev, line) {
+        ev.stopPropagation();
+        specJump(line);
+      }
+
+      // first and last line of the statement that starts at the given line: up to the ";" that
+      // closes it (it(...); / expect(...).toBe(...);), skipping strings and comments
+      function specStatementRange(spec, line) {
+        const lines = spec.split("\n");
+        let off = 0;
+        for (let i = 0; i < line - 1 && i < lines.length; i++) off += lines[i].length + 1;
+        const lim = Math.min(spec.length, off + 6000);
+        let depth = 0,
+          seen = false,
+          q = null,
+          end = off;
+        for (let j = off; j < lim; j++) {
+          const c = spec[j];
+          if (q) {
+            if (c === "\\") j++;
+            else if (c === q) q = null;
+            continue;
+          }
+          if (c === "/" && spec[j + 1] === "/") {
+            while (j < lim && spec[j] !== "\n") j++;
+            continue;
+          }
+          if (c === "/" && spec[j + 1] === "*") {
+            j = spec.indexOf("*/", j + 2);
+            if (j < 0) break;
+            j++;
+            continue;
+          }
+          if (c === '"' || c === "'" || c === "\x60") q = c;
+          else if ("([{".includes(c)) {
+            depth++;
+            seen = true;
+          } else if (")]}".includes(c)) depth--;
+          else if (c === ";" && depth <= 0 && seen) {
+            end = j;
+            break;
+          }
+        }
+        const extra = (spec.slice(off, end).match(/\n/g) || []).length;
+        return { start: line, end: Math.min(lines.length, line + Math.min(extra, 80)) };
+      }
+
+      let _specFlashIds = [],
+        _specFlashT1 = null,
+        _specFlashT2 = null;
+      function specFlash(start, end) {
+        clearTimeout(_specFlashT1);
+        clearTimeout(_specFlashT2);
+        const range = new monaco.Range(start, 1, end, 1);
+        const deco = (cls) => [
+          {
+            range,
+            options: { isWholeLine: true, className: cls, linesDecorationsClassName: "spec-flash-bar" },
+          },
+        ];
+        _specFlashIds = editor.deltaDecorations(_specFlashIds, deco("spec-flash"));
+        _specFlashT1 = setTimeout(
+          () => (_specFlashIds = editor.deltaDecorations(_specFlashIds, deco("spec-flash-fade"))),
+          650,
+        );
+        _specFlashT2 = setTimeout(
+          () => (_specFlashIds = editor.deltaDecorations(_specFlashIds, [])),
+          1000,
+        );
+      }
+
+      function specJump(line) {
+        if (!line || !curTask || !editor) return;
+        const files = FILECACHE[curCat().id + "/" + curTask.id];
+        if (!files || !files.spec) return;
+        if (typeof closeMobResults === "function") closeMobResults(); // phones: results cover the editor
+        const r = specStatementRange(files.spec, line);
+        const go = () => {
+          editor.revealLineInCenter(r.start, monaco.editor.ScrollType.Immediate); // no smooth scroll: the flash must not start before the target is on screen
+          editor.setPosition({ lineNumber: r.start, column: 1 });
+          specFlash(r.start, r.end);
+        };
+        // right after switchTab() the editor still lays out the old text: wait a moment
+        if (curTab !== "sp") {
+          switchTab("sp");
+          setTimeout(go, 60);
+        } else go();
+      }
+
+      // ── STRICT "too slow" modal over the results area ──
+      // Closed like any modal: the cross, Esc, a click on the dark area (and by the next run).
+      function showStrictLock(b) {
+        const pct = Math.round(strictRatio(b) * 1000) / 10; // one decimal
+        document.getElementById("res-lock-body").innerHTML =
+          `You didn't meet the time limit: your solution is <b>${pct}% slower</b> than the reference one (the limit is +${Math.round(STRICT_TOLERANCE * 100)}%).` +
+          `<span class="rl-sub">yours ${b.userMinTime.toFixed(2)} ms · reference ${b.refMinTime.toFixed(2)} ms</span>`;
+        document.getElementById("res-lock").classList.remove("hide");
+      }
+      function closeStrictLock() {
+        const el = document.getElementById("res-lock");
+        if (el) el.classList.add("hide");
+      }
+      document.getElementById("res-lock").addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) closeStrictLock();
+      });

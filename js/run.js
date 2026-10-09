@@ -9,6 +9,7 @@
           return;
         }
         playRunStart();
+        closeStrictLock();
         if (curTab !== "ed") switchTab("ed");
         const btn = document.getElementById("run-btn");
         btn.classList.add("go");
@@ -70,8 +71,15 @@
               : all.some((t) => t.status !== "pass")
                 ? "ng"
                 : "";
-          if (st) STATUS[key] = st;
-          if (st === "ok") {
+          // STRICT: every test is green but the run is slower than the reference by more than
+          // STRICT_TOLERANCE — that is a failure (fail sound, no reward), not a success
+          const tooSlow =
+            st === "ok" && _strictOn && files.sol && benchData && strictRatio(benchData) > STRICT_TOLERANCE;
+          if (st) STATUS[key] = tooSlow ? "ng" : st;
+          if (tooSlow) {
+            playFail();
+            showStrictLock(benchData);
+          } else if (st === "ok") {
             playAllPass();
             walletOnSolved(key, diff, !!files.sol, benchData, btn);
           } else if (st === "ng") playFail();
