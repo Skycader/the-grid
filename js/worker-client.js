@@ -8,13 +8,16 @@
         }
         return wkBlob;
       }
+      // A run that takes longer than this is killed (catastrophic backtracking, infinite
+      // loop): the player never waits more than ~3 s for a RUN.
+      const RUN_TIMEOUT_MS = 3000;
       function runWorker(sol, spec) {
         return new Promise((res) => {
           const w = new Worker(getWkUrl());
           const tid = setTimeout(() => {
             w.terminate();
-            res({ error: "TIMEOUT (10s)", suites: {}, total: 10000 });
-          }, 10000);
+            res({ error: "TIMEOUT (3s)", suites: {}, total: RUN_TIMEOUT_MS });
+          }, RUN_TIMEOUT_MS);
           w.onmessage = (e) => {
             clearTimeout(tid);
             w.terminate();

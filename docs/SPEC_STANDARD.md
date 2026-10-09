@@ -70,7 +70,7 @@ use `1️⃣`, `2️⃣`, … directly in the title.
 
 | # | Kind of check | |
 |---|---|---|
-| D1 | Performance / ReDoS: large input (`"x".repeat(100000)`) with a generous time limit (≥ 1 s) | O |
+| D1 | Performance / ReDoS: a larger input (up to `"x".repeat(5000)`) with a generous time limit (≥ 1 s). **Keep it small — see §5, item 7** | O |
 | D2 | Source constraints through `__source` (e.g. loops forbidden: `expect(__source).not.toMatch(/\b(for\|while)\s*\(/)`) | O |
 | D3 | Operation counting through an `Api` wrapper (reads / writes / iterations) for algorithm tasks | O |
 | D4 | Randomised data — only with a deterministic expectation (value picked from the generated data), never a hard-coded guess | O |
@@ -143,7 +143,7 @@ describe(":: Running test case for EXN (<short task name>)", () => {
   describe("N️⃣ Performance", () => {
     let big;
     beforeAll(() => {
-      big = "…".repeat(100000);
+      big = "…".repeat(5000);
     });
 
     it("N️⃣.1️⃣ should handle a very large input correctly and fast", () => {
@@ -181,6 +181,13 @@ spec makes it (E4).
 5. Titles, comments and the header are English; numbering follows B4.
 6. Opening any row of the results shows enough to see *why* a test failed without
    reading the spec file.
+7. **The whole spec runs in under ~10 ms with the reference solution.** In STRICT mode the
+   app repeats the entire spec up to 100 times for the reference and 100 times for the
+   user's code (1.5 s cap each, so at most ~3 s of waiting), and a single run is killed
+   after 3 s (`TIMEOUT (3s)`). A 50 ms spec would use the whole cap on every RUN.
+   Catastrophic backtracking is exponential: a ~30-character evil input already hangs a
+   bad regex, so a ReDoS test needs a *shaped* input, not a huge one. Inputs of at most
+   5 000 elements are enough for everything else (quadratic scans, copy-per-item).
 
 ## 6. Open decisions
 

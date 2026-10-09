@@ -39,8 +39,10 @@
         // ── Strict mode: multi-run benchmark ──────────────────────────
         let benchData = null;
         if (_strictOn && files.sol && !r.error) {
+          // each side (reference, then user) repeats the spec for at most TIME_LIMIT ms,
+          // so STRICT adds ≤ 3 s of waiting on top of the normal run
           const MAX_RUNS = 100,
-            TIME_LIMIT = 5000;
+            TIME_LIMIT = 1500;
           setStatus("⚡ STRICT — benchmarking reference…");
           btn.textContent = "⟳ REF";
           benchData = await runBenchmark(
