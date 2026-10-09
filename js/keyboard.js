@@ -11,6 +11,10 @@
             walletAdjustClose();
             return;
           }
+          if (!document.getElementById("tx-modal").classList.contains("hide")) {
+            txClose();
+            return;
+          }
           if (
             !document.getElementById("confirm-modal").classList.contains("hide")
           ) {

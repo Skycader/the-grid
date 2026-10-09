@@ -9,6 +9,51 @@
       attachHoverMenu(_hvWrap, 500);
       document.getElementById("hv-coin").innerHTML = coinSvg(16);
 
+      // ── Safe icon on the button ──
+      // Open safe, three states by the balance: empty (cobweb) → small pile → mountain of
+      // gold above HARVEST_RICH_BALANCE. Hover shows the balance; a click opens the
+      // transactions modal (not the "open the most overdue task" action of the button).
+      const _hvSafe = document.getElementById("hv-safe");
+      let _hvSafeState = null;
+      function safeIconSvg(state, px) {
+        const CY = "#00ffff",
+          coin = (cx, cy) =>
+            `<ellipse cx="${cx}" cy="${cy + 0.9}" rx="2.4" ry="1.15" fill="#a06a00"/><ellipse cx="${cx}" cy="${cy}" rx="2.4" ry="1.15" fill="#ffd84a"/>`;
+        let inner = "";
+        if (state === "empty") {
+          inner =
+            '<g stroke="#9fb1b1" stroke-width=".6" fill="none" stroke-linecap="round"><line x1="6" y1="9" x2="13" y2="9"/><line x1="6" y1="9" x2="11.04" y2="14.04"/><line x1="6" y1="9" x2="6" y2="16"/><polyline points="9.5,9 8.52,11.52 6,12.5"/><polyline points="13,9 11.04,14.04 6,16"/></g>';
+        } else {
+          const rows = state === "mountain" ? [4, 4, 3, 3, 2, 1] : [3, 2];
+          rows.forEach((n, r) => {
+            for (let i = 0; i < n; i++)
+              inner += coin(+(13 + (i - (n - 1) / 2) * 2.9).toFixed(2), +(22.2 - r * 1.9).toFixed(2));
+          });
+        }
+        return `<svg class="safe-ico" width="${px}" height="${px}" viewBox="0 0 32 32" aria-hidden="true"><defs><clipPath id="hv-safe-clip"><rect x="6" y="9" width="14" height="14"/></clipPath></defs><rect x="3" y="6" width="20" height="20" rx="1" fill="none" stroke="${CY}" stroke-width="1.7"/><g clip-path="url(#hv-safe-clip)">${inner}</g><path d="M23 6L29 3.5V28.5L23 26" fill="none" stroke="${CY}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/><circle cx="26" cy="16" r="1.1" fill="${CY}"/></svg>`;
+      }
+      function hvRefreshSafe() {
+        const state =
+          _balance > HARVEST_RICH_BALANCE ? "mountain" : _balance > 0 ? "pile" : "empty";
+        if (state !== _hvSafeState) {
+          _hvSafeState = state;
+          _hvSafe.innerHTML = safeIconSvg(state, 24);
+        }
+        _hvSafe.title = `Balance: ${fmtCoins(_balance)}`;
+      }
+      _hvSafe.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // the rest of the button keeps its own action
+        txOpen();
+      });
+      _hvSafe.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          e.stopPropagation();
+          txOpen();
+        }
+      });
+
       function hvBuildCats() {
         const wrap = document.getElementById("hv-cats");
         wrap.innerHTML = "";
@@ -87,6 +132,7 @@
         const total = round2(pool.reduce((s, p) => s + p.net, 0));
         document.getElementById("hv-amt").textContent = fmtCoins(total);
         document.getElementById("hv-btn").classList.toggle("has-yield", total > 0);
+        hvRefreshSafe();
         if (pool.length)
           document.getElementById("hv-empty").classList.remove("show");
       }

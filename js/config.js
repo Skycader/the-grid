@@ -8,6 +8,10 @@
       const STRICT_TOLERANCE = 0.1;
       const STRICT_DEFAULT = true; // strict mode on by default
 
+      // Safe icon on the HARVEST button: a balance above this shows a mountain of gold
+      // (0 → empty safe with a cobweb, anything in between → a small pile).
+      const HARVEST_RICH_BALANCE = 1000;
+
       const FALLBACK_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect x="4" y="4" width="40" height="40" rx="3" stroke="currentColor" stroke-width="1.5"/>
   <circle cx="24" cy="24" r="10" stroke="currentColor" stroke-width="1.5"/>
