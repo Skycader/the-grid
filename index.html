@@ -241,7 +241,7 @@
             ▶ RUN
           </button>
           <!-- WALLET: баланс виден только внутри открытой задачи, справа от RUN -->
-          <div id="wallet" class="wallet" title="Баланс · клик, чтобы обнулить" onclick="walletAskReset()">
+          <div id="wallet" class="wallet" title="Balance · click to adjust" onclick="walletAskReset()">
             <span class="wallet-val" id="wallet-val">0</span>
             <span class="wallet-coin" id="wallet-coin"></span>
           </div>
@@ -345,6 +345,40 @@
         <div class="m-acts">
           <button class="m-btn go" id="confirm-yes" onclick="closeConfirm(true)">ДА</button>
           <button class="m-btn cancel" id="confirm-no" onclick="closeConfirm(false, true)">НЕТ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADJUST BALANCE MODAL: 200 withdraws, -200 deposits -->
+    <div class="modal-bg hide" id="adjust-modal">
+      <div class="modal">
+        <div class="m-ico" id="adjust-ico"></div>
+        <div class="m-title">ADJUST YOUR BALANCE</div>
+        <div class="adj-balance">Balance: <b id="adjust-balance">0</b></div>
+        <input
+          class="adj-input"
+          id="adjust-input"
+          type="text"
+          inputmode="decimal"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="200"
+          aria-label="Amount: positive withdraws, negative deposits"
+        />
+        <input
+          class="adj-input adj-comment"
+          id="adjust-comment"
+          type="text"
+          maxlength="200"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Comment (optional)"
+          aria-label="Comment (optional)"
+        />
+        <div class="adj-hint" id="adjust-hint"></div>
+        <div class="m-acts">
+          <button class="m-btn go" id="adjust-ok" onclick="walletAdjustSubmit()">APPLY</button>
+          <button class="m-btn cancel" onclick="walletAdjustClose()">CANCEL</button>
         </div>
       </div>
     </div>

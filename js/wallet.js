@@ -55,7 +55,10 @@
       // Append-only transaction log, kept in its own localStorage item (gr_history):
       //   solve: { t, type:"solve", task:"cat/task", diff, first, days, gross, feePct, net, balance }
       //          first = the free first solve (net 0); balance = balance AFTER the entry
-      //   reset: { t, type:"reset", amount, balance:0 }  (amount = what was wiped)
+      //   withdraw / deposit: { t, type, amount, balance, comment? }  manual balance adjustment
+      //          (amount > 0 is the size of the move, balance = balance AFTER the entry;
+      //           comment is present only when the player typed one)
+      //   reset: { t, type:"reset", amount, balance:0 }  legacy entries of the old reset modal
       function walletLog(entry) {
         _history.push({ t: Date.now(), ...entry });
         try {
@@ -301,26 +304,98 @@
         if (typeof hvRefresh === "function") hvRefresh();
       }
 
-      // Клик по балансу → «Хотите обнулить баланс?» (lastSolved не трогаем)
-      function walletAskReset() {
-        askConfirm(
-          {
-            icon: coinSvg(30),
-            title: "RESET YOUR BALANCE?",
-            yes: "YES",
-            no: "NO",
-          },
-          () => {
-            const wiped = _balance;
-            _balance = 0;
-            _walletShown = 0;
-            saveWallet();
-            if (wiped > 0) walletLog({ type: "reset", amount: wiped, balance: 0 });
-            renderWallet();
-            walletBump();
-          },
-        );
+      // Click on the balance → "adjust your balance" modal with one input:
+      //   200  → withdraw 200 (balance − 200; can't exceed the balance)
+      //   -200 → deposit 200  (balance + 200; self-control only, no upper limit)
+      // lastSolved / ranks are not touched. Every adjustment is written to the history.
+      const ADJ_RE = /^[+-]?\d+(?:[.,]\d{1,2})?$/;
+      const ADJ_MAX = 1e9;
+      function walletParseAdjust(raw) {
+        const s = String(raw).trim();
+        if (!s) return { empty: true };
+        if (!ADJ_RE.test(s)) return { err: "Enter a number, e.g. 200 or -200" };
+        const n = round2(parseFloat(s.replace(",", ".")));
+        if (n === 0) return { err: "The amount can't be zero" };
+        if (Math.abs(n) > ADJ_MAX) return { err: "That's too much" };
+        if (n > 0 && n > _balance)
+          return { err: `Not enough coins — you have ${fmtCoins(_balance)}` };
+        return { delta: n };
       }
+      function walletAdjustHint() {
+        const r = walletParseAdjust(document.getElementById("adjust-input").value);
+        const hint = document.getElementById("adjust-hint");
+        const ok = document.getElementById("adjust-ok");
+        hint.className = "adj-hint";
+        if (r.empty) {
+          hint.textContent = "Positive number withdraws, negative number deposits.";
+          ok.disabled = true;
+        } else if (r.err) {
+          hint.textContent = r.err;
+          hint.classList.add("err");
+          ok.disabled = true;
+        } else {
+          const after = round2(_balance - r.delta);
+          hint.textContent =
+            (r.delta > 0 ? "Withdraw " : "Deposit ") +
+            fmtCoins(Math.abs(r.delta)) +
+            " → balance " +
+            fmtCoins(after);
+          hint.classList.add(r.delta > 0 ? "out" : "in");
+          ok.disabled = false;
+        }
+      }
+      function walletAskReset() {
+        const input = document.getElementById("adjust-input");
+        document.getElementById("adjust-ico").innerHTML = coinSvg(30);
+        document.getElementById("adjust-balance").textContent = fmtCoins(_balance);
+        input.value = "";
+        document.getElementById("adjust-comment").value = "";
+        walletAdjustHint();
+        document.getElementById("adjust-modal").classList.remove("hide");
+        playClick();
+        setTimeout(() => input.focus(), 0);
+      }
+      function walletAdjustClose() {
+        document.getElementById("adjust-modal").classList.add("hide");
+        playClick();
+      }
+      function walletAdjustSubmit() {
+        const r = walletParseAdjust(document.getElementById("adjust-input").value);
+        if (r.empty || r.err) {
+          walletAdjustHint();
+          return;
+        }
+        _balance = round2(_balance - r.delta);
+        _walletShown = _balance;
+        saveWallet();
+        const entry = {
+          type: r.delta > 0 ? "withdraw" : "deposit",
+          amount: Math.abs(r.delta),
+          balance: _balance,
+        };
+        const comment = document.getElementById("adjust-comment").value.trim().slice(0, 200);
+        if (comment) entry.comment = comment; // empty comment → no key at all
+        walletLog(entry);
+        renderWallet();
+        walletBump();
+        walletAdjustClose();
+      }
+      (function () {
+        const input = document.getElementById("adjust-input");
+        if (!input) return;
+        input.addEventListener("input", walletAdjustHint);
+        [input, document.getElementById("adjust-comment")].forEach((el) =>
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              walletAdjustSubmit();
+            }
+          }),
+        );
+        document.getElementById("adjust-modal").addEventListener("click", (e) => {
+          if (e.target === e.currentTarget) walletAdjustClose();
+        });
+      })();
 
       // ── Шкала "нужды": сколько суток прошло с lastSolved ──
       function walletNeedDays(key) {

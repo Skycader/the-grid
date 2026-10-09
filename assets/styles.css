@@ -2253,6 +2253,69 @@
       #confirm-modal.no-body .m-title {
         margin-bottom: 22px;
       }
+      /* adjust-balance modal: amount input + live hint */
+      .adj-balance {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--txd);
+        text-align: center;
+        margin-bottom: 12px;
+      }
+      .adj-balance b {
+        font-weight: 400;
+        color: #ffd84a;
+      }
+      .adj-input {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        background: rgba(0, 14, 24, 0.9);
+        border: 1px solid var(--bd);
+        color: var(--c);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1rem;
+        text-align: center;
+        padding: 8px 10px;
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .adj-comment {
+        margin-top: 8px;
+        font-size: 0.75rem;
+        color: var(--tx);
+      }
+      .adj-input:focus {
+        border-color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .adj-input::placeholder {
+        color: var(--txd);
+        opacity: 0.5;
+      }
+      .adj-hint {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--txd);
+        text-align: center;
+        min-height: 1.4em;
+        margin: 10px 0 16px;
+      }
+      .adj-hint.err {
+        color: #dc322f;
+      }
+      .adj-hint.out {
+        color: #cb4b16;
+      }
+      .adj-hint.in {
+        color: #859900;
+      }
+      .m-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
       .m-acts {
         display: flex;
         gap: 8px;

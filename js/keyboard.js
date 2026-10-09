@@ -7,6 +7,10 @@
         }
 
         if (e.key === "Escape") {
+          if (!document.getElementById("adjust-modal").classList.contains("hide")) {
+            walletAdjustClose();
+            return;
+          }
           if (
             !document.getElementById("confirm-modal").classList.contains("hide")
           ) {
