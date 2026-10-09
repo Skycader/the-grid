@@ -1,7 +1,8 @@
       // ═══════════ BOOT ═══════════
       (function () {
+        document.getElementById("vtag").textContent = `v${APP_VERSION} — CYBERNETIC BUILD`;
         const BL = [
-          "INITIALIZING GRID RUNTIME v1.3.0...",
+          `INITIALIZING GRID RUNTIME v${APP_VERSION}...`,
           "LOADING MONACO EDITOR ENGINE...",
           "MOUNTING PRETTIER FORMATTER v2.8.8...",
           "SPAWNING WORKER SANDBOX...",

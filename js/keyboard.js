@@ -7,6 +7,10 @@
         }
 
         if (e.key === "Escape") {
+          if (!document.getElementById("cl-modal").classList.contains("hide")) {
+            clClose();
+            return;
+          }
           if (!document.getElementById("res-lock").classList.contains("hide")) {
             closeStrictLock();
             return;

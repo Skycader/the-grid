@@ -162,30 +162,30 @@ describe(":: Running test case for EX27 (digit count logic)", () => {
   });
 
   // ==========================================
-  // 5️⃣ THE THREE REGEXES TOGETHER
+  // 5️⃣ GENERATED STRINGS
   // ==========================================
-  describe("5️⃣ Consistency", () => {
-    // generated cases: every table row is its own test row (it.each), the string is in its title
-    const digitCounts = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
-      const text = withDigits(n);
-      return [text, n === 3, n < 3, n >= 3];
-    });
-    it.each(digitCounts)("5️⃣.1️⃣ %j → r1 %s, r2 %s, r3 %s", (text, e1, e2, e3) => {
-      expect(f1(text)).toBe(e1);
-      expect(f2(text)).toBe(e2);
-      expect(f3(text)).toBe(e3);
+  // One row = one string and the answer of ONE regex: "abc" → false.
+  // 5.1 is r1, 5.2 is r2, 5.3 is r3 (the assertion under the row names it: f1 / f2 / f3).
+  describe("5️⃣ Generated strings", () => {
+    const digitsIn = (text) => (text.match(/\d/g) || []).length;
+    const texts = new Set();
+    for (let n = 0; n <= 6; n++) texts.add(withDigits(n)); // "x", "x1x", "x1x2x", …
+    for (let n = 2; n <= 4; n++) {
+      const digits = "7".repeat(n);
+      for (const text of [digits + "abc", "abc" + digits, "ab" + digits + "cd"]) texts.add(text);
+    }
+    const strings = [...texts];
+
+    it.each(strings.map((text) => [text, digitsIn(text) === 3]))("5️⃣.1️⃣ %j → %s", (text, expected) => {
+      expect(f1(text)).toBe(expected);
     });
 
-    const digitPlaces = [];
-    for (let n = 0; n <= 6; n++) {
-      const digits = "7".repeat(n);
-      for (const text of [digits + "abc", "abc" + digits, "ab" + digits + "cd"])
-        digitPlaces.push([text, n === 3, n < 3, n >= 3]);
-    }
-    it.each(digitPlaces)("5️⃣.2️⃣ %j → r1 %s, r2 %s, r3 %s", (text, e1, e2, e3) => {
-      expect(f1(text)).toBe(e1);
-      expect(f2(text)).toBe(e2);
-      expect(f3(text)).toBe(e3);
+    it.each(strings.map((text) => [text, digitsIn(text) < 3]))("5️⃣.2️⃣ %j → %s", (text, expected) => {
+      expect(f2(text)).toBe(expected);
+    });
+
+    it.each(strings.map((text) => [text, digitsIn(text) >= 3]))("5️⃣.3️⃣ %j → %s", (text, expected) => {
+      expect(f3(text)).toBe(expected);
     });
   });
 

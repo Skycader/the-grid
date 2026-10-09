@@ -191,6 +191,91 @@
         font-size: 0.57rem;
         color: var(--cm);
         letter-spacing: 0.16em;
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .vtag:hover {
+        color: var(--c);
+        border-color: var(--c);
+        box-shadow: var(--glow);
+      }
+
+      /* release notes modal: changelog/<version>.md rendered */
+      .cl-body {
+        max-height: 64vh;
+        overflow-y: auto;
+        text-align: left;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        line-height: 1.65;
+        color: var(--tx);
+      }
+      .cl-body.tx-rows {
+        padding: 4px 14px 10px 12px;
+      }
+      .cl-date {
+        color: var(--txd);
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        margin-bottom: 4px;
+      }
+      .cl-h2 {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        color: #b58900;
+        margin: 18px 0 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid rgba(181, 137, 0, 0.45);
+      }
+      .cl-h3 {
+        color: var(--c);
+        letter-spacing: 0.06em;
+        margin: 14px 0 4px;
+      }
+      .cl-body ul {
+        list-style: none;
+        margin: 4px 0 8px;
+        padding: 0;
+      }
+      .cl-body li {
+        position: relative;
+        padding: 2px 0 2px 16px;
+      }
+      .cl-body li::before {
+        content: "";
+        position: absolute;
+        left: 2px;
+        top: 0.72em;
+        width: 5px;
+        height: 5px;
+        background: #b58900;
+      }
+      .cl-body code {
+        background: rgba(0, 255, 255, 0.08);
+        color: var(--c);
+        padding: 0 4px;
+      }
+      .cl-body b {
+        color: #eee8d5;
+        font-weight: 700;
+      }
+      .cl-body em {
+        font-style: italic;
+        color: #eee8d5;
+      }
+      .cl-body p {
+        margin: 6px 0;
+      }
+      .cl-msg {
+        color: var(--txd);
+        text-align: center;
+        padding: 24px 0;
+        letter-spacing: 0.06em;
       }
 
       /* ── SEARCH ── */

@@ -32,7 +32,7 @@
             <div class="logo-sub">
               // JAVASCRIPT ALGORITHM TESTING ENVIRONMENT //
             </div>
-            <div class="vtag">v1.3.0 — CYBERNETIC BUILD</div>
+            <div class="vtag" id="vtag"></div>
           </div>
           <div class="search-row">
             <div class="search-wrap">
@@ -413,6 +413,21 @@
       </div>
     </div>
 
+    <!-- RELEASE NOTES MODAL: opened by the version tag on the home screen -->
+    <div class="modal-bg hide" id="cl-modal">
+      <div class="modal tx-modal">
+        <div class="m-head has-ico">
+          <svg class="m-head-ico" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M8 3.5H20L25.5 9V28.5H8Z" fill="none" stroke="#00ffff" stroke-width="1.9" stroke-linejoin="round"/><path d="M19.5 3.5V9.5H25.5M12 14.5H21.5M12 18.5H21.5M12 22.5H18" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="m-title">CHANGELOG</div>
+          <button class="m-x" type="button" aria-label="Close" onclick="clClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+        <div class="m-content">
+          <div class="tx-tab" id="cl-tab"></div>
+          <div class="cl-body tx-rows" id="cl-body"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- TRANSACTIONS MODAL: opened by the safe icon on the HARVEST button -->
     <div class="modal-bg hide" id="tx-modal">
       <div class="modal tx-modal">
@@ -787,6 +802,7 @@
     <script src="js/random.js"></script>
     <script src="js/harvest.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/changelog.js"></script>
     <script src="js/home.js"></script>
     <script src="js/category.js"></script>
     <script src="js/task-view.js"></script>
