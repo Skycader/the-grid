@@ -26,7 +26,7 @@
         color: var(--tx);
         font-family: "JetBrains Mono", monospace;
         overflow: hidden;
-        cursor: crosshair;
+        cursor: default;
       }
       body::after {
         content: "";
@@ -964,12 +964,8 @@
       .pf-btn.has-level .pf-lvl {
         color: var(--c);
       }
-      /* placeholder button (home): no action yet */
-      .stub-btn {
-        opacity: 0.5;
-        cursor: default;
-      }
-      .stub-btn svg {
+      /* TRANSACTIONS button (home): history icon, opens the transactions modal */
+      .tx-btn svg {
         display: block;
       }
       /* button: <amount> <coin> <gap> <safe> */
@@ -1018,6 +1014,7 @@
         padding: 4px 8px 4px 10px;
       }
       .tx-head {
+        align-items: center;
         color: var(--txd);
         letter-spacing: 0.1em;
         font-size: 0.58rem;
@@ -1025,10 +1022,12 @@
         padding-bottom: 6px;
       }
       .tx-list {
-        max-height: 56vh;
+        max-height: 60vh;
         overflow-y: auto;
-        margin-bottom: 14px;
         padding-top: 12px;
+      }
+      .tx-day:last-child {
+        margin-bottom: 0;
       }
       /* a chapter: the date is a folder tab sitting on the top edge of its table */
       .tx-day {
@@ -1138,6 +1137,48 @@
       .tx-arrow {
         white-space: nowrap;
         font-variant-numeric: tabular-nums;
+      }
+      /* icons: rank bars, coin, avatar with bars */
+      .tx-ico {
+        display: inline-flex;
+        vertical-align: middle;
+        margin-right: 5px;
+        color: #6c71c4;
+      }
+      .tx-ico svg {
+        display: block;
+      }
+      .tx-ico.lvl {
+        color: #6c71c4;
+      }
+      .tx-arrow.same .tx-ico.rank,
+      .tx-arrow.same .tx-ico.lvl {
+        color: var(--txd);
+      }
+      .tx-arrow.down .tx-ico.rank,
+      .tx-arrow.down .tx-ico.lvl {
+        color: #cb4b16;
+      }
+      /* closed safe after the balance x → y */
+      .tx-ico.safe {
+        margin: 0 0 0 7px;
+        color: var(--c);
+      }
+      .tx-arrow.coin.same .tx-ico.safe {
+        color: var(--txd);
+      }
+      .tx-amt .tx-ico {
+        margin: 0 0 0 4px;
+      }
+      .tx-head .tx-ico {
+        margin-right: 6px;
+      }
+      .tx-head .tx-c,
+      .tx-head .tx-r,
+      .tx-head .tx-o {
+        display: flex;
+        align-items: center;
+        gap: 0;
       }
       .tx-arrow i {
         font-style: normal;
@@ -2410,7 +2451,7 @@
         border: 1px solid rgba(181, 137, 0, 0.35);
         max-width: 360px;
         width: 90%;
-        padding: 24px;
+        padding: 0;
         position: relative;
         box-shadow:
           0 0 30px rgba(181, 137, 0, 0.08),
@@ -2470,14 +2511,78 @@
       .m-warn-line .w-rank + svg {
         color: #6c71c4;
       }
+      /* modal header: a highlighted bar with the title on the left and a close cross on the right */
+      .m-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 10px 11px 16px;
+        background: linear-gradient(
+          90deg,
+          rgba(181, 137, 0, 0.26),
+          rgba(181, 137, 0, 0.08) 65%,
+          rgba(181, 137, 0, 0.02)
+        );
+        border-bottom: 1px solid rgba(181, 137, 0, 0.55);
+      }
+      .m-head::before {
+        content: "";
+        flex: 0 0 4px;
+        height: 16px;
+        background: #b58900;
+        box-shadow: 0 0 8px rgba(181, 137, 0, 0.7);
+      }
+      /* a modal can put its own icon in the header instead of the gold bar */
+      .m-head.has-ico::before {
+        display: none;
+      }
+      .m-head-ico {
+        flex: 0 0 auto;
+        display: block;
+        filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.45));
+      }
       .m-title {
         font-family: "Orbitron", sans-serif;
         font-size: 0.83rem;
         font-weight: 700;
         color: #b58900;
         letter-spacing: 0.14em;
-        text-align: center;
-        margin-bottom: 8px;
+        text-align: left;
+        margin: 0;
+        flex: 1;
+        min-width: 0;
+      }
+      .m-x {
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--txd);
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s,
+          background 0.15s,
+          box-shadow 0.15s;
+      }
+      .m-x svg {
+        display: block;
+      }
+      .m-x:hover,
+      .m-x:focus-visible {
+        color: #b58900;
+        border-color: rgba(181, 137, 0, 0.6);
+        background: rgba(181, 137, 0, 0.12);
+        box-shadow: 0 0 8px rgba(181, 137, 0, 0.3);
+        outline: none;
+      }
+      .m-content {
+        padding: 20px 24px 22px;
       }
       .m-body {
         font-family: "JetBrains Mono", monospace;
@@ -2487,10 +2592,6 @@
         text-align: center;
         margin-bottom: 18px;
         opacity: 0.8;
-      }
-      /* title-only confirm modal: no body text, so give the title the body's gap */
-      #confirm-modal.no-body .m-title {
-        margin-bottom: 22px;
       }
       /* adjust-balance modal: amount input + live hint */
       .adj-balance {

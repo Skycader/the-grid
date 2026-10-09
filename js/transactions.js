@@ -29,12 +29,31 @@
         return map;
       }
 
-      // "x → y" cell: grew = violet/green, fell = orange, equal = dim; blank when unknown
+      // icons of the table: task rank (signal bars), coin, overall rank (avatar + bars)
+      const txProfileSvg = (px) =>
+        `<svg width="${px}" height="${px}" viewBox="0 0 32 32" aria-hidden="true"><circle cx="13" cy="10.5" r="4.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3.5 27C3.5 21 7.5 17.5 13 17.5C14.7 17.5 16.2 17.8 17.5 18.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><g fill="currentColor"><rect x="19.5" y="23" width="2.4" height="4.5" rx=".5"/><rect x="23" y="19.5" width="2.4" height="8" rx=".5"/><rect x="26.5" y="16" width="2.4" height="11.5" rx=".5"/></g></svg>`;
+      // the HARVEST safe, closed: the balance after the entry is locked in the safe
+      const txSafeClosedSvg = (px) =>
+        `<svg width="${px}" height="${px}" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="24" height="22" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="8" y="9" width="16" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".65"/><circle cx="16" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M16 13.2V14.6M16 17.4V18.8M13.2 16H14.6M17.4 16H18.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><rect x="8" y="27" width="3.5" height="2" fill="currentColor"/><rect x="20.5" y="27" width="3.5" height="2" fill="currentColor"/></svg>`;
+      const TX_ICONS = {
+        rank: () => rankIconSvg(11),
+        lvl: () => txProfileSvg(13),
+        coin: () => coinSvg(12),
+      };
+      // column headers get the same icons as the cells
+      document.querySelector(".tx-head .tx-r").innerHTML = `<span class="tx-ico rank">${TX_ICONS.rank()}</span>TASK RANK`;
+      document.querySelector(".tx-head .tx-c").innerHTML = `<span class="tx-ico coin">${TX_ICONS.coin()}</span>COINS (BALANCE)`;
+      document.querySelector(".tx-head .tx-o").innerHTML = `<span class="tx-ico lvl">${TX_ICONS.lvl()}</span>OVERALL RANK`;
+
+      // "x → y" cell with the icon of its column (coins carry theirs on the amount instead): grew = violet, fell = orange, equal = dim;
+      // blank when unknown
       function txArrow(from, to, fmt, cls) {
         if (from == null || to == null || Number.isNaN(from) || Number.isNaN(to)) return '<span class="tx-na">—</span>';
         const dir = to > from ? "up" : to < from ? "down" : "same";
-        return `<span class="tx-arrow ${cls} ${dir}">${fmt(from)}<i>→</i>${fmt(to)}</span>`;
+        return `<span class="tx-arrow ${cls} ${dir}">${cls === "coin" ? "" : `<span class="tx-ico ${cls}">${TX_ICONS[cls]()}</span>`}${fmt(from)}<i>→</i>${fmt(to)}${cls === "coin" ? `<span class="tx-ico safe" title="Balance">${txSafeClosedSvg(15)}</span>` : ""}</span>`;
       }
+      // the coin next to an earned / spent amount
+      const txAmtIcon = `<span class="tx-ico coin">${coinSvg(12)}</span>`;
 
       // balance before the entry: stored, or derived for entries from the old format
       function txBalanceFrom(e) {
@@ -68,7 +87,7 @@
           case "solve": {
             const net = e.net || 0;
             cls = net > 0 ? "in" : "muted";
-            coins = `<b class="tx-amt ${net > 0 ? "in" : ""}">${e.first ? "first clear" : txSigned(net)}</b>${txArrow(balFrom, balTo, fmtCoins, "coin")}`;
+            coins = `<b class="tx-amt ${net > 0 ? "in" : ""}">${e.first ? "first clear" : txSigned(net) + txAmtIcon}</b>${txArrow(balFrom, balTo, fmtCoins, "coin")}`;
             break;
           }
           case "withdraw":
@@ -76,13 +95,13 @@
             const out = e.type === "withdraw";
             cls = out ? "out" : "in";
             cell1 = `<span class="tx-evt ${cls}">${out ? "WITHDRAW" : "DEPOSIT"}</span>${e.comment ? `<em class="tx-note" title="${txEsc(e.comment)}">${txEsc(e.comment)}</em>` : ""}`;
-            coins = `<b class="tx-amt ${cls}">${txSigned(out ? -e.amount : e.amount)}</b>${txArrow(balFrom, balTo, fmtCoins, "coin")}`;
+            coins = `<b class="tx-amt ${cls}">${txSigned(out ? -e.amount : e.amount)}${txAmtIcon}</b>${txArrow(balFrom, balTo, fmtCoins, "coin")}`;
             break;
           }
           case "reset":
             cls = "out";
             cell1 = '<span class="tx-evt out">RESET</span>';
-            coins = `<b class="tx-amt out">${txSigned(-e.amount)}</b>${txArrow(balFrom, balTo, fmtCoins, "coin")}`;
+            coins = `<b class="tx-amt out">${txSigned(-e.amount)}${txAmtIcon}</b>${txArrow(balFrom, balTo, fmtCoins, "coin")}`;
             break;
           case "rank":
             cls = "rank";
@@ -136,6 +155,8 @@
         txModal.classList.add("hide");
         playClick();
       }
+      // the history button on the home screen (the safe icon on HARVEST opens it too)
+      document.getElementById("tx-btn").addEventListener("click", txOpen);
       // click on a task id → close the modal and open that task
       document.getElementById("tx-list").addEventListener("click", (ev) => {
         const a = ev.target.closest(".tx-task[data-key]");

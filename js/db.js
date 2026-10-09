@@ -51,8 +51,8 @@
         askConfirm(
           {
             icon: "⇩",
-            title: "INCLUDE TRANSACTION HISTORY?",
-            body: `${n} transaction${n === 1 ? "" : "s"} recorded.`,
+            title: "EXPORT DATABASE",
+            body: `Include the transaction history? (${n} transaction${n === 1 ? "" : "s"} recorded)`,
             yes: "YES",
             no: "NO",
           },
@@ -177,7 +177,7 @@
         askConfirm(
           {
             icon: "⇧",
-            title: "ИМПОРТ БАЗЫ",
+            title: "IMPORT DATABASE",
             body: `Текущие баланс и даты решений будут заменены данными из файла (баланс: ${w != null ? fmtCoins(w) : "—"}, задач с датой: ${n}).${histNote} Продолжить?`,
             yes: "ДА",
             no: "НЕТ",

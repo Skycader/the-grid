@@ -115,8 +115,8 @@
                 <span class="pf-lvl" id="pf-lvl">0</span>
               </button>
             </div>
-            <div class="rnd-wrap stub-wrap" id="stub-wrap">
-              <button class="rnd-btn stub-btn" id="stub-btn" title="Coming soon" aria-label="Coming soon">
+            <div class="rnd-wrap tx-wrap" id="tx-wrap">
+              <button class="rnd-btn tx-btn" id="tx-btn" title="Transactions" aria-label="Transactions">
                 <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
                   <path d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" />
                   <path d="M4 4.5V10H9.5" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" />
@@ -352,6 +352,11 @@
     <!-- SOLUTIONS MODAL -->
     <div class="modal-bg hide" id="modal">
       <div class="modal">
+        <div class="m-head">
+          <div class="m-title">SHOW SOLUTION</div>
+          <button class="m-x" type="button" aria-label="Close" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+        <div class="m-content">
         <div class="m-ico">
           <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 2.5 L22.5 20.5 H1.5 Z" fill="#dc322f" stroke="#dc322f" stroke-width="1.6" stroke-linejoin="round" />
@@ -359,7 +364,6 @@
             <circle cx="12" cy="17.7" r="1.2" fill="#fff" />
           </svg>
         </div>
-        <div class="m-title">SHOW SOLUTION?</div>
         <div class="m-body">
           <!-- filled per task by requestSolutions() -->
           <div class="m-warn-list">
@@ -371,18 +375,24 @@
           <button class="m-btn cancel" onclick="closeModal()">CANCEL</button>
           <button class="m-btn go" onclick="doShowSolution()">SHOW</button>
         </div>
+        </div>
       </div>
     </div>
 
     <!-- CONFIRM MODAL (универсальный: сброс баланса, импорт базы) -->
     <div class="modal-bg hide" id="confirm-modal">
       <div class="modal">
+        <div class="m-head">
+          <div class="m-title" id="confirm-title"></div>
+          <button class="m-x" type="button" aria-label="Close" onclick="closeConfirm(false)"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+        <div class="m-content">
         <div class="m-ico" id="confirm-ico"></div>
-        <div class="m-title" id="confirm-title"></div>
         <div class="m-body" id="confirm-body"></div>
         <div class="m-acts">
           <button class="m-btn go" id="confirm-yes" onclick="closeConfirm(true)">ДА</button>
           <button class="m-btn cancel" id="confirm-no" onclick="closeConfirm(false, true)">НЕТ</button>
+        </div>
         </div>
       </div>
     </div>
@@ -390,21 +400,17 @@
     <!-- TRANSACTIONS MODAL: opened by the safe icon on the HARVEST button -->
     <div class="modal-bg hide" id="tx-modal">
       <div class="modal tx-modal">
-        <div class="m-ico">
-          <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
-            <path d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" />
-            <path d="M4 4.5V10H9.5" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" />
-            <path d="M16 9.5V16L20 18.5" fill="none" stroke="#00ffff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
-          </svg>
+        <div class="m-head has-ico">
+          <svg class="m-head-ico" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6" fill="none" stroke="#00ffff" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" /><path d="M4 4.5V10H9.5" fill="none" stroke="#00ffff" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" /><path d="M16 9.5V16L20 18.5" fill="none" stroke="#00ffff" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          <div class="m-title">TRANSACTIONS</div>
+          <button class="m-x" type="button" aria-label="Close" onclick="txClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         </div>
-        <div class="m-title">TRANSACTIONS</div>
+        <div class="m-content">
         <div class="adj-balance">Balance: <b id="tx-balance">0</b></div>
         <div class="tx-head">
           <span class="tx-t">TIME</span><span class="tx-k">TASK</span><span class="tx-r">TASK RANK</span><span class="tx-c">COINS (BALANCE)</span><span class="tx-o">OVERALL RANK</span>
         </div>
         <div class="tx-list" id="tx-list"></div>
-        <div class="m-acts">
-          <button class="m-btn cancel" onclick="txClose()">CLOSE</button>
         </div>
       </div>
     </div>
@@ -412,8 +418,12 @@
     <!-- ADJUST BALANCE MODAL: 200 withdraws, -200 deposits -->
     <div class="modal-bg hide" id="adjust-modal">
       <div class="modal">
+        <div class="m-head">
+          <div class="m-title">ADJUST BALANCE</div>
+          <button class="m-x" type="button" aria-label="Close" onclick="walletAdjustClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+        <div class="m-content">
         <div class="m-ico" id="adjust-ico"></div>
-        <div class="m-title">ADJUST YOUR BALANCE</div>
         <div class="adj-balance">Balance: <b id="adjust-balance">0</b></div>
         <input
           class="adj-input"
@@ -439,6 +449,7 @@
         <div class="m-acts">
           <button class="m-btn go" id="adjust-ok" onclick="walletAdjustSubmit()">APPLY</button>
           <button class="m-btn cancel" onclick="walletAdjustClose()">CANCEL</button>
+        </div>
         </div>
       </div>
     </div>
