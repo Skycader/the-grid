@@ -1003,70 +1003,170 @@
       .hv-safe svg {
         display: block;
       }
-      /* transactions modal */
+      /* transactions modal: a document with one chapter (tab) per day */
       .modal.tx-modal {
-        max-width: 680px;
+        max-width: 820px;
       }
       .tx-head,
       .tx-row {
         display: grid;
-        grid-template-columns: 112px 88px minmax(0, 1fr) 76px 76px;
-        gap: 10px;
+        grid-template-columns: 46px minmax(0, 1.05fr) 84px minmax(0, 1.6fr) 128px;
+        gap: 12px;
         align-items: baseline;
         font-family: "JetBrains Mono", monospace;
         font-size: 0.68rem;
-        padding: 3px 4px;
+        padding: 4px 8px 4px 10px;
       }
       .tx-head {
         color: var(--txd);
         letter-spacing: 0.1em;
-        font-size: 0.6rem;
+        font-size: 0.58rem;
         border-bottom: 1px solid var(--bd);
-        padding-bottom: 5px;
+        padding-bottom: 6px;
       }
       .tx-list {
-        max-height: 52vh;
+        max-height: 56vh;
         overflow-y: auto;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
+        padding-top: 12px;
+      }
+      /* a chapter: the date is a folder tab sitting on the top edge of its table */
+      .tx-day {
+        margin-bottom: 18px;
+      }
+      .tx-tab {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 5px 22px 4px 12px;
+        background: rgba(181, 137, 0, 0.14);
+        border: 1px solid rgba(181, 137, 0, 0.55);
+        border-bottom: none;
+        clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+        font-family: "Orbitron", sans-serif;
+        position: relative;
+        top: 1px;
+      }
+      .tx-tab b {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #b58900;
+      }
+      .tx-tab i {
+        font-style: normal;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.56rem;
+        color: var(--txd);
+        letter-spacing: 0.1em;
+      }
+      /* the spine of the document: gold rule on the left and under the tab */
+      .tx-rows {
+        border-top: 1px solid rgba(181, 137, 0, 0.55);
+        border-left: 3px solid rgba(181, 137, 0, 0.55);
+        background: rgba(0, 14, 24, 0.35);
       }
       .tx-row {
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       }
-      .tx-a,
-      .tx-b {
-        text-align: right;
-        font-variant-numeric: tabular-nums;
+      .tx-row:last-child {
+        border-bottom: none;
       }
-      .tx-d {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--txd);
+      .tx-row:hover {
+        background: rgba(0, 255, 255, 0.04);
       }
       .tx-t {
         color: var(--txd);
+        font-variant-numeric: tabular-nums;
       }
-      .tx-row .tx-l {
+      .tx-k {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+      }
+      .tx-task {
+        color: var(--c);
+        cursor: pointer;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+      }
+      a.tx-task:hover {
+        text-decoration: underline;
+        text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
+      }
+      .tx-task.gone {
+        color: var(--txd);
+        cursor: default;
+      }
+      .tx-evt {
+        letter-spacing: 0.08em;
         color: var(--tx);
       }
-      .tx-row.in .tx-a {
+      .tx-evt.in {
         color: #859900;
       }
-      .tx-row.out .tx-a {
+      .tx-evt.out {
         color: #cb4b16;
       }
-      .tx-row.muted {
-        opacity: 0.55;
+      .tx-note {
+        font-style: normal;
+        color: var(--txd);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.62rem;
       }
-      .tx-row.rank-up .tx-l,
-      .tx-row.rank-down .tx-l {
+      .tx-c {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .tx-amt {
+        font-weight: 400;
+        min-width: 44px;
+        font-variant-numeric: tabular-nums;
+        color: var(--txd);
+      }
+      .tx-amt.in {
+        color: #859900;
+      }
+      .tx-amt.out {
+        color: #cb4b16;
+      }
+      .tx-arrow {
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .tx-arrow i {
+        font-style: normal;
+        opacity: 0.55;
+        margin: 0 4px;
+      }
+      .tx-arrow.same {
+        color: var(--txd);
+      }
+      .tx-arrow.coin {
+        color: #ffd84a;
+      }
+      .tx-arrow.coin.same {
+        color: var(--txd);
+      }
+      .tx-arrow.rank.up,
+      .tx-arrow.lvl.up {
         color: #6c71c4;
       }
-      .tx-row.rank-down .tx-d {
+      .tx-arrow.rank.down,
+      .tx-arrow.lvl.down {
         color: #cb4b16;
       }
-      .tx-row .tx-b {
-        color: #ffd84a;
+      .tx-na {
+        color: var(--txd);
+        opacity: 0.4;
+      }
+      .tx-row.muted .tx-amt {
+        opacity: 0.8;
       }
       .tx-empty {
         font-family: "JetBrains Mono", monospace;
@@ -1076,33 +1176,19 @@
         padding: 18px 0;
         letter-spacing: 0.1em;
       }
-      .tx-opt {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        justify-content: center;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.66rem;
-        color: var(--txd);
-        margin-bottom: 14px;
-        cursor: pointer;
-      }
-      @media (max-width: 560px) {
-        .tx-head,
+      @media (max-width: 640px) {
+        .tx-head {
+          display: none;
+        }
         .tx-row {
-          grid-template-columns: 1fr 1fr 64px;
+          grid-template-columns: 40px minmax(0, 1fr) 76px;
+          row-gap: 2px;
         }
-        .tx-head .tx-t,
-        .tx-head .tx-b,
-        .tx-row .tx-b {
-          display: none;
+        .tx-c {
+          grid-column: 2 / 4;
         }
-        .tx-row .tx-t {
-          display: none;
-        }
-        .tx-head .tx-d,
-        .tx-row .tx-d {
-          grid-column: 2;
+        .tx-o {
+          grid-column: 2 / 4;
         }
       }
       .hv-num {
