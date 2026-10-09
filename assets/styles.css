@@ -276,6 +276,9 @@
           box-shadow 0.2s;
         backdrop-filter: blur(12px);
       }
+      .rnd-dice {
+        display: block;
+      }
       .rnd-wrap:hover .rnd-btn,
       .rnd-btn:focus-visible {
         border-color: var(--c);

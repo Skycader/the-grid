@@ -45,8 +45,18 @@
               />
             </div>
             <div class="rnd-wrap" id="rnd-wrap">
-              <button class="rnd-btn" id="rnd-btn" title="Открыть случайную задачу">
-                <span>RANDOM</span>
+              <button class="rnd-btn" id="rnd-btn" title="Open a random task" aria-label="Random task">
+                <svg class="rnd-dice" width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
+                  <g transform="rotate(16 22 10)">
+                    <rect x="14.5" y="2.5" width="15" height="15" rx="3" fill="none" stroke="#00ffff" stroke-linejoin="round" stroke-width="1.6" />
+                    <circle cx="19" cy="7" r="1.4" fill="#00ffff" />
+                    <circle cx="25" cy="13" r="1.4" fill="#00ffff" />
+                  </g>
+                  <rect x="3" y="11" width="17.5" height="17.5" rx="3.2" fill="#001423" stroke="#00ffff" stroke-width="1.7" />
+                  <circle cx="8.2" cy="16.2" r="1.6" fill="#00ffff" />
+                  <circle cx="11.8" cy="19.8" r="1.6" fill="#00ffff" />
+                  <circle cx="15.4" cy="23.4" r="1.6" fill="#00ffff" />
+                </svg>
               </button>
               <div class="rnd-panel" id="rnd-panel">
                 <div class="rnd-panel-title">СЛОЖНОСТЬ</div>
