@@ -50,6 +50,7 @@
           localStorage.setItem(RANK_KEY, JSON.stringify(_rank));
         } catch (e) {}
         if (typeof hvRefresh === "function") hvRefresh(); // harvest button total
+        if (typeof profileRefresh === "function") profileRefresh(); // player level
         if (typeof walletRenderTaskReward === "function") walletRenderTaskReward();
       }
       // Append-only transaction log, kept in its own localStorage item (gr_history):
@@ -316,6 +317,7 @@
         _walletShown = _balance;
         renderWallet();
         if (typeof hvRefresh === "function") hvRefresh();
+        if (typeof profileRefresh === "function") profileRefresh();
       }
 
       // Click on the balance → "adjust your balance" modal with one input:

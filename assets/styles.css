@@ -949,6 +949,21 @@
         color: #ffd84a;
         text-shadow: 0 0 6px rgba(255, 200, 40, 0.5);
       }
+      /* PROFILE button (home): profile icon + player level */
+      .pf-btn {
+        gap: 6px;
+        padding: 0 9px;
+      }
+      .pf-btn svg {
+        display: block;
+      }
+      .pf-lvl {
+        font-variant-numeric: tabular-nums;
+        color: var(--txd);
+      }
+      .pf-btn.has-level .pf-lvl {
+        color: var(--c);
+      }
       /* button: <amount> <coin> <gap> <safe> */
       .hv-btn {
         gap: 4px;
