@@ -1750,25 +1750,83 @@
         white-space: nowrap;
         font-size: 0.78rem;
       }
-      /* the text over the dark area must be readable: full-strength colours */
-      .res-lock .m-body {
-        opacity: 1;
-        color: #eee8d5;
-        font-size: 0.76rem;
-        line-height: 1.6;
+      /* "too slow" modal: ref / you bars on one scale, the dashed line is the limit */
+      .res-lock .rl-bars {
+        --rl-lbl: 58px;
+        --rl-val: 70px;
+        position: relative;
+        padding-top: 18px;
+        margin-bottom: 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
       }
-      .res-lock .m-body b {
-        color: #ff6b5e;
-        font-weight: 700;
+      .rl-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 11px 0;
       }
-      .res-lock .m-body .rl-sub {
-        display: block;
-        margin-top: 10px;
+      .rl-lbl {
+        flex: 0 0 var(--rl-lbl);
+        display: flex;
+        align-items: center;
+        gap: 6px;
         color: #93a1a1;
-        font-size: 0.7rem;
       }
-      .m-head-ico.red {
-        filter: drop-shadow(0 0 5px rgba(220, 50, 47, 0.5));
+      .rl-sq {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+      }
+      /* ref: all green; you: blue, and red where it went over the limit */
+      .rl-sq.ref,
+      .rl-bar.ref {
+        background: #859900;
+      }
+      .rl-sq.you,
+      .rl-bar.you {
+        background: #268bd2;
+      }
+      .rl-track {
+        position: relative;
+        flex: 1;
+        height: 14px;
+        background: #073642;
+      }
+      .rl-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      .rl-bar.over {
+        background: repeating-linear-gradient(135deg, #dc322f 0 4px, #a32420 4px 8px);
+      }
+      .rl-val {
+        flex: 0 0 var(--rl-val);
+        color: #eee8d5;
+      }
+      .rl-val.red {
+        color: #ff6b5e;
+      }
+      .m-head-ico.blue {
+        filter: drop-shadow(0 0 5px rgba(38, 139, 210, 0.55));
+      }
+      .rl-limit {
+        position: absolute;
+        top: 16px;
+        bottom: 0;
+        border-left: 1px dashed #eee8d5;
+        pointer-events: none;
+      }
+      .rl-limit span {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        color: #eee8d5;
+        font-size: 0.62rem;
       }
       .res-hdr {
         font-family: "JetBrains Mono", monospace;

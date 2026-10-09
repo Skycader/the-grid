@@ -238,10 +238,21 @@
       // ── STRICT "too slow" modal over the results area ──
       // Closed like any modal: the cross, Esc, a click on the dark area (and by the next run).
       function showStrictLock(b) {
-        const pct = Math.round(strictRatio(b) * 1000) / 10; // one decimal
+        // two bars on one scale: ref, and you (the part beyond the limit is hatched red);
+        // the dashed line is the limit: ref + STRICT_TOLERANCE
+        const limitMs = b.refMinTime * (1 + STRICT_TOLERANCE);
+        const scale = Math.max(b.userMinTime, limitMs) * 1.1;
+        const w = (ms) => ((ms / scale) * 100).toFixed(2);
+        const inLimit = Math.min(b.userMinTime, limitMs);
         document.getElementById("res-lock-body").innerHTML =
-          `You didn't meet the time limit: your solution is <b>${pct}% slower</b> than the reference one (the limit is +${Math.round(STRICT_TOLERANCE * 100)}%).` +
-          `<span class="rl-sub">yours ${b.userMinTime.toFixed(2)} ms · reference ${b.refMinTime.toFixed(2)} ms</span>`;
+          `<div class="rl-row"><span class="rl-lbl"><i class="rl-sq ref"></i>ref.</span>` +
+          `<div class="rl-track"><div class="rl-bar ref" style="width:${w(b.refMinTime)}%"></div></div>` +
+          `<span class="rl-val">${b.refMinTime.toFixed(2)} ms</span></div>` +
+          `<div class="rl-row"><span class="rl-lbl"><i class="rl-sq you"></i>your</span>` +
+          `<div class="rl-track"><div class="rl-bar you" style="width:${w(inLimit)}%"></div>` +
+          `<div class="rl-bar over" style="left:${w(inLimit)}%;width:${w(b.userMinTime - inLimit)}%"></div></div>` +
+          `<span class="rl-val red">${b.userMinTime.toFixed(2)} ms</span></div>` +
+          `<div class="rl-limit" style="left:calc(var(--rl-lbl) + 8px + (100% - var(--rl-lbl) - var(--rl-val) - 16px) * ${(limitMs / scale).toFixed(4)})"><span>limit ${limitMs.toFixed(2)} ms</span></div>`;
         document.getElementById("res-lock").classList.remove("hide");
       }
       function closeStrictLock() {

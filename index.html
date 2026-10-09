@@ -309,12 +309,15 @@
             <div class="res-lock hide" id="res-lock">
               <div class="modal">
                 <div class="m-head has-ico">
-                  <svg class="m-head-ico red" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="18" r="10" fill="none" stroke="#dc322f" stroke-width="2"/><path d="M16 12V18L20 20.5M12.5 4H19.5M16 4V8" fill="none" stroke="#dc322f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <svg class="m-head-ico blue" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="18" r="10" fill="none" stroke="#268bd2" stroke-width="2"/><path d="M16 12V18L20 20.5M12.5 4H19.5M16 4V8" fill="none" stroke="#268bd2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <div class="m-title">TIME LIMIT EXCEEDED</div>
                   <button class="m-x" type="button" aria-label="Close" onclick="closeStrictLock()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
                 </div>
                 <div class="m-content">
-                  <div class="m-body" id="res-lock-body"></div>
+                  <div class="rl-bars" id="res-lock-body"></div>
+                  <div class="m-acts">
+                    <button class="m-btn go" type="button" onclick="closeStrictLock()">VIEW TESTS</button>
+                  </div>
                 </div>
               </div>
             </div>

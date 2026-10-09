@@ -1,0 +1,139 @@
+<!doctype html><meta charset="utf-8"><title>STRICT "too slow" modal - 6 alternatives</title><style>
+:root{--bd:#004455;--txd:#657b83}
+*{box-sizing:border-box}
+body{background:#000810;color:#93a1a1;font:12px/1.5 "JetBrains Mono",monospace;margin:18px}
+h1{font-size:13px;color:#00ffff;font-weight:400;letter-spacing:.1em;margin:0 0 4px}
+p.note{margin:0 0 16px;color:#657b83}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px}
+.slot h2{font-size:11px;font-weight:400;color:#00aaaa;margin:0 0 6px;letter-spacing:.08em}
+/* the results area: dark and blurred, the design sits in the middle of it */
+.area{height:330px;background:rgba(0,15,22,.92);border:1px solid #003040;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.area:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,255,255,.03) 0 1px,transparent 1px 22px)}
+.card{position:relative;width:326px;background:#002b36;border:1px solid rgba(181,137,0,.35);box-shadow:0 0 30px rgba(0,0,0,.5);padding:16px 18px;text-align:center}
+.x{position:absolute;top:8px;right:8px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid transparent;color:#657b83;cursor:pointer}
+.x:hover{color:#b58900;border-color:rgba(181,137,0,.6)}
+.tag{font-family:Orbitron,sans-serif;font-weight:700;font-size:10px;letter-spacing:.16em;color:#dc322f;text-align:left;padding-right:30px}
+.tag.center{text-align:center;padding:0}
+.sub{color:#93a1a1;font-size:11px;margin-top:2px}.sub.up{text-transform:uppercase;letter-spacing:.14em;font-size:10px}
+.nums{display:flex;justify-content:center;gap:16px;margin-top:10px;color:#657b83;font-size:11px}
+.nums b{color:#eee8d5;font-weight:400}
+.red{color:#ff6b5e}
+/* 1 */
+.c1 svg{display:block;margin:6px auto 0}
+/* 2 */
+.c2 .dot{display:inline-block;width:8px;height:8px;background:#dc322f;margin-right:8px;box-shadow:0 0 8px #dc322f}
+.bars{position:relative;margin-top:16px;padding-top:16px}
+.row{display:flex;align-items:center;gap:8px;margin:10px 0}
+.lbl{width:56px;text-align:right;color:#657b83;font-size:10.5px}
+.track{position:relative;flex:1;height:14px;background:#073642}
+.bar{position:absolute;top:0;left:0;height:100%}
+.bar.ok{background:#2aa198}
+.bar.over{background:repeating-linear-gradient(135deg,#dc322f 0 4px,#a32420 4px 8px)}
+.val{width:64px;text-align:left;color:#eee8d5;font-size:11px}
+.limitline{position:absolute;top:0;bottom:0;border-left:1px dashed #ffd84a}
+.limitline span{position:absolute;top:-2px;left:-40px;width:80px;text-align:center;color:#ffd84a;font-size:9.5px}
+.big{font-family:Orbitron,sans-serif;font-weight:700;font-size:30px;color:#ff6b5e;margin-top:10px;text-shadow:0 0 14px rgba(220,50,47,.5)}
+/* 3 */
+.c3{border-color:rgba(220,50,47,.45);padding:22px 18px 18px;background:radial-gradient(circle at 50% 38%,#0b2a30 0,#002b36 70%)}
+.huge{font-family:Orbitron,sans-serif;font-weight:900;font-size:64px;line-height:1.05;color:#ff6b5e;text-shadow:0 0 22px rgba(220,50,47,.65);margin-top:12px}
+.huge small{font-size:30px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,#dc322f,transparent);margin:14px 0 4px}
+.corner{position:absolute;width:12px;height:12px;border:2px solid #dc322f}
+.corner.tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.corner.tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+.corner.bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+.corner.br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+.c3 .x{top:12px;right:12px}
+/* 4 */
+.c4{padding:0;text-align:left;background:#001a21;border-color:#0a4a5a}
+.tbar{display:flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;background:#06323d;border-bottom:1px solid #0a4a5a;color:#657b83;font-size:10.5px}
+.tbar i{width:9px;height:9px;border-radius:50%;background:#586e75}.tbar i:first-child{background:#dc322f}
+.tbar span{flex:1;text-align:center}
+.tbar .x{position:static;margin-left:auto;width:22px;height:22px}
+.c4 pre{margin:0;padding:14px 14px 16px;color:#eee8d5;font:11.5px/1.7 "JetBrains Mono",monospace;white-space:pre}
+.c4 .dim{color:#586e75}
+.c4 em{font-style:normal;color:#ff6b5e}
+.c4 pre{color:#2aa198}.c4 pre em{color:#ff6b5e}
+.blink{color:#ff6b5e;animation:b 1s steps(2) infinite}@keyframes b{50%{opacity:0}}
+/* 5 */
+.c5 svg{display:block;margin:6px auto 0}
+/* 6 */
+.c6{padding:18px 18px 22px;background:#002b36}
+.ticket{position:relative;margin-top:10px;padding:14px 16px 52px;background:#0a3a46;border:1px dashed #586e75;text-align:left}
+.th{font-family:Orbitron,sans-serif;font-size:10px;letter-spacing:.16em;color:#b58900;margin-bottom:10px;text-align:center}
+.tr{display:flex;align-items:baseline;gap:6px;margin:5px 0;color:#93a1a1;font-size:11.5px}
+.tr i{flex:1;border-bottom:1px dotted #586e75;transform:translateY(-3px)}
+.tr b{color:#eee8d5;font-weight:400}
+.tr.over{margin-top:12px;font-size:13px;color:#ff6b5e}.tr.over b{color:#ff6b5e;font-weight:700}
+.stamp{position:absolute;right:12px;bottom:8px;transform:rotate(-11deg);border:3px solid #dc322f;color:#dc322f;font-family:Orbitron,sans-serif;font-weight:900;font-size:19px;letter-spacing:.18em;padding:2px 10px;background:rgba(0,43,54,.55);opacity:.92}
+</style>
+<h1>STRICT "TOO SLOW" MODAL - 6 ALTERNATIVES</h1>
+<p class="note">Sample: yours 11.70 ms, reference 9.50 ms, limit +10%. Each sits in the darkened results area; closed by the cross, Esc or a click outside.</p>
+<div class="grid"><div class="slot"><h2>1 · gauge</h2><div class="area">
+<div class="card c1"><button class="x" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  <div class="tag">TIME LIMIT EXCEEDED</div>
+  <svg viewBox="0 0 300 186" width="300" height="186">
+    <path d="M62.00 138.00A88 88 0 0 1 238.00 138.00" fill="none" stroke="#073642" stroke-width="16" stroke-linecap="round"/>
+    <path d="M62.00 138.00A88 88 0 0 1 87.77 75.77" fill="none" stroke="#2aa198" stroke-width="16" stroke-linecap="butt"/>
+    <path d="M87.77 75.77A88 88 0 0 1 238.00 138.00" fill="none" stroke="#dc322f" stroke-width="16" opacity=".35"/>
+    <path d="M87.77 75.77A88 88 0 0 1 171.60 52.69" fill="none" stroke="#dc322f" stroke-width="16"/>
+    <line x1="103.3" y1="91.3" x2="73.6" y2="61.6" stroke="#ffd84a" stroke-width="2"/>
+    <text x="63.7" y="51.7" fill="#ffd84a" font-size="10" text-anchor="middle" font-family="JetBrains Mono, monospace">limit +10%</text>
+    <line x1="150" y1="138" x2="170.6" y2="56.6" stroke="#eee8d5" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="150" cy="138" r="7" fill="#eee8d5"/>
+    <text x="150" y="178" fill="#ff6b5e" font-size="30" text-anchor="middle" font-family="Orbitron, sans-serif" font-weight="700">+23.2%</text>
+  </svg>
+  <div class="sub">slower than the reference</div>
+  <div class="nums"><span>yours <b>11.70 ms</b></span><span>reference <b>9.50 ms</b></span></div>
+</div></div></div><div class="slot"><h2>2 · time bars</h2><div class="area">
+<div class="card c2"><button class="x" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  <div class="tag"><i class="dot"></i>TOO SLOW</div>
+  <div class="bars">
+    <div class="row"><span class="lbl">reference</span><div class="track"><div class="bar ok" style="width:67.85714285714286%"></div></div><span class="val">9.50 ms</span></div>
+    <div class="row"><span class="lbl">yours</span><div class="track"><div class="bar ok" style="width:74.64285714285715%"></div><div class="bar over" style="left:74.64285714285715%;width:8.928571428571416%"></div></div><span class="val red">11.70 ms</span></div>
+    <div class="limitline" style="left:calc(64px + (100% - 64px - 72px) * 0.7464285714285716)"><span>limit 10.45 ms</span></div>
+  </div>
+  <div class="big">+23.2%</div>
+  <div class="sub">over the reference · the limit is +10%</div>
+</div></div></div><div class="slot"><h2>3 · big number</h2><div class="area">
+<div class="card c3"><button class="x" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+  <div class="tag center">// STRICT · TIME LIMIT EXCEEDED //</div>
+  <div class="huge">+23.2<small>%</small></div>
+  <div class="sub up">slower than the reference</div>
+  <div class="rule"></div>
+  <div class="nums"><span>limit <b>+10%</b></span><span>yours <b>11.70 ms</b></span><span>ref <b>9.50 ms</b></span></div>
+</div></div></div><div class="slot"><h2>4 · terminal</h2><div class="area">
+<div class="card c4">
+  <div class="tbar"><i></i><i></i><i></i><span>strict — compare</span><button class="x" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
+  <pre><span class="dim">$</span> strict --compare reference
+<span class="dim">ref  </span> ███████████████░░░░░░░ 9.50 ms
+<span class="dim">you  </span> ████████████████<em>██</em>░░░░ 11.70 ms
+<span class="dim">limit</span> +10%  → 10.45 ms
+<span class="dim">delta</span> <em>+23.2%</em>
+
+<em>✗ TIME LIMIT EXCEEDED</em><span class="blink">_</span></pre>
+</div></div></div><div class="slot"><h2>5 · stopwatch dial</h2><div class="area">
+<div class="card c5"><button class="x" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  <div class="tag center">TIME LIMIT EXCEEDED</div>
+  <svg viewBox="0 0 160 160" width="170" height="170">
+    <line x1="80.0" y1="10.0" x2="80.0" y2="4.0" stroke="#586e75" stroke-width="1.6"/><line x1="91.4" y1="7.9" x2="91.9" y2="4.9" stroke="#586e75" stroke-width="1"/><line x1="102.6" y1="10.6" x2="103.5" y2="7.7" stroke="#586e75" stroke-width="1"/><line x1="113.1" y1="15.0" x2="114.5" y2="12.3" stroke="#586e75" stroke-width="1"/><line x1="122.9" y1="20.9" x2="124.7" y2="18.5" stroke="#586e75" stroke-width="1"/><line x1="129.5" y1="30.5" x2="133.7" y2="26.3" stroke="#586e75" stroke-width="1.6"/><line x1="139.1" y1="37.1" x2="141.5" y2="35.3" stroke="#586e75" stroke-width="1"/><line x1="145.0" y1="46.9" x2="147.7" y2="45.5" stroke="#586e75" stroke-width="1"/><line x1="149.4" y1="57.4" x2="152.3" y2="56.5" stroke="#586e75" stroke-width="1"/><line x1="152.1" y1="68.6" x2="155.1" y2="68.1" stroke="#586e75" stroke-width="1"/><line x1="150.0" y1="80.0" x2="156.0" y2="80.0" stroke="#586e75" stroke-width="1.6"/><line x1="152.1" y1="91.4" x2="155.1" y2="91.9" stroke="#586e75" stroke-width="1"/><line x1="149.4" y1="102.6" x2="152.3" y2="103.5" stroke="#586e75" stroke-width="1"/><line x1="145.0" y1="113.1" x2="147.7" y2="114.5" stroke="#586e75" stroke-width="1"/><line x1="139.1" y1="122.9" x2="141.5" y2="124.7" stroke="#586e75" stroke-width="1"/><line x1="129.5" y1="129.5" x2="133.7" y2="133.7" stroke="#586e75" stroke-width="1.6"/><line x1="122.9" y1="139.1" x2="124.7" y2="141.5" stroke="#586e75" stroke-width="1"/><line x1="113.1" y1="145.0" x2="114.5" y2="147.7" stroke="#586e75" stroke-width="1"/><line x1="102.6" y1="149.4" x2="103.5" y2="152.3" stroke="#586e75" stroke-width="1"/><line x1="91.4" y1="152.1" x2="91.9" y2="155.1" stroke="#586e75" stroke-width="1"/><line x1="80.0" y1="150.0" x2="80.0" y2="156.0" stroke="#586e75" stroke-width="1.6"/><line x1="68.6" y1="152.1" x2="68.1" y2="155.1" stroke="#586e75" stroke-width="1"/><line x1="57.4" y1="149.4" x2="56.5" y2="152.3" stroke="#586e75" stroke-width="1"/><line x1="46.9" y1="145.0" x2="45.5" y2="147.7" stroke="#586e75" stroke-width="1"/><line x1="37.1" y1="139.1" x2="35.3" y2="141.5" stroke="#586e75" stroke-width="1"/><line x1="30.5" y1="129.5" x2="26.3" y2="133.7" stroke="#586e75" stroke-width="1.6"/><line x1="20.9" y1="122.9" x2="18.5" y2="124.7" stroke="#586e75" stroke-width="1"/><line x1="15.0" y1="113.1" x2="12.3" y2="114.5" stroke="#586e75" stroke-width="1"/><line x1="10.6" y1="102.6" x2="7.7" y2="103.5" stroke="#586e75" stroke-width="1"/><line x1="7.9" y1="91.4" x2="4.9" y2="91.9" stroke="#586e75" stroke-width="1"/><line x1="10.0" y1="80.0" x2="4.0" y2="80.0" stroke="#586e75" stroke-width="1.6"/><line x1="7.9" y1="68.6" x2="4.9" y2="68.1" stroke="#586e75" stroke-width="1"/><line x1="10.6" y1="57.4" x2="7.7" y2="56.5" stroke="#586e75" stroke-width="1"/><line x1="15.0" y1="46.9" x2="12.3" y2="45.5" stroke="#586e75" stroke-width="1"/><line x1="20.9" y1="37.1" x2="18.5" y2="35.3" stroke="#586e75" stroke-width="1"/><line x1="30.5" y1="30.5" x2="26.3" y2="26.3" stroke="#586e75" stroke-width="1.6"/><line x1="37.1" y1="20.9" x2="35.3" y2="18.5" stroke="#586e75" stroke-width="1"/><line x1="46.9" y1="15.0" x2="45.5" y2="12.3" stroke="#586e75" stroke-width="1"/><line x1="57.4" y1="10.6" x2="56.5" y2="7.7" stroke="#586e75" stroke-width="1"/><line x1="68.6" y1="7.9" x2="68.1" y2="4.9" stroke="#586e75" stroke-width="1"/>
+    <circle cx="80" cy="80" r="62" fill="none" stroke="#073642" stroke-width="10"/>
+    <circle cx="80" cy="80" r="62" fill="none" stroke="#2aa198" stroke-width="10" stroke-dasharray="97.4 389.6" transform="rotate(-90 80 80)"/>
+    <circle cx="80" cy="80" r="62" fill="none" stroke="#dc322f" stroke-width="10" stroke-dasharray="128.1 389.6" stroke-dashoffset="-97.4" transform="rotate(-90 80 80)"/>
+    <text x="80" y="82" fill="#ff6b5e" font-size="23" text-anchor="middle" font-family="Orbitron, sans-serif" font-weight="700">+23.2%</text>
+    <text x="80" y="100" fill="#93a1a1" font-size="8.5" text-anchor="middle" font-family="JetBrains Mono, monospace">limit +10%</text>
+    <path d="M70 18H90M80 18V10" stroke="#586e75" stroke-width="2.4" stroke-linecap="round"/>
+  </svg>
+  <div class="nums"><span>yours <b>11.70 ms</b></span><span>reference <b>9.50 ms</b></span></div>
+</div></div></div><div class="slot"><h2>6 · stamped report</h2><div class="area">
+<div class="card c6"><button class="x" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  <div class="ticket">
+    <div class="th">STRICT · TIMING REPORT</div>
+    <div class="tr"><span>reference</span><i></i><b>9.50 ms</b></div>
+    <div class="tr"><span>yours</span><i></i><b>11.70 ms</b></div>
+    <div class="tr"><span>limit  +10%</span><i></i><b>10.45 ms</b></div>
+    <div class="tr over"><span>over the limit</span><i></i><b>+23.2%</b></div>
+    <div class="stamp">REJECTED</div>
+  </div>
+</div></div></div></div>
