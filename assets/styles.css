@@ -964,6 +964,14 @@
       .pf-btn.has-level .pf-lvl {
         color: var(--c);
       }
+      /* placeholder button (home): no action yet */
+      .stub-btn {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .stub-btn svg {
+        display: block;
+      }
       /* button: <amount> <coin> <gap> <safe> */
       .hv-btn {
         gap: 4px;
