@@ -58,6 +58,9 @@
       //   withdraw / deposit: { t, type, amount, balance, comment? }  manual balance adjustment
       //          (amount > 0 is the size of the move, balance = balance AFTER the entry;
       //           comment is present only when the player typed one)
+      //   rank:  { t, type:"rank", task, from, to, reason:"solve"|"solution" }
+      //          a change of the task's shown (integer) rank: grew after a counted repeat
+      //          solve, or was wiped to 0 by viewing the solution
       //   reset: { t, type:"reset", amount, balance:0 }  legacy entries of the old reset modal
       function walletLog(entry) {
         _history.push({ t: Date.now(), ...entry });
@@ -232,6 +235,7 @@
         const payout = walletPayout(diff, days);
         if (payout.net > 0) _balance = round2(_balance + payout.net);
         // rank = accumulated days between counted solves (experience; doesn't affect rewards yet)
+        const rankBefore = walletRank(key);
         _rank[key] = Math.round(((_rank[key] || 0) + days) * 10000) / 10000;
         saveWallet();
         walletLog({
@@ -246,14 +250,24 @@
           rank: walletRank(key),
           balance: _balance,
         });
+        walletLogRank(key, rankBefore, walletRank(key), "solve");
         if (payout.net > 0) walletFlyCoins(fromEl, payout.net, payout);
       }
 
       // "Смотреть решение" = проиграл: таймер идёт заново с этого момента
       function walletMarkSolutionViewed(key) {
         _solved[key] = Date.now();
+        const rankBefore = walletRank(key);
         delete _rank[key]; // peeking at the solution wipes the task's rank
         saveWallet();
+        walletLogRank(key, rankBefore, 0, "solution");
+      }
+
+      // History entry for a visible rank change (the shown integer rank, not the hidden
+      // fraction): nothing is written when from === to.
+      function walletLogRank(key, from, to, reason) {
+        if (from === to) return;
+        walletLog({ type: "rank", task: key, from, to, reason });
       }
 
       // Rank of a task = whole days accumulated across its counted repeat solves.
