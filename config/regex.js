@@ -142,7 +142,7 @@ window.CFG_regex = [
   {
     id: "regex_21",
     title: "Same Letter Start/End",
-    diff: 5,
+    diff: 6,
     desc: "Count words ending with the same letter they start with",
     file: "ex21",
   },
