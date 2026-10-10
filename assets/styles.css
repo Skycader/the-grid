@@ -855,6 +855,14 @@
         box-shadow:
           var(--glow),
           inset 0 0 22px rgba(0, 255, 255, 0.04);
+      }
+      /* the lift is on the content, not on the card: a card that moves out from under the
+         cursor at its bottom edge loses :hover, drops back, gets :hover again — and jitters */
+      .cat-card > * {
+        transition: transform 0.18s;
+      }
+      .cat-card:hover > *,
+      .cat-card.focused > * {
         transform: translateY(-2px);
       }
       .cat-icon {
