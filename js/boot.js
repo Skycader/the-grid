@@ -63,6 +63,7 @@
         if (id === "home") {
           focusCatIdx = -1;
           if (typeof hvRefresh === "function") hvRefresh();
+          if (typeof profileRefresh === "function") profileRefresh();
         }
         if (id === "category") {
           focusTaskIdx = -1;
@@ -154,6 +155,7 @@
         await Promise.all(MENU.map(bootNode));
         renderCats("");
         if (typeof hvRefresh === "function") hvRefresh(); // tasks are loaded now
+        if (typeof profileRefresh === "function") profileRefresh(); // the level needs the task list
         // After boot: try to restore state from URL query params
         restoreRoute();
       })();
