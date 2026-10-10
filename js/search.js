@@ -35,8 +35,10 @@
         _srchFocusIdx = -1;
       const PAGE_SRCH = 5;
 
+      const srchWrap = document.getElementById("srch").closest(".search-wrap");
       document.getElementById("srch").addEventListener("input", (e) => {
         clearTimeout(_srchTimer);
+        srchWrap.classList.toggle("has-text", !!e.target.value);
         const q = e.target.value.trim();
         if (!q) {
           hideSrch();
@@ -94,8 +96,15 @@
           return;
         }
       });
+      document.getElementById("srch-x").addEventListener("click", () => {
+        clearSrch();
+        playClick();
+        document.getElementById("srch").focus();
+      });
       function clearSrch() {
+        clearTimeout(_srchTimer);
         document.getElementById("srch").value = "";
+        srchWrap.classList.remove("has-text");
         _srchFocusIdx = -1;
         hideSrch();
         renderCats("");

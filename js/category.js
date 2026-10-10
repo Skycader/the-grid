@@ -347,7 +347,6 @@ ${mkRankBadge(`${_vsCat.id}/${t.id}`)}${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.di
         if (navStack.length) {
           openCat(navStack[navStack.length - 1]);
         } else {
-          clearQueryParams();
           showView("home");
         }
       };

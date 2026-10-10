@@ -73,6 +73,7 @@
         }
         const cat = findNode(catId, MENU);
         if (!cat) {
+          history.replaceState({}, "", location.pathname); // unknown category: just the menu
           showView("home");
           return;
         }

@@ -491,6 +491,41 @@
         color: var(--txd);
         letter-spacing: 0.12em;
       }
+      /* clear button: shown only while the field has text */
+      #srch {
+        padding-right: 36px;
+      }
+      .srch-x {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        width: 24px;
+        height: 24px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--txd);
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s,
+          background 0.15s;
+      }
+      .search-wrap.has-text .srch-x {
+        display: flex;
+      }
+      .srch-x:hover,
+      .srch-x:focus-visible {
+        color: var(--c);
+        border-color: var(--bd);
+        background: rgba(0, 255, 255, 0.08);
+        outline: none;
+      }
 
       /* ── SEARCH ROW (search input 90% + random button 10%) ── */
       .search-row {
