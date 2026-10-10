@@ -43,19 +43,68 @@
                 autocomplete="off"
                 spellcheck="false"
               />
-              <button class="srch-x" id="srch-x" type="button" title="Clear" aria-label="Clear search">
-                <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3L13 13M13 3L3 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <button
+                class="srch-x"
+                id="srch-x"
+                type="button"
+                title="Clear"
+                aria-label="Clear search"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 3L13 13M13 3L3 13"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                  />
+                </svg>
               </button>
             </div>
             <div class="rnd-wrap" id="rnd-wrap">
-              <button class="rnd-btn" id="rnd-btn" title="Open a random task" aria-label="Random task">
-                <svg class="rnd-dice" width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
+              <button
+                class="rnd-btn"
+                id="rnd-btn"
+                title="Open a random task"
+                aria-label="Random task"
+              >
+                <svg
+                  class="rnd-dice"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 32 32"
+                  aria-hidden="true"
+                >
                   <g transform="rotate(16 22 10)">
-                    <rect x="14.5" y="2.5" width="15" height="15" rx="3" fill="none" stroke="#00ffff" stroke-linejoin="round" stroke-width="1.6" />
+                    <rect
+                      x="14.5"
+                      y="2.5"
+                      width="15"
+                      height="15"
+                      rx="3"
+                      fill="none"
+                      stroke="#00ffff"
+                      stroke-linejoin="round"
+                      stroke-width="1.6"
+                    />
                     <circle cx="19" cy="7" r="1.4" fill="#00ffff" />
                     <circle cx="25" cy="13" r="1.4" fill="#00ffff" />
                   </g>
-                  <rect x="3" y="11" width="17.5" height="17.5" rx="3.2" fill="#001423" stroke="#00ffff" stroke-width="1.7" />
+                  <rect
+                    x="3"
+                    y="11"
+                    width="17.5"
+                    height="17.5"
+                    rx="3.2"
+                    fill="#001423"
+                    stroke="#00ffff"
+                    stroke-width="1.7"
+                  />
                   <circle cx="8.2" cy="16.2" r="1.6" fill="#00ffff" />
                   <circle cx="11.8" cy="19.8" r="1.6" fill="#00ffff" />
                   <circle cx="15.4" cy="23.4" r="1.6" fill="#00ffff" />
@@ -67,24 +116,63 @@
                   <span id="rnd-diff-val">1 – 10</span>
                 </div>
                 <div class="rnd-slider-wrap">
-                  <input type="range" id="rnd-diff-min" min="1" max="10" value="1" step="1" />
-                  <input type="range" id="rnd-diff-max" min="1" max="10" value="10" step="1" />
+                  <input
+                    type="range"
+                    id="rnd-diff-min"
+                    min="1"
+                    max="10"
+                    value="1"
+                    step="1"
+                  />
+                  <input
+                    type="range"
+                    id="rnd-diff-max"
+                    min="1"
+                    max="10"
+                    value="10"
+                    step="1"
+                  />
                 </div>
                 <div class="rnd-panel-title">КАТЕГОРИИ</div>
                 <div class="rnd-cats" id="rnd-cats"></div>
-                <div class="rnd-empty" id="rnd-empty">// НЕТ ЗАДАЧ ПОД ФИЛЬТР //</div>
+                <div class="rnd-empty" id="rnd-empty">
+                  // НЕТ ЗАДАЧ ПОД ФИЛЬТР //
+                </div>
               </div>
             </div>
             <div class="rnd-wrap hv-wrap" id="hv-wrap">
-              <button class="rnd-btn hv-btn" id="hv-btn" title="Open the most overdue task" aria-label="Harvest: open the most overdue task">
+              <button
+                class="rnd-btn hv-btn"
+                id="hv-btn"
+                title="Open the most overdue task"
+                aria-label="Harvest: open the most overdue task"
+              >
                 <span class="hv-amt" id="hv-amt">0</span>
                 <span class="hv-coin" id="hv-coin"></span>
-                <svg class="hv-arrow" width="15" height="11" viewBox="0 0 22 16" aria-hidden="true">
+                <svg
+                  class="hv-arrow"
+                  width="15"
+                  height="11"
+                  viewBox="0 0 22 16"
+                  aria-hidden="true"
+                >
                   <circle cx="2" cy="8" r="1.1" fill="#00ffff" opacity=".25" />
                   <circle cx="7" cy="8" r="1.1" fill="#00ffff" opacity=".5" />
-                  <polyline points="12,3.5 17,8 12,12.5" fill="none" stroke="#00ffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <polyline
+                    points="12,3.5 17,8 12,12.5"
+                    fill="none"
+                    stroke="#00ffff"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
-                <span class="hv-safe" id="hv-safe" role="button" tabindex="0"><span id="hv-safe-ico"></span><span class="hv-balwrap"><span class="hv-bal" id="hv-bal"></span><span class="hv-coin" id="hv-bal-coin"></span></span></span>
+                <span class="hv-safe" id="hv-safe" role="button" tabindex="0"
+                  ><span id="hv-safe-ico"></span
+                  ><span class="hv-balwrap"
+                    ><span class="hv-bal" id="hv-bal"></span
+                    ><span class="hv-coin" id="hv-bal-coin"></span></span
+                ></span>
               </button>
               <div class="rnd-panel" id="hv-panel">
                 <div class="rnd-panel-title">DIFFICULTY</div>
@@ -92,23 +180,79 @@
                   <span id="hv-diff-val">1 – 10</span>
                 </div>
                 <div class="rnd-slider-wrap">
-                  <input type="range" id="hv-diff-min" min="1" max="10" value="1" step="1" />
-                  <input type="range" id="hv-diff-max" min="1" max="10" value="10" step="1" />
+                  <input
+                    type="range"
+                    id="hv-diff-min"
+                    min="1"
+                    max="10"
+                    value="1"
+                    step="1"
+                  />
+                  <input
+                    type="range"
+                    id="hv-diff-max"
+                    min="1"
+                    max="10"
+                    value="10"
+                    step="1"
+                  />
                 </div>
                 <div class="rnd-panel-title">CATEGORIES</div>
                 <div class="rnd-cats" id="hv-cats"></div>
                 <div class="rnd-panel-title">MIN DAYS SINCE SOLVED</div>
-                <input type="number" class="hv-num" id="hv-days" min="0" step="1" value="0" />
+                <input
+                  type="number"
+                  class="hv-num"
+                  id="hv-days"
+                  min="0"
+                  step="1"
+                  value="0"
+                />
                 <div class="rnd-panel-title">MIN REWARD (COINS)</div>
-                <input type="number" class="hv-num" id="hv-reward" min="0" step="1" value="0" />
-                <div class="rnd-empty" id="hv-empty">// NOTHING TO HARVEST //</div>
+                <input
+                  type="number"
+                  class="hv-num"
+                  id="hv-reward"
+                  min="0"
+                  step="1"
+                  value="0"
+                />
+                <div class="rnd-empty" id="hv-empty">
+                  // NOTHING TO HARVEST //
+                </div>
               </div>
             </div>
             <div class="rnd-wrap pf-wrap" id="pf-wrap">
-              <button class="rnd-btn pf-btn" id="pf-btn" title="Player level" aria-label="Profile">
-                <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
-                  <circle cx="13" cy="10.5" r="4.8" fill="none" stroke="#00ffff" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.7" />
-                  <path d="M3.5 27C3.5 21 7.5 17.5 13 17.5C14.7 17.5 16.2 17.8 17.5 18.4" fill="none" stroke="#00ffff" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.7" />
+              <button
+                class="rnd-btn pf-btn"
+                id="pf-btn"
+                title="Player level"
+                aria-label="Profile"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 32 32"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="13"
+                    cy="10.5"
+                    r="4.8"
+                    fill="none"
+                    stroke="#00ffff"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                    stroke-width="1.7"
+                  />
+                  <path
+                    d="M3.5 27C3.5 21 7.5 17.5 13 17.5C14.7 17.5 16.2 17.8 17.5 18.4"
+                    fill="none"
+                    stroke="#00ffff"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                    stroke-width="1.7"
+                  />
                   <g fill="#00ffff">
                     <rect x="19.5" y="23" width="2.4" height="4.5" rx=".5" />
                     <rect x="23" y="19.5" width="2.4" height="8" rx=".5" />
@@ -119,11 +263,42 @@
               </button>
             </div>
             <div class="rnd-wrap tx-wrap" id="tx-wrap">
-              <button class="rnd-btn tx-btn" id="tx-btn" title="Transactions" aria-label="Transactions">
-                <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
-                  <path d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" />
-                  <path d="M4 4.5V10H9.5" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" />
-                  <path d="M16 9.5V16L20 18.5" fill="none" stroke="#00ffff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+              <button
+                class="rnd-btn tx-btn"
+                id="tx-btn"
+                title="Transactions"
+                aria-label="Transactions"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 32 32"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6"
+                    fill="none"
+                    stroke="#00ffff"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M4 4.5V10H9.5"
+                    fill="none"
+                    stroke="#00ffff"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M16 9.5V16L20 18.5"
+                    fill="none"
+                    stroke="#00ffff"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  />
                 </svg>
               </button>
             </div>
@@ -217,7 +392,13 @@
               />
             </div>
             <div class="sort-wrap" id="sort-wrap">
-              <button class="sort-btn sort-easy" id="sort-btn" title="Sort: easiest first">★▼</button>
+              <button
+                class="sort-btn sort-easy"
+                id="sort-btn"
+                title="Sort: easiest first"
+              >
+                ★▼
+              </button>
               <div class="sort-menu" id="sort-menu"></div>
             </div>
           </div>
@@ -282,7 +463,12 @@
             ▶ RUN
           </button>
           <!-- WALLET: баланс виден только внутри открытой задачи, справа от RUN -->
-          <div id="wallet" class="wallet" title="Balance · click to adjust" onclick="walletAskReset()">
+          <div
+            id="wallet"
+            class="wallet"
+            title="Balance · click to adjust"
+            onclick="walletAskReset()"
+          >
             <span class="wallet-val" id="wallet-val">0</span>
             <span class="wallet-coin" id="wallet-coin"></span>
           </div>
@@ -312,14 +498,63 @@
             <div class="res-lock hide" id="res-lock">
               <div class="modal">
                 <div class="m-head has-ico">
-                  <svg class="m-head-ico blue" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="18" r="10" fill="none" stroke="#268bd2" stroke-width="2"/><path d="M16 12V18L20 20.5M12.5 4H19.5M16 4V8" fill="none" stroke="#268bd2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <svg
+                    class="m-head-ico blue"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 32 32"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="16"
+                      cy="18"
+                      r="10"
+                      fill="none"
+                      stroke="#268bd2"
+                      stroke-width="2"
+                    />
+                    <path
+                      d="M16 12V18L20 20.5M12.5 4H19.5M16 4V8"
+                      fill="none"
+                      stroke="#268bd2"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                   <div class="m-title">TIME LIMIT EXCEEDED</div>
-                  <button class="m-x" type="button" aria-label="Close" onclick="closeStrictLock()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                  <button
+                    class="m-x"
+                    type="button"
+                    aria-label="Close"
+                    onclick="closeStrictLock()"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2 2L12 12M12 2L2 12"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
                 </div>
                 <div class="m-content">
                   <div class="rl-bars" id="res-lock-body"></div>
                   <div class="m-acts">
-                    <button class="m-btn go" type="button" onclick="closeStrictLock()">VIEW TESTS</button>
+                    <button
+                      class="m-btn go"
+                      type="button"
+                      onclick="closeStrictLock()"
+                    >
+                      VIEW TESTS
+                    </button>
                   </div>
                 </div>
               </div>
@@ -363,9 +598,36 @@
     <div id="hud">
       <div class="hud-btn" id="btn-fs" onclick="toggleFS()">⛶ FULLSCREEN</div>
       <div class="hud-btn" id="btn-mute" onclick="toggleMute()">♪ SOUND</div>
-      <div class="hud-btn" id="btn-export" onclick="exportDb()" title="Скачать базу (баланс, даты решений) в JSON">⇩ EXPORT</div>
-      <div class="hud-btn" id="btn-import" onclick="importDb()" title="Загрузить базу из JSON">⇧ IMPORT</div>
+      <div
+        class="hud-btn"
+        id="btn-export"
+        onclick="exportDb()"
+        title="Скачать базу (баланс, даты решений) в JSON"
+      >
+        ⇩ EXPORT
+      </div>
+      <div
+        class="hud-btn"
+        id="btn-import"
+        onclick="importDb()"
+        title="Загрузить базу из JSON"
+      >
+        ⇧ IMPORT
+      </div>
       <input type="file" id="db-file" accept=".json,application/json" hidden />
+    </div>
+    <div id="credit" class="hud-btn">
+      <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M5.5 4L1.5 8L5.5 12M10.5 4L14.5 8L10.5 12M9 3L7 13"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span>Developed and Maintained by Vodrion</span>
     </div>
 
     <!-- SOLUTIONS MODAL -->
@@ -373,27 +635,48 @@
       <div class="modal">
         <div class="m-head">
           <div class="m-title">SHOW SOLUTION</div>
-          <button class="m-x" type="button" aria-label="Close" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button
+            class="m-x"
+            type="button"
+            aria-label="Close"
+            onclick="closeModal()"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2L12 12M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="m-content">
-        <div class="m-ico">
-          <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2.5 L22.5 20.5 H1.5 Z" fill="#dc322f" stroke="#dc322f" stroke-width="1.6" stroke-linejoin="round" />
-            <rect x="11" y="8.5" width="2" height="6.5" rx="1" fill="#fff" />
-            <circle cx="12" cy="17.7" r="1.2" fill="#fff" />
-          </svg>
-        </div>
-        <div class="m-body">
-          <!-- filled per task by requestSolutions() -->
-          <div class="m-warn-list">
-            <div class="m-warn-line" id="sol-warn-rank"></div>
-            <div class="m-warn-line" id="sol-warn-reward"></div>
+          <div class="m-ico">
+            <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2.5 L22.5 20.5 H1.5 Z"
+                fill="#dc322f"
+                stroke="#dc322f"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <rect x="11" y="8.5" width="2" height="6.5" rx="1" fill="#fff" />
+              <circle cx="12" cy="17.7" r="1.2" fill="#fff" />
+            </svg>
           </div>
-        </div>
-        <div class="m-acts">
-          <button class="m-btn cancel" onclick="closeModal()">CANCEL</button>
-          <button class="m-btn go" onclick="doShowSolution()">SHOW</button>
-        </div>
+          <div class="m-body">
+            <!-- filled per task by requestSolutions() -->
+            <div class="m-warn-list">
+              <div class="m-warn-line" id="sol-warn-rank"></div>
+              <div class="m-warn-line" id="sol-warn-reward"></div>
+            </div>
+          </div>
+          <div class="m-acts">
+            <button class="m-btn cancel" onclick="closeModal()">CANCEL</button>
+            <button class="m-btn go" onclick="doShowSolution()">SHOW</button>
+          </div>
         </div>
       </div>
     </div>
@@ -403,15 +686,42 @@
       <div class="modal">
         <div class="m-head">
           <div class="m-title" id="confirm-title"></div>
-          <button class="m-x" type="button" aria-label="Close" onclick="closeConfirm(false)"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button
+            class="m-x"
+            type="button"
+            aria-label="Close"
+            onclick="closeConfirm(false)"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2L12 12M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="m-content">
-        <div class="m-ico" id="confirm-ico"></div>
-        <div class="m-body" id="confirm-body"></div>
-        <div class="m-acts">
-          <button class="m-btn go" id="confirm-yes" onclick="closeConfirm(true)">ДА</button>
-          <button class="m-btn cancel" id="confirm-no" onclick="closeConfirm(false, true)">НЕТ</button>
-        </div>
+          <div class="m-ico" id="confirm-ico"></div>
+          <div class="m-body" id="confirm-body"></div>
+          <div class="m-acts">
+            <button
+              class="m-btn go"
+              id="confirm-yes"
+              onclick="closeConfirm(true)"
+            >
+              ДА
+            </button>
+            <button
+              class="m-btn cancel"
+              id="confirm-no"
+              onclick="closeConfirm(false, true)"
+            >
+              НЕТ
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -420,9 +730,54 @@
     <div class="modal-bg hide" id="pfm-modal">
       <div class="modal tx-modal pfm-modal">
         <div class="m-head has-ico">
-          <svg class="m-head-ico" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><circle cx="13" cy="10.5" r="4.8" fill="none" stroke="#00ffff" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.9"/><path d="M3.5 27C3.5 21 7.5 17.5 13 17.5C14.7 17.5 16.2 17.8 17.5 18.4" fill="none" stroke="#00ffff" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.9"/><g fill="#00ffff"><rect x="19.5" y="23" width="2.4" height="4.5" rx=".5"/><rect x="23" y="19.5" width="2.4" height="8" rx=".5"/><rect x="26.5" y="16" width="2.4" height="11.5" rx=".5"/></g></svg>
+          <svg
+            class="m-head-ico"
+            width="22"
+            height="22"
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+          >
+            <circle
+              cx="13"
+              cy="10.5"
+              r="4.8"
+              fill="none"
+              stroke="#00ffff"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="1.9"
+            />
+            <path
+              d="M3.5 27C3.5 21 7.5 17.5 13 17.5C14.7 17.5 16.2 17.8 17.5 18.4"
+              fill="none"
+              stroke="#00ffff"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="1.9"
+            />
+            <g fill="#00ffff">
+              <rect x="19.5" y="23" width="2.4" height="4.5" rx=".5" />
+              <rect x="23" y="19.5" width="2.4" height="8" rx=".5" />
+              <rect x="26.5" y="16" width="2.4" height="11.5" rx=".5" />
+            </g>
+          </svg>
           <div class="m-title">PROFILE</div>
-          <button class="m-x" type="button" aria-label="Close" onclick="pfmClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button
+            class="m-x"
+            type="button"
+            aria-label="Close"
+            onclick="pfmClose()"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2L12 12M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="m-content">
           <div class="adj-balance" id="pfm-sum"></div>
@@ -436,9 +791,46 @@
     <div class="modal-bg hide" id="cl-modal">
       <div class="modal tx-modal cl-modal">
         <div class="m-head has-ico">
-          <svg class="m-head-ico" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M8 3.5H20L25.5 9V28.5H8Z" fill="none" stroke="#00ffff" stroke-width="1.9" stroke-linejoin="round"/><path d="M19.5 3.5V9.5H25.5M12 14.5H21.5M12 18.5H21.5M12 22.5H18" fill="none" stroke="#00ffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg
+            class="m-head-ico"
+            width="22"
+            height="22"
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 3.5H20L25.5 9V28.5H8Z"
+              fill="none"
+              stroke="#00ffff"
+              stroke-width="1.9"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M19.5 3.5V9.5H25.5M12 14.5H21.5M12 18.5H21.5M12 22.5H18"
+              fill="none"
+              stroke="#00ffff"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
           <div class="m-title">CHANGELOG</div>
-          <button class="m-x" type="button" aria-label="Close" onclick="clClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button
+            class="m-x"
+            type="button"
+            aria-label="Close"
+            onclick="clClose()"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2L12 12M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="m-content">
           <div class="tx-tab" id="cl-tab"></div>
@@ -451,16 +843,65 @@
     <div class="modal-bg hide" id="tx-modal">
       <div class="modal tx-modal">
         <div class="m-head has-ico">
-          <svg class="m-head-ico" width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6" fill="none" stroke="#00ffff" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" /><path d="M4 4.5V10H9.5" fill="none" stroke="#00ffff" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" /><path d="M16 9.5V16L20 18.5" fill="none" stroke="#00ffff" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" /></svg>
+          <svg
+            class="m-head-ico"
+            width="22"
+            height="22"
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+          >
+            <path
+              d="M5.5 16A10.5 10.5 0 1 0 8.6 8.6"
+              fill="none"
+              stroke="#00ffff"
+              stroke-width="1.9"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            />
+            <path
+              d="M4 4.5V10H9.5"
+              fill="none"
+              stroke="#00ffff"
+              stroke-width="1.9"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            />
+            <path
+              d="M16 9.5V16L20 18.5"
+              fill="none"
+              stroke="#00ffff"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            />
+          </svg>
           <div class="m-title">TRANSACTIONS</div>
-          <button class="m-x" type="button" aria-label="Close" onclick="txClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button
+            class="m-x"
+            type="button"
+            aria-label="Close"
+            onclick="txClose()"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2L12 12M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="m-content">
-        <div class="adj-balance">Balance: <b id="tx-balance">0</b></div>
-        <div class="tx-head">
-          <span class="tx-t">TIME</span><span class="tx-k">TASK</span><span class="tx-r">TASK RANK</span><span class="tx-c">COINS (BALANCE)</span><span class="tx-o">OVERALL RANK</span>
-        </div>
-        <div class="tx-list" id="tx-list"></div>
+          <div class="adj-balance">Balance: <b id="tx-balance">0</b></div>
+          <div class="tx-head">
+            <span class="tx-t">TIME</span><span class="tx-k">TASK</span
+            ><span class="tx-r">TASK RANK</span
+            ><span class="tx-c">COINS (BALANCE)</span
+            ><span class="tx-o">OVERALL RANK</span>
+          </div>
+          <div class="tx-list" id="tx-list"></div>
         </div>
       </div>
     </div>
@@ -470,36 +911,59 @@
       <div class="modal">
         <div class="m-head">
           <div class="m-title">ADJUST BALANCE</div>
-          <button class="m-x" type="button" aria-label="Close" onclick="walletAdjustClose()"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          <button
+            class="m-x"
+            type="button"
+            aria-label="Close"
+            onclick="walletAdjustClose()"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2L12 12M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
         <div class="m-content">
-        <div class="m-ico" id="adjust-ico"></div>
-        <div class="adj-balance">Balance: <b id="adjust-balance">0</b></div>
-        <input
-          class="adj-input"
-          id="adjust-input"
-          type="text"
-          inputmode="decimal"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="200"
-          aria-label="Amount: positive withdraws, negative deposits"
-        />
-        <input
-          class="adj-input adj-comment"
-          id="adjust-comment"
-          type="text"
-          maxlength="200"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="Comment (optional)"
-          aria-label="Comment (optional)"
-        />
-        <div class="adj-hint" id="adjust-hint"></div>
-        <div class="m-acts">
-          <button class="m-btn go" id="adjust-ok" onclick="walletAdjustSubmit()">APPLY</button>
-          <button class="m-btn cancel" onclick="walletAdjustClose()">CANCEL</button>
-        </div>
+          <div class="m-ico" id="adjust-ico"></div>
+          <div class="adj-balance">Balance: <b id="adjust-balance">0</b></div>
+          <input
+            class="adj-input"
+            id="adjust-input"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="200"
+            aria-label="Amount: positive withdraws, negative deposits"
+          />
+          <input
+            class="adj-input adj-comment"
+            id="adjust-comment"
+            type="text"
+            maxlength="200"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Comment (optional)"
+            aria-label="Comment (optional)"
+          />
+          <div class="adj-hint" id="adjust-hint"></div>
+          <div class="m-acts">
+            <button
+              class="m-btn go"
+              id="adjust-ok"
+              onclick="walletAdjustSubmit()"
+            >
+              APPLY
+            </button>
+            <button class="m-btn cancel" onclick="walletAdjustClose()">
+              CANCEL
+            </button>
+          </div>
         </div>
       </div>
     </div>

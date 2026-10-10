@@ -60,6 +60,8 @@
         view = id;
         document.getElementById("hud").style.display =
           id === "home" ? "flex" : "none";
+        document.getElementById("credit").style.display =
+          id === "home" ? "flex" : "none";
         if (id === "home") {
           // every way back to the menu (BACK, Esc, a click on the backdrop) drops ?cat=…&task=…
           if (location.search && typeof clearQueryParams === "function") clearQueryParams();

@@ -2569,6 +2569,20 @@
         display: flex;
         gap: 6px;
       }
+      /* bottom right of the main menu: looks like the .hud-btn buttons, but is not clickable */
+      #credit {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: default;
+      }
+      #credit svg {
+        display: block;
+      }
       .hud-btn {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.62rem;
