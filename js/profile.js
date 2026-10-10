@@ -124,7 +124,7 @@
         _pfmTab = 0; // REGEX, the first catalog
         pfmRender();
         pfmModal.classList.remove("hide");
-        pfmModal.querySelector(".modal").scrollTop = 0;
+        pfmModal.querySelector(".m-content").scrollTop = 0;
         playClick();
       }
       function pfmClose() {

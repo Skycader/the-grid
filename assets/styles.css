@@ -49,7 +49,7 @@
         height: 3px;
       }
       ::-webkit-scrollbar-track {
-        background: rgba(0, 20, 30, 0.8);
+        background: transparent;
       }
       ::-webkit-scrollbar-thumb {
         background: rgba(0, 180, 220, 0.38);
@@ -207,15 +207,20 @@
       /* the whole modal scrolls (the header stays on top), the document itself is as tall as the text */
       .modal.cl-modal,
       .modal.pfm-modal {
+        display: flex;
+        flex-direction: column;
         max-height: 90vh;
-        overflow-y: auto;
+        overflow: hidden;
       }
       .cl-modal .m-head,
       .pfm-modal .m-head {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        background-color: #002b36;
+        flex: 0 0 auto;
+      }
+      .cl-modal .m-content,
+      .pfm-modal .m-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
       }
       /* profile modal: tabs (like the date tabs of the transactions) and a grid of task cards */
       .modal.pfm-modal {
@@ -2808,8 +2813,7 @@
         position: fixed;
         inset: 0;
         z-index: 800;
-        background: rgba(0, 15, 22, 0.88);
-        backdrop-filter: blur(8px);
+        background: rgba(0, 10, 16, 0.4); /* a light dim: the animated plane behind stays visible */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2904,6 +2908,18 @@
           rgba(181, 137, 0, 0.02)
         );
         border-bottom: 1px solid rgba(181, 137, 0, 0.55);
+      }
+      /* the header is the handle of a draggable modal (js/modal-drag.js) */
+      .modal-bg > .modal > .m-head {
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+      }
+      .modal.dragging {
+        transition: none;
+      }
+      .modal.dragging > .m-head {
+        cursor: grabbing;
       }
       .m-head::before {
         content: "";

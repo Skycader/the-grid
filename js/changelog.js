@@ -63,7 +63,7 @@
         const body = document.getElementById("cl-body");
         body.innerHTML = '<div class="cl-msg">Loading…</div>';
         clModal.classList.remove("hide");
-        body.scrollTop = 0;
+        clModal.querySelector(".m-content").scrollTop = 0;
         playClick();
         try {
           const res = await fetch(`changelog/${APP_VERSION}.md`, { cache: "no-cache" });
