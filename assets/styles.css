@@ -456,13 +456,16 @@
         flex-shrink: 0;
       }
       .search-wrap::before {
-        content: "⌕";
+        content: "";
         position: absolute;
         left: 10px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--cd);
-        font-size: 1rem;
+        width: 17px;
+        height: 17px;
+        background: var(--cd);
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='6.5' cy='6.5' r='4.7' fill='none' stroke='black' stroke-width='1.6'/%3E%3Cpath d='M10 10L14.2 14.2' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='6.5' cy='6.5' r='4.7' fill='none' stroke='black' stroke-width='1.6'/%3E%3Cpath d='M10 10L14.2 14.2' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
         pointer-events: none;
         z-index: 1;
       }
@@ -1550,13 +1553,16 @@
         position: relative;
       }
       .cat-search-wrap::before {
-        content: "⌕";
+        content: "";
         position: absolute;
-        left: 10px;
+        left: 9px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--cd);
-        font-size: 0.95rem;
+        width: 15px;
+        height: 15px;
+        background: var(--cd);
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='6.5' cy='6.5' r='4.7' fill='none' stroke='black' stroke-width='1.6'/%3E%3Cpath d='M10 10L14.2 14.2' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='6.5' cy='6.5' r='4.7' fill='none' stroke='black' stroke-width='1.6'/%3E%3Cpath d='M10 10L14.2 14.2' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
         pointer-events: none;
       }
       #cat-srch {
