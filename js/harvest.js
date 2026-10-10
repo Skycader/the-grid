@@ -11,9 +11,10 @@
       document.getElementById("hv-bal-coin").innerHTML = coinSvg(16);
 
       // ── Safe icon on the button ──
-      // Open safe, three states by the balance: empty (cobweb) → small pile → mountain of
-      // gold above HARVEST_RICH_BALANCE. Hover shows the balance; a click opens the
-      // transactions modal (not the "open the most overdue task" action of the button).
+      // Closed by default, opens on hover. Three states of the contents by the balance: empty
+      // (cobweb) → small pile → mountain of gold above HARVEST_RICH_BALANCE. Hover shows the
+      // balance; a click opens the Adjust balance modal (not the "open the most overdue task"
+      // action of the button). The transactions modal is opened by the history button.
       const _hvSafe = document.getElementById("hv-safe");
       let _hvSafeState = null;
       function safeIconSvg(state, px) {
@@ -31,7 +32,9 @@
               inner += coin(+(13 + (i - (n - 1) / 2) * 2.9).toFixed(2), +(22.2 - r * 1.9).toFixed(2));
           });
         }
-        return `<svg class="safe-ico" width="${px}" height="${px}" viewBox="0 0 32 32" aria-hidden="true"><defs><clipPath id="hv-safe-clip"><rect x="6" y="9" width="14" height="14"/></clipPath></defs><rect x="3" y="6" width="20" height="20" rx="1" fill="none" stroke="${CY}" stroke-width="1.7"/><g clip-path="url(#hv-safe-clip)">${inner}</g><path d="M23 6L29 3.5V28.5L23 26" fill="none" stroke="${CY}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/><circle cx="26" cy="16" r="1.1" fill="${CY}"/></svg>`;
+        // two layers in one icon: .sf-closed (the door shut, default) and .sf-open (the door ajar,
+        // the contents visible); the CSS swaps them while the pointer is over the safe
+        return `<svg class="safe-ico" width="${px}" height="${px}" viewBox="0 0 32 32" aria-hidden="true"><defs><clipPath id="hv-safe-clip"><rect x="6" y="9" width="14" height="14"/></clipPath></defs><rect x="3" y="6" width="20" height="20" rx="1" fill="none" stroke="${CY}" stroke-width="1.7"/><g class="sf-closed"><rect x="6" y="9" width="14" height="14" rx="1" fill="none" stroke="${CY}" stroke-width="1.1" opacity=".6"/><circle cx="13" cy="16" r="3" fill="none" stroke="${CY}" stroke-width="1.4"/><path d="M13 13.3V14.6M13 17.4V18.7M10.3 16H11.6M14.4 16H15.7" stroke="${CY}" stroke-width="1.1" stroke-linecap="round"/><path d="M23 10.5H24.6M23 21.5H24.6" stroke="${CY}" stroke-width="1.7" stroke-linecap="round"/></g><g class="sf-open"><g clip-path="url(#hv-safe-clip)">${inner}</g><path d="M23 6L29 3.5V28.5L23 26" fill="none" stroke="${CY}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/><circle cx="26" cy="16" r="1.1" fill="${CY}"/></g></svg>`;
       }
       function hvRefreshSafe() {
         const state =
@@ -41,18 +44,18 @@
           document.getElementById("hv-safe-ico").innerHTML = safeIconSvg(state, 24);
         }
         document.getElementById("hv-bal").textContent = fmtCoins(_balance); // the balance, right of the safe
-        _hvSafe.title = `Balance: ${fmtCoins(_balance)}`;
+        _hvSafe.title = `Balance: ${fmtCoins(_balance)} · click to adjust`;
       }
       _hvSafe.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation(); // the rest of the button keeps its own action
-        txOpen();
+        walletAskReset();
       });
       _hvSafe.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           e.stopPropagation();
-          txOpen();
+          walletAskReset();
         }
       });
 

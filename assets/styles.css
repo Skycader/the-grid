@@ -1279,7 +1279,7 @@
       .hv-coin svg {
         display: block;
       }
-      /* safe icon: hover = balance (title), click = transactions modal */
+      /* safe icon: hover = opens + balance (title), click = Adjust balance modal */
       /* flow arrow coin → safe: fading dots + chevron */
       .hv-arrow {
         display: block;
@@ -1300,6 +1300,22 @@
       }
       .hv-safe svg {
         display: block;
+      }
+      /* the safe is closed by default and opens while the pointer is over it */
+      .safe-ico .sf-closed,
+      .safe-ico .sf-open {
+        transition: opacity 0.15s;
+      }
+      .safe-ico .sf-open {
+        opacity: 0;
+      }
+      .hv-safe:hover .sf-closed,
+      .hv-safe:focus-visible .sf-closed {
+        opacity: 0;
+      }
+      .hv-safe:hover .sf-open,
+      .hv-safe:focus-visible .sf-open {
+        opacity: 1;
       }
       /* the player's balance and a coin, right of the safe icon: yellow like the reward number */
       .hv-balwrap {

@@ -1,5 +1,5 @@
       // ═══════════ TRANSACTIONS MODAL ═══════════
-      // Opened by the safe icon on the HARVEST button. A document-like table over
+      // Opened by the history button on the home screen. A document-like table over
       // gr_history (_history): newest first, split into chapters by day (each day is a
       // tab / document spine). Columns:
       //   TIME  |  TASK (click → open it)  |  TASK RANK x → y  |  COINS +n (balance x → y)  |  OVERALL RANK x → y
@@ -155,7 +155,7 @@
         txModal.classList.add("hide");
         playClick();
       }
-      // the history button on the home screen (the safe icon on HARVEST opens it too)
+      // the history button on the home screen
       document.getElementById("tx-btn").addEventListener("click", txOpen);
       // click on a task id → close the modal and open that task
       document.getElementById("tx-list").addEventListener("click", (ev) => {
