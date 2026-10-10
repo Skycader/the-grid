@@ -10,6 +10,7 @@
       const SOLVED_KEY = "gr_solved";
       const HISTORY_KEY = "gr_history"; // transaction log, its own localStorage item
       const RANK_KEY = "gr_rank"; // { "cat/task": accumulated days between counted solves }
+      const STATS_KEY = "gr_stats"; // { "cat/task": { ok, fail, coins } } successful runs, failed runs, coins earned
       const DAY_MS = 86400000;
       const NEED_DAYS = 7; // шкала "нужды" заполняется за 7 суток
 
@@ -31,6 +32,38 @@
 
       const round2 = (n) => Math.round(n * 100) / 100;
 
+      // Per-task statistics for the profile cards. A run with every test green (and, in STRICT,
+      // not too slow) is a success, any other finished run is a fail; coins are the payouts.
+      // Data from before the stats existed is rebuilt from the history (successes and coins; the
+      // failures of the past are unknown, so they start from 0).
+      let _stats = {};
+      function statsLoad() {
+        try {
+          const s = JSON.parse(localStorage.getItem(STATS_KEY));
+          if (s && typeof s === "object" && !Array.isArray(s)) {
+            _stats = s;
+            return;
+          }
+        } catch (e) {}
+        _stats = {};
+        for (const e of _history) {
+          if (e.type !== "solve" || !e.task) continue;
+          const t = _stats[e.task] || (_stats[e.task] = { ok: 0, fail: 0, coins: 0 });
+          t.ok++;
+          t.coins = round2(t.coins + (e.net || 0));
+        }
+      }
+      statsLoad();
+      const walletStat = (key) => ({ ok: 0, fail: 0, coins: 0, ..._stats[key] });
+      function statsRecordRun(key, ok) {
+        const t = _stats[key] || (_stats[key] = { ok: 0, fail: 0, coins: 0 });
+        if (ok) t.ok++;
+        else t.fail++;
+        try {
+          localStorage.setItem(STATS_KEY, JSON.stringify(_stats));
+        } catch (e) {}
+      }
+
       // Выплата: gross = diff × дни; комиссия = (10 − diff) × 10 % (в [0..100]);
       // net = gross − комиссия. Пример: diff 9, 100 дн → 900 − 10 % = 810;
       // diff 1, 100 дн → 100 − 90 % = 10.
@@ -48,6 +81,7 @@
           localStorage.setItem(WALLET_KEY, String(_balance));
           localStorage.setItem(SOLVED_KEY, JSON.stringify(_solved));
           localStorage.setItem(RANK_KEY, JSON.stringify(_rank));
+          localStorage.setItem(STATS_KEY, JSON.stringify(_stats));
         } catch (e) {}
         if (typeof hvRefresh === "function") hvRefresh(); // harvest button total
         if (typeof profileRefresh === "function") profileRefresh(); // player level
@@ -252,7 +286,11 @@
         }
         const days = (now - prev) / DAY_MS;
         const payout = walletPayout(diff, days);
-        if (payout.net > 0) _balance = round2(_balance + payout.net);
+        if (payout.net > 0) {
+          _balance = round2(_balance + payout.net);
+          const st = _stats[key] || (_stats[key] = { ok: 0, fail: 0, coins: 0 });
+          st.coins = round2(st.coins + payout.net); // coins earned from this task, all time
+        }
         // rank = accumulated days between counted solves (experience; doesn't affect rewards yet)
         const rankBefore = walletRank(key);
         _rank[key] = Math.round(((_rank[key] || 0) + days) * 10000) / 10000;
@@ -350,6 +388,7 @@
         } catch (e) {
           _history = [];
         }
+        statsLoad();
         _walletShown = _balance;
         renderWallet();
         if (typeof hvRefresh === "function") hvRefresh();

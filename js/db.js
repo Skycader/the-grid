@@ -124,6 +124,13 @@
           if (!r || typeof r !== "object" || Array.isArray(r)) return "bad gr_rank";
           if (!Object.values(r).every((v) => Number.isFinite(v) && v >= 0)) return "bad gr_rank";
         }
+        if ("gr_stats" in d) {
+          const st = d.gr_stats;
+          if (!st || typeof st !== "object" || Array.isArray(st)) return "bad gr_stats";
+          const num = (v) => Number.isFinite(v) && v >= 0;
+          if (!Object.values(st).every((t) => t && num(t.ok) && num(t.fail) && num(t.coins)))
+            return "bad gr_stats";
+        }
         if ("gr_history" in d) {
           const h = d.gr_history;
           if (
@@ -141,6 +148,7 @@
           localStorage.removeItem(WALLET_KEY);
           localStorage.removeItem(SOLVED_KEY);
           localStorage.removeItem(RANK_KEY);
+          localStorage.removeItem(STATS_KEY); // rebuilt from the history when the file has no stats
           localStorage.removeItem(HISTORY_KEY); // history is replaced too (empty if the file has none)
           for (const [k, v] of Object.entries(data))
             localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v));

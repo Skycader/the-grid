@@ -205,15 +205,171 @@
 
       /* release notes modal: changelog/<version>.md rendered */
       /* the whole modal scrolls (the header stays on top), the document itself is as tall as the text */
-      .modal.cl-modal {
+      .modal.cl-modal,
+      .modal.pfm-modal {
         max-height: 90vh;
         overflow-y: auto;
       }
-      .cl-modal .m-head {
+      .cl-modal .m-head,
+      .pfm-modal .m-head {
         position: sticky;
         top: 0;
         z-index: 2;
         background-color: #002b36;
+      }
+      /* profile modal: tabs (like the date tabs of the transactions) and a grid of task cards */
+      .modal.pfm-modal {
+        max-width: 1000px;
+      }
+      .pfm-tabs {
+        display: flex;
+        gap: 3px;
+        margin-top: 6px;
+        position: relative;
+        z-index: 1;
+      }
+      .pfm-tab {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 5px 24px 4px 12px;
+        background: rgba(181, 137, 0, 0.06);
+        border: 1px solid rgba(181, 137, 0, 0.3);
+        border-bottom: none;
+        clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+        font-family: "Orbitron", sans-serif;
+        cursor: pointer;
+        position: relative;
+        top: 1px;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .pfm-tab b {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--txd);
+      }
+      .pfm-tab i {
+        font-style: normal;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.56rem;
+        color: var(--txd);
+        letter-spacing: 0.08em;
+      }
+      .pfm-tab:hover {
+        background: rgba(181, 137, 0, 0.14);
+      }
+      .pfm-tab.on {
+        background: rgba(181, 137, 0, 0.22);
+        border-color: rgba(181, 137, 0, 0.7);
+      }
+      .pfm-tab.on b {
+        color: #b58900;
+      }
+      .pfm-grid.tx-rows {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 12px;
+        padding: 14px;
+      }
+      .pfm-card {
+        position: relative;
+        height: 158px;
+        background: #01323d;
+        border: 1px solid var(--bd);
+        cursor: pointer;
+        overflow: hidden;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .pfm-card:hover {
+        border-color: var(--c);
+        box-shadow: var(--glow);
+      }
+      .pfm-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: filter 0.2s;
+      }
+      .pfm-head {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 9px;
+        background: rgba(181, 137, 0, 0.16);
+        border-bottom: 1px solid rgba(181, 137, 0, 0.45);
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #b58900;
+      }
+      .pfm-head .sym {
+        color: var(--c);
+        flex: 0 0 auto;
+      }
+      .pfm-mid {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--c);
+        min-height: 0;
+      }
+      .pfm-mid svg {
+        width: 62px;
+        height: 62px;
+        opacity: 0.9;
+      }
+      .pfm-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        background: rgba(0, 14, 24, 0.75);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--txd);
+      }
+      .pfm-foot span {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+      }
+      .pfm-foot .ok {
+        color: #859900;
+      }
+      .pfm-foot .bad {
+        color: #cb4b16;
+      }
+      .pfm-foot .coins {
+        color: #ffd84a;
+      }
+      .pfm-foot svg {
+        display: block;
+      }
+      /* a task that was never solved: blurred under a padlock (the card still opens it) */
+      .pfm-card.locked .pfm-inner {
+        filter: blur(4px) saturate(0.35);
+        opacity: 0.75;
+      }
+      .pfm-card.locked:hover .pfm-inner {
+        filter: blur(2px) saturate(0.6);
+      }
+      .pfm-lock {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.5));
+        pointer-events: none;
       }
       .cl-body {
         text-align: left;

@@ -76,6 +76,7 @@
           const tooSlow =
             st === "ok" && _strictOn && files.sol && benchData && strictRatio(benchData) > STRICT_TOLERANCE;
           if (st) STATUS[key] = tooSlow ? "ng" : st;
+          if (st) statsRecordRun(key, st === "ok" && !tooSlow); // profile statistics
           if (tooSlow) {
             playFail();
             showStrictLock(benchData);
@@ -83,7 +84,10 @@
             playAllPass();
             walletOnSolved(key, diff, !!files.sol, benchData, btn);
           } else if (st === "ng") playFail();
-        } else playError();
+        } else {
+          statsRecordRun(key, false); // an error / timeout is a failed run
+          playError();
+        }
         setStatus("");
       }
 

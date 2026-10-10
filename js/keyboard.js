@@ -7,6 +7,10 @@
         }
 
         if (e.key === "Escape") {
+          if (!document.getElementById("pfm-modal").classList.contains("hide")) {
+            pfmClose();
+            return;
+          }
           if (!document.getElementById("cl-modal").classList.contains("hide")) {
             clClose();
             return;
