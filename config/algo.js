@@ -8,9 +8,9 @@ window.CFG_algo = [
     files: [
       {
         id: "binary_search",
-        title: "Binary Search через API",
+        title: "Binary Search via API",
         diff: 3,
-        desc: "Реализовать бинарный поиск по заданному API с минимальным количеством запросов",
+        desc: "Implement binary search over a given API with the minimal number of requests",
         file: "binary-search",
       },
     ],
