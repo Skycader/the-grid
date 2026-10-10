@@ -204,9 +204,18 @@
       }
 
       /* release notes modal: changelog/<version>.md rendered */
-      .cl-body {
-        max-height: 64vh;
+      /* the whole modal scrolls (the header stays on top), the document itself is as tall as the text */
+      .modal.cl-modal {
+        max-height: 90vh;
         overflow-y: auto;
+      }
+      .cl-modal .m-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #002b36;
+      }
+      .cl-body {
         text-align: left;
         font-family: "JetBrains Mono", monospace;
         font-size: 0.72rem;
@@ -1073,6 +1082,7 @@
       .hv-safe {
         display: flex;
         align-items: center;
+        gap: 6px;
         cursor: pointer;
         transition: filter 0.15s;
       }
@@ -1083,6 +1093,16 @@
       }
       .hv-safe svg {
         display: block;
+      }
+      /* the player's balance and a coin, right of the safe icon: yellow like the reward number */
+      .hv-balwrap {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .hv-bal {
+        color: #ffd84a;
+        font-variant-numeric: tabular-nums;
       }
       /* transactions modal: a document with one chapter (tab) per day */
       .modal.tx-modal {

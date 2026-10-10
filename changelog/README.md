@@ -19,6 +19,13 @@ and small tweaks, **major** only when stored data stops being compatible.
 The local database (`gr_*` keys of `localStorage`, export format `version: 1`) is described in the
 release in which a key or an entry type appears.
 
+## Collecting the next release
+
+Changes of a release that is not out yet are collected in its own file, whose first line says
+`unreleased` instead of a date (`# 1.15.0 — unreleased`). Until the release is cut, `APP_VERSION`
+stays as it is and the table has no row for it. Cutting the release: bump `APP_VERSION`, replace
+`unreleased` with the date, delete the "work in progress" lines, add the table row.
+
 ## Template
 
 ```md

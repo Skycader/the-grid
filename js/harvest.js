@@ -8,6 +8,7 @@
       const _hvWrap = document.getElementById("hv-wrap");
       attachHoverMenu(_hvWrap, 500);
       document.getElementById("hv-coin").innerHTML = coinSvg(16);
+      document.getElementById("hv-bal-coin").innerHTML = coinSvg(16);
 
       // ── Safe icon on the button ──
       // Open safe, three states by the balance: empty (cobweb) → small pile → mountain of
@@ -37,8 +38,9 @@
           _balance > HARVEST_RICH_BALANCE ? "mountain" : _balance > 0 ? "pile" : "empty";
         if (state !== _hvSafeState) {
           _hvSafeState = state;
-          _hvSafe.innerHTML = safeIconSvg(state, 24);
+          document.getElementById("hv-safe-ico").innerHTML = safeIconSvg(state, 24);
         }
+        document.getElementById("hv-bal").textContent = fmtCoins(_balance); // the balance, right of the safe
         _hvSafe.title = `Balance: ${fmtCoins(_balance)}`;
       }
       _hvSafe.addEventListener("click", (e) => {
