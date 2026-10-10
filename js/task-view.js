@@ -107,7 +107,8 @@
       }
       document.getElementById("bk-task").onclick = () => {
         playClick();
-        if (editor && curTask && !_editorLoading) {
+        // only the EDITOR tab holds the player's code: on the SPEC tab the editor shows the spec
+        if (editor && curTask && !_editorLoading && curTab === "ed") {
           solCode = editor.getValue();
           CODE[`${curCat().id}/${curTask.id}`] = solCode;
         }

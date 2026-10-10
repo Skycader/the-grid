@@ -1144,10 +1144,26 @@
 
         function expect(v){
           const site=_asserts?callSite():undefined;
+          // a value as the player should see it: JSON.stringify gives undefined for undefined /
+          // function / symbol (the row then had no "received" at all), null for NaN / Infinity,
+          // and throws on bigint and circular structures
+          function show(x){
+            if(x===undefined)return 'undefined';
+            if(typeof x==='number'){
+              if(Number.isNaN(x))return 'NaN';
+              if(Object.is(x,-0))return '-0';
+              return String(x);
+            }
+            if(typeof x==='bigint')return x+'n';
+            if(typeof x==='function')return '[Function'+(x.name?' '+x.name:'')+']';
+            if(typeof x==='symbol')return x.toString();
+            try{const s=JSON.stringify(x);return s===undefined?String(x):s;}catch(e){return String(x);}
+          }
           function soft(ok,matcher,expected,received){
             const entry={status:ok?'pass':'fail',matcher,call:site&&site.text,line:site&&site.line,
-              expected:expected!==undefined?trunc(JSON.stringify(expected)):undefined,
-              received:received!==undefined?trunc(JSON.stringify(received)):trunc(JSON.stringify(v))};
+              expected:expected!==undefined?trunc(show(expected)):undefined,
+              // received is always shown, undefined included: arguments.length tells "not passed"
+              received:trunc(show(arguments.length>3?received:v))};
             if(_asserts){_asserts.push(entry);}
             else if(!ok){throw new Error(matcher+': expected '+JSON.stringify(expected)+' got '+JSON.stringify(v));}
           }
