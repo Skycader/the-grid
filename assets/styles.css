@@ -3080,6 +3080,19 @@
         font-weight: 400;
         color: #ffd84a;
       }
+      /* Adjust balance: "Balance: <coin> <number>" */
+      .adj-balance.with-coin {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .adj-coin {
+        display: inline-flex;
+      }
+      .adj-coin svg {
+        display: block;
+      }
       .adj-input {
         display: block;
         width: 100%;

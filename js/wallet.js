@@ -437,7 +437,7 @@
       }
       function walletAskReset() {
         const input = document.getElementById("adjust-input");
-        document.getElementById("adjust-ico").innerHTML = coinSvg(30);
+        document.getElementById("adjust-coin").innerHTML = coinSvg(15); // before the number
         document.getElementById("adjust-balance").textContent = fmtCoins(_balance);
         input.value = "";
         document.getElementById("adjust-comment").value = "";
