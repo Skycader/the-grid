@@ -18,9 +18,13 @@
         };
       }
       const rnd = lcg(0xcafe1234);
-      const STARS = Array.from({ length: 120 }, () => ({
-        x: rnd(),
-        y: rnd() * 0.44,
+      // Stars live in polar coordinates around the horizon centre (the vanishing point of the
+      // plane) and all rotate at the same speed, like a celestial sphere; the half that is
+      // below the horizon is clipped, so the stars rise on one side and set on the other.
+      const ROT_SPEED = 0.008; // rad/s
+      const STARS = Array.from({ length: 220 }, () => ({
+        r: 0.05 + rnd() * 0.78,
+        ang: rnd() * Math.PI * 2,
         sz: rnd() < 0.14 ? 1.5 : 1,
         ph: rnd() * Math.PI * 2,
         sp: 0.28 + rnd() * 0.48,
@@ -46,11 +50,18 @@
         hg.addColorStop(1, "rgba(0,80,140,0)");
         cx.fillStyle = hg;
         cx.fillRect(0, H * 0.43, W, H * 0.22);
+        const hz = H * 0.5;
+        const diag = Math.sqrt((W / 2) * (W / 2) + hz * hz) * 1.05;
         cx.save();
+        cx.beginPath();
+        cx.rect(0, 0, W, hz);
+        cx.clip();
+        cx.translate(W / 2, hz);
+        cx.rotate(t * ROT_SPEED);
         STARS.forEach((s) => {
           const fl = 0.3 + 0.7 * Math.abs(Math.sin(t * s.sp + s.ph));
           cx.fillStyle = `rgba(160,220,255,${fl * 0.5})`;
-          cx.fillRect(s.x * W, s.y * H, s.sz, s.sz);
+          cx.fillRect(Math.cos(s.ang) * s.r * diag, Math.sin(s.ang) * s.r * diag, s.sz, s.sz);
         });
         cx.restore();
         drawGrid(W, H, t);
