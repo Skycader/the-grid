@@ -1,4 +1,5 @@
 /* Binary Search
+ * 🎖CERTIFIED 2026-10-11
  * Given an API over a sorted (ascending) array of distinct numbers:
  *   api.get(index)  → the number at that index
  *   api.getLength() → the length of the array

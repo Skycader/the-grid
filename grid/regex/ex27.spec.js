@@ -1,4 +1,5 @@
 /* Ex27
+ * 🎖CERTIFIED 2026-10-10
  * Three regular expressions about the number of digits in a string, exported as [r1, r2, r3]:
  *   r1 — exactly 3 digits     r2 — fewer than 3 digits     r3 — 3 or more digits
  * Every regex is used as r.test(text) on the whole string.

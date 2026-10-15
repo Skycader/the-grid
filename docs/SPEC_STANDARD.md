@@ -30,6 +30,7 @@ Legend: **M** — mandatory, **R** — recommended, **O** — only when it appli
 
 | # | Item | |
 |---|---|---|
+| A0 | The line ` * 🎖CERTIFIED YYYY-MM-DD` right under the title (`/* ExN`): the date is the day the spec was certified. It is put only when the spec meets this standard and the definition of done in §5; a spec without the mark is not standardized yet (`grep -h CERTIFIED grid/*/*.spec.js` lists the certified ones). When a spec is reworked in a way that changes what it checks, the date is renewed | M |
 | A1 | Block comment `/* ExN … */` with the task statement | M |
 | A2 | At least one `input → output` example | M |
 | A3 | `Scope`: `✓` what is covered, `✗` what is deliberately out of scope | R |
@@ -92,6 +93,7 @@ use `1️⃣`, `2️⃣`, … directly in the title.
 
 ```js
 /* ExN
+ * 🎖CERTIFIED YYYY-MM-DD
  * <Task statement in one or two sentences.>
  *
  * Example:

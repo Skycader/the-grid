@@ -1,4 +1,5 @@
 /* Ex25
+ * 🎖CERTIFIED 2026-10-09
  * Three regular expressions for lookahead / lookbehind, exported as [r1, r2, r3]:
  *   r1 — prices after `$`            "RHX: $431.41"                 →  ["431.41"]
  *   r2 — the text inside <title>     "<title>Main title</title>"    →  ["Main title"]

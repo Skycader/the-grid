@@ -1,4 +1,5 @@
 /* Ex2
+ * 🎖CERTIFIED 2026-10-07
  * Remove the titles `Mr.` and `Mrs.` from the text.
  *
  * Example:

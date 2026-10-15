@@ -1,4 +1,5 @@
 /* Ex1
+ * 🎖CERTIFIED 2026-10-07
  * Remove every whole word `cat` from the text.
  *
  * Example:
