@@ -8,4 +8,8 @@
  * Find all of them
  */
 
+const f = txt => {
+  const r = //;
+}
+
 module.exports = f;
