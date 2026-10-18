@@ -64,7 +64,7 @@
           id === "home" ? "flex" : "none";
         if (id === "home") {
           // every way back to the menu (BACK, Esc, a click on the backdrop) drops ?cat=…&task=…
-          if (location.search && typeof clearQueryParams === "function") clearQueryParams();
+          if (new URLSearchParams(location.search).has("cat") && typeof clearQueryParams === "function") clearQueryParams();
           focusCatIdx = -1;
           if (typeof hvRefresh === "function") hvRefresh();
           if (typeof profileRefresh === "function") profileRefresh();

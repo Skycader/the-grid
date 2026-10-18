@@ -1262,8 +1262,14 @@
         display: block;
       }
       .pf-lvl {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         font-variant-numeric: tabular-nums;
         color: var(--txd);
+      }
+      .pf-lvl .rank-badge {
+        width: 20px;
       }
       .pf-btn.has-level .pf-lvl {
         color: var(--c);

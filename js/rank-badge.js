@@ -1,10 +1,15 @@
       // ═══════════ RANK BADGE: the patch of a rank ═══════════
-      // The rank of a task is a number of days (walletRank). The badge shows the PATCH of the
-      // rank — small squares, 21 steps (docs/ranks.md) — and a pointer over it shows a tooltip:
-      // the signal-bars icon with the number of days and the name of the rank (RU · EN).
+      // Two kinds of ranks share one set of 21 names and patches (docs/ranks.md):
+      //   task   — the rank of a task is a number of days (walletRank);
+      //   player — the level of the player (profileLevel), the PROFILE button.
+      // The badge shows the PATCH of the rank — small squares — and a pointer over it shows a tooltip:
+      // an icon with the number (days / level) and the name of the rank (RU · EN). A click opens the
+      // RANKS window with all the ranks.
       //
-      //   a rank k (1-based) starts at round(1000 * ((k - 1) / 20) ^ 1.2) days;
-      //   the 21st rank starts at 1000 days.
+      //   task:   a rank k (1-based) starts at round(1000 * ((k - 1) / 20) ^ 1.2) days;
+      //           the 21st rank starts at 1000 days.
+      //   player: a rank k starts at round(100 * ((k - 1) / 20) ^ 1.2, 1 decimal) level;
+      //           the 21st rank starts at level 100 (all of today's 37 tasks give about 67).
       const RANK_NAMES = [
         ["Рекрут", "Recruit"], ["Слуга", "Servant"], ["Ученик", "Apprentice"], ["Вестник", "Herald"],
         ["Посвящённый", "Initiate"], ["Охотник", "Hunter"], ["Воин", "Warrior"], ["Ветеран", "Veteran"],
@@ -21,7 +26,17 @@
         "影 Kage", "最後の影 Saigo no Kage", "哨兵 Shōhei", "大哨兵 Daishōhei", "師範 Shihan", "長老 Chōrō",
         "大長老 Daichōrō", "覇王 Haō", "覇帝 Hatei",
       ];
-      const RANK_START = Array.from({ length: 21 }, (_, n) => Math.round(1000 * Math.pow(n / 20, 1.2)));
+      // where each rank starts (a number of days / a level) and how a value is written
+      const RANK_SCALES = {
+        task: {
+          start: Array.from({ length: 21 }, (_, n) => Math.round(1000 * Math.pow(n / 20, 1.2))),
+          decimals: 0,
+        },
+        player: {
+          start: Array.from({ length: 21 }, (_, n) => Math.round(100 * Math.pow(n / 20, 1.2) * 10) / 10),
+          decimals: 1,
+        },
+      };
       // the patches: w white, y yellow, r red, k black, b blue; a string is a row of squares
       const RANK_PATCH = [
         ["w"], ["ww"], ["www"], ["y"], ["yy"], ["yyy"], ["yy", "yy"], ["yy", "yy", "yy"],
@@ -30,24 +45,31 @@
         ["kkk", "kkk", "bbb"], ["kkk", "bbb", "bbb"], ["bbb", "bbb", "bbb"],
       ];
 
-      // 0-based index of the rank for a number of days
-      function rankStep(days) {
+      // a value as it is written: whole days, a level with at most one decimal
+      function rankFmt(v, kind = "task") {
+        return RANK_SCALES[kind].decimals ? (Math.round(v * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }) : String(Math.floor(v));
+      }
+      // 0-based index of the rank for a number of days / a level
+      function rankStep(v, kind = "task") {
+        const start = RANK_SCALES[kind].start;
         let k = 0;
-        for (let i = 0; i < RANK_START.length; i++) if (days >= RANK_START[i]) k = i;
+        for (let i = 0; i < start.length; i++) if (v >= start[i]) k = i;
         return k;
       }
       // { step: 1..21, name: [ru, en], from, to (null for the last one) }
-      function rankInfo(days) {
-        const k = rankStep(days);
+      function rankInfo(v, kind = "task") {
+        const start = RANK_SCALES[kind].start;
+        const k = rankStep(v, kind);
+        const gap = RANK_SCALES[kind].decimals ? 0.1 : 1;
         return {
           step: k + 1,
           name: RANK_NAMES[k],
-          from: RANK_START[k],
-          to: k === RANK_START.length - 1 ? null : RANK_START[k + 1] - 1,
+          from: start[k],
+          to: k === start.length - 1 ? null : Math.round((start[k + 1] - gap) * 10) / 10,
         };
       }
-      function rankPatchHtml(days) {
-        return rankPatchStep(rankStep(days));
+      function rankPatchHtml(v, kind = "task") {
+        return rankPatchStep(rankStep(v, kind));
       }
       // the patch of a rank by its 0-based step
       function rankPatchStep(k) {
@@ -62,23 +84,35 @@
         );
       }
 
-      // ── The modal with all the ranks: a click on a patch. The rank of the clicked task is marked. ──
+      // the badge of the PLAYER (the level) for the PROFILE button; the task badge is mkRankBadge
+      function mkPlayerBadge(level) {
+        return `<span class="rank-badge${level > 0 ? "" : " zero"}" data-kind="player" data-rank="${level}" aria-label="Player level ${rankFmt(level, "player")}">${rankPatchHtml(level, "player")}</span>`;
+      }
+
+      // ── The modal with all the ranks: a click on a patch. The rank of the clicked task / player is marked. ──
       const rkModal = document.getElementById("rk-modal");
-      const rkRange = (k) => (k === RANK_START.length - 1 ? `${RANK_START[k]}+` : `${RANK_START[k]} - ${RANK_START[k + 1] - 1}`);
-      function rkOpen(days) {
-        const cur = rankStep(days);
+      function rkRange(k, kind) {
+        const i = rankInfo(RANK_SCALES[kind].start[k], kind);
+        return i.to === null ? `${rankFmt(i.from, kind)}+` : `${rankFmt(i.from, kind)} - ${rankFmt(i.to, kind)}`;
+      }
+      function rkOpen(value, kind = "task") {
+        const start = RANK_SCALES[kind].start;
+        const player = kind === "player";
+        const cur = rankStep(value, kind);
         document.getElementById("rk-head-ico").innerHTML = rankIconSvg(22);
+        const unit = player ? "level" : "days";
         const next =
-          cur === RANK_START.length - 1
+          cur === start.length - 1
             ? "the highest rank"
-            : `next: ${RANK_NAMES[cur + 1][0]} · ${RANK_NAMES[cur + 1][1]} at ${RANK_START[cur + 1]} days (${RANK_START[cur + 1] - days} to go)`;
+            : `next: ${RANK_NAMES[cur + 1][0]} · ${RANK_NAMES[cur + 1][1]} at ${rankFmt(start[cur + 1], kind)} ${unit} (${rankFmt(start[cur + 1] - value, kind)} to go)`;
+        const formula = player ? "<br><span>the level is the sum of 10 / (11 − difficulty) over the tasks in your database</span>" : "";
         document.getElementById("rkm-now").innerHTML =
-          `This task: <b>${days}</b> days → <b>${RANK_NAMES[cur][0]} · ${RANK_NAMES[cur][1]}</b><br><span>${next}</span>`;
-        // the progress inside the current rank: how far from its first day to the first day of the next
-        const pct = cur === RANK_START.length - 1 ? 100 : Math.round(((days - RANK_START[cur]) / (RANK_START[cur + 1] - RANK_START[cur])) * 100);
+          `${player ? "Your level" : "This task"}: <b>${rankFmt(value, kind)}</b> ${player ? "" : "days "}→ <b>${RANK_NAMES[cur][0]} · ${RANK_NAMES[cur][1]}</b><br><span>${next}</span>${formula}`;
+        // the progress inside the current rank: how far from its first value to the first value of the next
+        const pct = cur === start.length - 1 ? 100 : Math.round(((value - start[cur]) / (start[cur + 1] - start[cur])) * 100);
         document.getElementById("rkm-list").innerHTML = RANK_NAMES.map(
           (nm, k) =>
-            `<div class="rkm-row${k === cur ? " cur" : ""}"${k === cur ? ` style="--p:${pct}%" title="${pct}% of the way to the next rank"` : ""}><span class="rkm-n">${k + 1}</span><span class="rkm-p">${rankPatchStep(k)}</span><span class="rkm-nm">${nm[0]} <small>· ${nm[1]}</small></span><span class="rkm-ja">${RANK_JA[k]}</span><span class="rkm-d">${rkRange(k)}</span></div>`,
+            `<div class="rkm-row${k === cur ? " cur" : ""}"${k === cur ? ` style="--p:${pct}%" title="${pct}% of the way to the next rank"` : ""}><span class="rkm-n">${k + 1}</span><span class="rkm-p">${rankPatchStep(k)}</span><span class="rkm-nm">${nm[0]} <small>· ${nm[1]}</small></span><span class="rkm-ja">${RANK_JA[k]}</span><span class="rkm-d">${rkRange(k, kind)}</span></div>`,
         ).join("");
         rkModal.classList.remove("hide");
         const row = rkModal.querySelector(".rkm-row.cur");
@@ -92,7 +126,7 @@
       rkModal.addEventListener("click", (e) => {
         if (e.target === e.currentTarget) rkClose();
       });
-      // capture: a click on a patch must not open the task of the row it stands in
+      // capture: a click on a patch must not open the task of the row / the profile it stands in
       document.addEventListener(
         "click",
         (e) => {
@@ -100,13 +134,14 @@
           if (!b) return;
           e.stopPropagation();
           e.preventDefault();
-          rkOpen(+b.dataset.rank);
+          rkOpen(+b.dataset.rank, b.dataset.kind || "task");
         },
         true,
       );
 
       // One floating tooltip for all the badges (a tooltip inside a row would be clipped by the
-      // scrolling list): the signal-bars icon and the number of days.
+      // scrolling list): an icon with the number (the signal bars for a task, the profile for the
+      // player) and the name of the rank.
       (function () {
         const tip = document.createElement("div");
         tip.id = "rk-tip";
@@ -115,8 +150,10 @@
         document.addEventListener("mouseover", (e) => {
           const b = e.target.closest && e.target.closest(".rank-badge");
           if (!b) return hide();
-          const nm = rankInfo(+b.dataset.rank).name;
-          tip.innerHTML = `<span class="rk-t1">${rankIconSvg(11)}<b>${b.dataset.rank}</b></span><span class="rk-t2">${nm[0]} · ${nm[1]}</span>`;
+          const kind = b.dataset.kind || "task";
+          const nm = rankInfo(+b.dataset.rank, kind).name;
+          const ico = kind === "player" ? txProfileSvg(12) : rankIconSvg(11);
+          tip.innerHTML = `<span class="rk-t1">${ico}<b>${rankFmt(+b.dataset.rank, kind)}</b></span><span class="rk-t2">${kind === "player" ? nm[1] : `${nm[0]} · ${nm[1]}`}</span>`;
           tip.style.left = "0px";
           tip.style.top = "0px";
           const r = b.getBoundingClientRect(),

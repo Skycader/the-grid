@@ -42,14 +42,11 @@
 
       function profileRefresh() {
         const { level, tasks } = profileLevel();
-        const lvl = document.getElementById("pf-lvl");
-        lvl.textContent = (Math.round(level * 10) / 10).toLocaleString("en-US", {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 1,
-        });
+        // "<level> <patch of the rank of the level>" (js/rank-badge.js): the number has the native hint
+        // with the formula, the patch has its own tooltip and opens the RANKS window
+        const hint = `Player level ${fmtCoins(round2(level))} — sum of 10 / (11 − difficulty) over ${tasks} task${tasks === 1 ? "" : "s"} in your database`;
+        document.getElementById("pf-lvl").innerHTML = `<span title="${hint}">${rankFmt(level, "player")}</span>${mkPlayerBadge(level)}`;
         document.getElementById("pf-btn").classList.toggle("has-level", level > 0);
-        document.getElementById("pf-btn").title =
-          `Player level ${fmtCoins(round2(level))} — sum of 10 / (11 − difficulty) over ${tasks} task${tasks === 1 ? "" : "s"} in your database`;
       }
       profileRefresh();
 
@@ -120,24 +117,37 @@
           `Level <b>${fmtCoins(round2(lv.level))}</b> · solved <b>${lv.tasks}</b> / <b>${Object.keys(profileDiffs()).length}</b>`;
       }
 
-      function pfmOpen() {
-        _pfmTab = 0; // REGEX, the first catalog
+      // The URL keeps the profile window: ?profile=<id of the catalog> while it is open (the tab);
+      // a reload opens it again, the browser's back / forward open or close it (js/routing.js).
+      // replaceState: opening a window is not a page, it does not make a history entry.
+      function pfmSyncUrl(open) {
+        const url = new URL(location.href);
+        if (open) url.searchParams.set("profile", MENU[_pfmTab].id);
+        else url.searchParams.delete("profile");
+        history.replaceState({}, "", url.toString());
+      }
+      // tabId: the id of a catalog (the URL) — absent / unknown means the first one
+      function pfmOpen(tabId) {
+        _pfmTab = Math.max(0, MENU.findIndex((t) => t.id === tabId)); // REGEX, the first catalog
         pfmRender();
         pfmModal.classList.remove("hide");
         pfmModal.querySelector(".m-content").scrollTop = 0;
+        pfmSyncUrl(true);
         playClick();
       }
-      function pfmClose() {
+      function pfmClose(silent) {
         pfmModal.classList.add("hide");
-        playClick();
+        pfmSyncUrl(false);
+        if (!silent) playClick();
       }
-      document.getElementById("pf-btn").addEventListener("click", pfmOpen);
+      document.getElementById("pf-btn").addEventListener("click", () => pfmOpen());
       pfmModal.addEventListener("click", (e) => {
         if (e.target === e.currentTarget) return pfmClose();
         const tab = e.target.closest(".pfm-tab");
         if (tab) {
           _pfmTab = +tab.dataset.t;
           playClick();
+          pfmSyncUrl(true);
           return pfmRender();
         }
         const card = e.target.closest(".pfm-card");

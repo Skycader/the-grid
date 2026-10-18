@@ -118,7 +118,8 @@
       //   rich / poor — by the reward one solve would pay right now (walletReward):
       //                 highest / lowest first. Never-solved pay 0 (first solve is free).
       //   ranked / novice — by task rank (walletRank): highest / lowest first.
-      let _taskSortDir = "easy";
+      const DEFAULT_SORT = "easy";
+      let _taskSortDir = DEFAULT_SORT; // the URL keeps it: &sort=… (js/routing.js)
       const SORT_MODES = {
         easy: { icon: "★▼", label: "Easiest first" },
         hard: { icon: "★▲", label: "Hardest first" },
@@ -169,6 +170,7 @@
         _taskSortDir = mode;
         updateSortBtn();
         renderRows();
+        syncSortParam();
       }
       function toggleTaskSort() {
         playClick();
