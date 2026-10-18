@@ -74,9 +74,11 @@
             : `next: ${RANK_NAMES[cur + 1][0]} · ${RANK_NAMES[cur + 1][1]} at ${RANK_START[cur + 1]} days (${RANK_START[cur + 1] - days} to go)`;
         document.getElementById("rkm-now").innerHTML =
           `This task: <b>${days}</b> days → <b>${RANK_NAMES[cur][0]} · ${RANK_NAMES[cur][1]}</b><br><span>${next}</span>`;
+        // the progress inside the current rank: how far from its first day to the first day of the next
+        const pct = cur === RANK_START.length - 1 ? 100 : Math.round(((days - RANK_START[cur]) / (RANK_START[cur + 1] - RANK_START[cur])) * 100);
         document.getElementById("rkm-list").innerHTML = RANK_NAMES.map(
           (nm, k) =>
-            `<div class="rkm-row${k === cur ? " cur" : ""}"><span class="rkm-n">${k + 1}</span><span class="rkm-p">${rankPatchStep(k)}</span><span class="rkm-nm">${nm[0]} <small>· ${nm[1]}</small></span><span class="rkm-ja">${RANK_JA[k]}</span><span class="rkm-d">${rkRange(k)}</span></div>`,
+            `<div class="rkm-row${k === cur ? " cur" : ""}"${k === cur ? ` style="--p:${pct}%" title="${pct}% of the way to the next rank"` : ""}><span class="rkm-n">${k + 1}</span><span class="rkm-p">${rankPatchStep(k)}</span><span class="rkm-nm">${nm[0]} <small>· ${nm[1]}</small></span><span class="rkm-ja">${RANK_JA[k]}</span><span class="rkm-d">${rkRange(k)}</span></div>`,
         ).join("");
         rkModal.classList.remove("hide");
         const row = rkModal.querySelector(".rkm-row.cur");

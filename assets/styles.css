@@ -1936,8 +1936,33 @@
         border-bottom: none;
       }
       .rkm-row.cur {
+        position: relative;
         background: rgba(108, 113, 196, 0.18);
         box-shadow: inset 3px 0 0 #6c71c4;
+      }
+      /* the progress inside the rank: a thin bar under the row, a faint track and the fill (--p) */
+      .rkm-row.cur::before,
+      .rkm-row.cur::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 2px;
+      }
+      .rkm-row.cur::before {
+        width: 100%;
+        background: rgba(108, 113, 196, 0.25);
+      }
+      .rkm-row.cur::after {
+        width: var(--p, 0%);
+        background: #6c71c4;
+        box-shadow: 0 0 6px rgba(108, 113, 196, 0.8);
+        animation: rkfill 0.7s ease-out;
+      }
+      @keyframes rkfill {
+        from {
+          width: 0;
+        }
       }
       .rkm-n {
         width: 18px;
