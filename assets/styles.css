@@ -1924,6 +1924,82 @@
         font-weight: 400;
         color: #6c71c4;
       }
+      /* the level of the player, task by task: an expandable list in the RANKS window */
+      .rkm-calc {
+        margin-bottom: 12px;
+        border: 1px solid rgba(108, 113, 196, 0.35);
+        background: rgba(0, 14, 24, 0.35);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+      }
+      .rkm-calc[hidden] {
+        display: none;
+      }
+      .rkm-calc summary {
+        cursor: pointer;
+        padding: 6px 12px;
+        color: #6c71c4;
+        user-select: none;
+      }
+      .rkm-calc summary:hover {
+        background: rgba(108, 113, 196, 0.12);
+      }
+      .rkc-f {
+        padding: 4px 12px 8px;
+        color: var(--txd);
+        line-height: 1.6;
+      }
+      .rkc-r {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 3px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+        font-variant-numeric: tabular-nums;
+      }
+      .rkc-t {
+        flex: 1;
+        min-width: 0;
+        color: var(--c);
+      }
+      .rkc-d {
+        width: 34px;
+        text-align: right;
+        color: var(--txd);
+      }
+      .rkc-w {
+        width: 64px;
+        text-align: right;
+        color: var(--tx);
+      }
+      .rkc-k {
+        width: 52px;
+        text-align: right;
+        color: #6c71c4;
+      }
+      .rkc-p {
+        width: 62px;
+        text-align: right;
+        color: #ffd84a;
+      }
+      .rkc-h span {
+        color: var(--txd);
+        font-size: 0.62rem;
+        letter-spacing: 0.08em;
+      }
+      .rkc-u span {
+        color: var(--txd);
+      }
+      .rkc-s {
+        background: rgba(108, 113, 196, 0.18);
+        border-top: 1px solid rgba(108, 113, 196, 0.5);
+      }
+      .rkc-s span {
+        color: #6c71c4;
+      }
+      .rkc-s .rkc-p {
+        color: #ffd84a;
+      }
       .rkm-list {
         border-top: 1px solid rgba(181, 137, 0, 0.55);
         border-left: 3px solid rgba(181, 137, 0, 0.55);

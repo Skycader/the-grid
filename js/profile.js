@@ -1,16 +1,18 @@
       // ═══════════ PROFILE: PLAYER LEVEL ═══════════
       // Button next to HARVEST on the home screen: profile icon + the player's level.
       //
-      //   level = Σ over the tasks in the player's database (gr_solved) of 10 / (11 − difficulty)
-      //   difficulty 1 → 10/10 = 1 point, difficulty 5 → 10/6 ≈ 1.67, difficulty 10 → 10/1 = 10 points
+      //   level = Σ over ALL the tasks of the catalog of  rank × weight
+      //   weight = (1 / (11 − difficulty)) / S,   S = Σ over all the tasks of 1 / (11 − difficulty)
       //
-      // Only tasks that exist in the catalog are counted (their difficulty is known).
-      // The first version of the formula: no ranks, no recency, no coins.
-      const PROFILE_POINTS_BASE = 10;
-
-      const profilePoints = (diff) => {
+      // That is the average of the task ranks, weighted by the difficulty: the weights add up to 1, so
+      // the level is 0 … 1000 and 1000 means "every task of the catalog is at the rank 1000" (the scale
+      // of the ranks, docs/ranks.md). The rank of a task is its accumulated days (walletRank, whole
+      // days); a task that was never solved has the rank 0, but its weight is still in S — so a task
+      // that appears in the catalog lowers the level until it is solved. The level grows with every
+      // repeat solve and falls when the solution of a task is viewed (its rank is wiped).
+      const profileWeight = (diff) => {
         const d = Math.min(10, Math.max(1, diff || 1));
-        return PROFILE_POINTS_BASE / (11 - d);
+        return 1 / (11 - d);
       };
 
       // "cat/task" → difficulty for every task of the catalog. Not cached: the task
@@ -27,24 +29,57 @@
         return diffs;
       }
 
-      // { level, tasks } — level is not rounded
+      // { level, tasks (solved), total (in the catalog) } — level is not rounded
       function profileLevel() {
         const diffs = profileDiffs();
-        let level = 0,
+        let S = 0,
+          sum = 0,
           tasks = 0;
+        for (const key in diffs) S += profileWeight(diffs[key]);
         for (const key of Object.keys(_solved)) {
           if (!(key in diffs)) continue;
-          level += profilePoints(diffs[key]);
+          sum += walletRank(key) * profileWeight(diffs[key]);
           tasks++;
         }
-        return { level, tasks };
+        return { level: S ? sum / S : 0, tasks, total: Object.keys(diffs).length };
+      }
+
+      // The same level, task by task (the RANKS window of the player shows it):
+      // { rows: [{ name, diff, weight, rank, points }] of the solved tasks (the biggest points first),
+      //   S, unsolved (a number), unsolvedWeight, level }
+      function profileBreakdown() {
+        const found = [];
+        MENU.forEach((top) => {
+          const res = [];
+          gatherAllTasks(top, res);
+          res.forEach(({ cat, task }) => found.push({ key: `${cat.id}/${task.id}`, task }));
+        });
+        let S = 0;
+        found.forEach(({ task }) => (S += profileWeight(task.diff)));
+        const rows = [];
+        let unsolved = 0,
+          unsolvedWeight = 0,
+          level = 0;
+        found.forEach(({ key, task }) => {
+          const weight = S ? profileWeight(task.diff) / S : 0;
+          if (key in _solved) {
+            const rank = walletRank(key);
+            rows.push({ name: pfmName(task), diff: task.diff || 1, weight, rank, points: rank * weight });
+            level += rank * weight;
+          } else {
+            unsolved++;
+            unsolvedWeight += weight;
+          }
+        });
+        rows.sort((a, b) => b.points - a.points || b.weight - a.weight);
+        return { rows, S, unsolved, unsolvedWeight, level };
       }
 
       function profileRefresh() {
-        const { level, tasks } = profileLevel();
+        const { level, total } = profileLevel();
         // "<level> <patch of the rank of the level>" (js/rank-badge.js): the number has the native hint
         // with the formula, the patch has its own tooltip and opens the RANKS window
-        const hint = `Player level ${fmtCoins(round2(level))} — sum of 10 / (11 − difficulty) over ${tasks} task${tasks === 1 ? "" : "s"} in your database`;
+        const hint = `Player level ${fmtCoins(round2(level))} — the average rank of all ${total} tasks, weighted by 1 / (11 − difficulty); 1000 = every task at the rank 1000`;
         document.getElementById("pf-lvl").innerHTML = `<span title="${hint}">${rankFmt(level, "player")}</span>${mkPlayerBadge(level)}`;
         document.getElementById("pf-btn").classList.toggle("has-level", level > 0);
       }

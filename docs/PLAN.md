@@ -82,29 +82,29 @@ The rank of a task gets a name and a badge; the number stays next to it. The lad
 The names are the clan's (影身, Tokyo); the badges are the patches of the clan: white → yellow → red →
 black → blue (a `/` is a new row of the patch).
 
-| # | RU | EN | 漢字 · Rōmaji | Badge |
+| # | EN | RU | 漢字 · Rōmaji | Badge |
 |---|---|---|---|---|
-| 1 | Рекрут | Recruit | 新兵 Shinpei | ◽ |
-| 2 | Слуга | Servant | 従者 Jūsha | ⬜⬜ |
-| 3 | Ученик | Apprentice | 見習い Minarai | ⬜⬜⬜ |
-| 4 | Вестник | Herald | 伝令 Denrei | 🟨 |
-| 5 | Посвящённый | Initiate | 入門者 Nyūmonsha | 🟨🟨 |
-| 6 | Охотник | Hunter | 狩人 Kariudo | 🟨🟨🟨 |
-| 7 | Воин | Warrior | 戦士 Senshi | 🟨🟨 / 🟨🟨 |
-| 8 | Ветеран | Veteran | 古参兵 Kosanhei | 🟨🟨 / 🟨🟨 / 🟨🟨 |
-| 9 | Мастер | Master | 達人 Tatsujin | 🟨🟨 / 🟨🟨 / 🟥🟥 |
-| 10 | Ассасин | Assassin | 暗殺者 Ansatsusha | 🟨🟨 / 🟥🟥 / 🟥🟥 |
-| 11 | Призрак | Phantom | 幽鬼 Yūki | 🟥🟥 / 🟥🟥 / 🟥🟥 |
-| 12 | Следопыт | Tracker | 追跡者 Tsuisekisha | ⬛ |
-| 13 | Тень | Shadow | 影 Kage | ⬛⬛ |
-| 14 | Последняя Тень | The Last Shadow | 最後の影 Saigo no Kage | ⬛⬛⬛ |
-| 15 | Страж | Sentinel | 哨兵 Shōhei | ⬛⬛ / ⬛⬛ |
-| 16 | Верховный Страж | Supreme Sentinel | 大哨兵 Daishōhei | ⬛⬛ / ⬛⬛ / ⬛⬛ |
-| 17 | Наставник | Instructor | 師範 Shihan | ⬛⬛⬛ / ⬛⬛⬛ |
-| 18 | Старейшина | Elder | 長老 Chōrō | ⬛⬛⬛ / ⬛⬛⬛ / ⬛⬛⬛ |
-| 19 | Верховный Старейшина | High Elder | 大長老 Daichōrō | ⬛⬛⬛ / ⬛⬛⬛ / 🟦🟦🟦 |
-| 20 | Властитель | Overlord | 覇王 Haō | ⬛⬛⬛ / 🟦🟦🟦 / 🟦🟦🟦 |
-| 21 | Верховный Властитель | Supreme Overlord | 覇帝 Hatei | 🟦🟦🟦 / 🟦🟦🟦 / 🟦🟦🟦 |
+| 1 | Recruit | Рекрут | 新兵 Shinpei | ◽ |
+| 2 | Servant | Слуга | 従者 Jūsha | ⬜⬜ |
+| 3 | Apprentice | Ученик | 見習い Minarai | ⬜⬜⬜ |
+| 4 | Herald | Вестник | 伝令 Denrei | 🟨 |
+| 5 | Initiate | Посвящённый | 入門者 Nyūmonsha | 🟨🟨 |
+| 6 | Hunter | Охотник | 狩人 Kariudo | 🟨🟨🟨 |
+| 7 | Warrior | Воин | 戦士 Senshi | 🟨🟨 / 🟨🟨 |
+| 8 | Veteran | Ветеран | 古参兵 Kosanhei | 🟨🟨 / 🟨🟨 / 🟨🟨 |
+| 9 | Master | Мастер | 達人 Tatsujin | 🟨🟨 / 🟨🟨 / 🟥🟥 |
+| 10 | Assassin | Ассасин | 暗殺者 Ansatsusha | 🟨🟨 / 🟥🟥 / 🟥🟥 |
+| 11 | Ghost | Призрак | 幽鬼 Yūki | 🟥🟥 / 🟥🟥 / 🟥🟥 |
+| 12 | Tracker | Следопыт | 追跡者 Tsuisekisha | ⬛ |
+| 13 | Shadow | Тень | 影 Kage | ⬛⬛ |
+| 14 | The Last Shadow | Последняя Тень | 最後の影 Saigo no Kage | ⬛⬛⬛ |
+| 15 | Sentinel | Страж | 哨兵 Shōhei | ⬛⬛ / ⬛⬛ |
+| 16 | Supreme Sentinel | Верховный Страж | 大哨兵 Daishōhei | ⬛⬛ / ⬛⬛ / ⬛⬛ |
+| 17 | Instructor | Наставник | 師範 Shihan | ⬛⬛⬛ / ⬛⬛⬛ |
+| 18 | Elder | Старейшина | 長老 Chōrō | ⬛⬛⬛ / ⬛⬛⬛ / ⬛⬛⬛ |
+| 19 | High Elder | Верховный Старейшина | 大長老 Daichōrō | ⬛⬛⬛ / ⬛⬛⬛ / 🟦🟦🟦 |
+| 20 | Overlord | Властитель | 覇王 Haō | ⬛⬛⬛ / 🟦🟦🟦 / 🟦🟦🟦 |
+| 21 | Supreme Overlord | Верховный Властитель | 覇帝 Hatei | 🟦🟦🟦 / 🟦🟦🟦 / 🟦🟦🟦 |
 
 Open:
 - The thresholds: how many days of rank a step needs. Non-linear (fast in the beginning, a year at the
@@ -112,7 +112,7 @@ Open:
 - Where the name is shown: the task list and the search rows (next to the signal bars?), the editor
   task bar, the rank-update bar (item 1), the PROFILE cards. The badge could replace the signal bars.
 - The language of the name in the UI: RU, EN or kanji (a setting, or EN with the kanji in the tooltip).
-- The EN names of 11, 12 and 17 are mine (Phantom, Tracker, Instructor) — to be checked.
+- The EN names of 11, 12 and 17 are mine (Ghost, Tracker, Instructor) — to be checked.
 
 ---
 

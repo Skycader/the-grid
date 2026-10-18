@@ -3,21 +3,21 @@
       //   task   — the rank of a task is a number of days (walletRank);
       //   player — the level of the player (profileLevel), the PROFILE button.
       // The badge shows the PATCH of the rank — small squares — and a pointer over it shows a tooltip:
-      // an icon with the number (days / level) and the name of the rank (RU · EN). A click opens the
+      // an icon with the number (days / level) and the name of the rank (EN · RU). A click opens the
       // RANKS window with all the ranks.
       //
       //   task:   a rank k (1-based) starts at round(1000 * ((k - 1) / 20) ^ 1.2) days;
       //           the 21st rank starts at 1000 days.
-      //   player: a rank k starts at round(100 * ((k - 1) / 20) ^ 1.2, 1 decimal) level;
-      //           the 21st rank starts at level 100 (all of today's 37 tasks give about 67).
+      //   player: the same ranges, as a level (the level is the average rank of all the tasks, weighted
+      //           by 1 / (11 − difficulty), js/profile.js): the 21st rank starts at level 1000.
       const RANK_NAMES = [
-        ["Рекрут", "Recruit"], ["Слуга", "Servant"], ["Ученик", "Apprentice"], ["Вестник", "Herald"],
-        ["Посвящённый", "Initiate"], ["Охотник", "Hunter"], ["Воин", "Warrior"], ["Ветеран", "Veteran"],
-        ["Мастер", "Master"], ["Ассасин", "Assassin"], ["Призрак", "Phantom"], ["Следопыт", "Tracker"],
-        ["Тень", "Shadow"], ["Последняя Тень", "The Last Shadow"], ["Страж", "Sentinel"],
-        ["Верховный Страж", "Supreme Sentinel"], ["Наставник", "Instructor"], ["Старейшина", "Elder"],
-        ["Верховный Старейшина", "High Elder"], ["Властитель", "Overlord"],
-        ["Верховный Властитель", "Supreme Overlord"],
+        ["Recruit", "Рекрут"], ["Servant", "Слуга"], ["Apprentice", "Ученик"], ["Herald", "Вестник"],
+        ["Initiate", "Посвящённый"], ["Hunter", "Охотник"], ["Warrior", "Воин"], ["Veteran", "Ветеран"],
+        ["Master", "Мастер"], ["Assassin", "Ассасин"], ["Ghost", "Призрак"], ["Tracker", "Следопыт"],
+        ["Shadow", "Тень"], ["The Last Shadow", "Последняя Тень"], ["Sentinel", "Страж"],
+        ["Supreme Sentinel", "Верховный Страж"], ["Instructor", "Наставник"], ["Elder", "Старейшина"],
+        ["High Elder", "Верховный Старейшина"], ["Overlord", "Властитель"],
+        ["Supreme Overlord", "Верховный Властитель"],
       ];
       // the same names in Japanese (the clan is in Tokyo): kanji and romaji
       const RANK_JA = [
@@ -33,7 +33,7 @@
           decimals: 0,
         },
         player: {
-          start: Array.from({ length: 21 }, (_, n) => Math.round(100 * Math.pow(n / 20, 1.2) * 10) / 10),
+          start: Array.from({ length: 21 }, (_, n) => Math.round(1000 * Math.pow(n / 20, 1.2))),
           decimals: 1,
         },
       };
@@ -105,7 +105,7 @@
           cur === start.length - 1
             ? "the highest rank"
             : `next: ${RANK_NAMES[cur + 1][0]} · ${RANK_NAMES[cur + 1][1]} at ${rankFmt(start[cur + 1], kind)} ${unit} (${rankFmt(start[cur + 1] - value, kind)} to go)`;
-        const formula = player ? "<br><span>the level is the sum of 10 / (11 − difficulty) over the tasks in your database</span>" : "";
+        const formula = player ? "<br><span>the level is the average rank of all the tasks, weighted by 1 / (11 − difficulty); 1000 = every task at the rank 1000</span>" : "";
         document.getElementById("rkm-now").innerHTML =
           `${player ? "Your level" : "This task"}: <b>${rankFmt(value, kind)}</b> ${player ? "" : "days "}→ <b>${RANK_NAMES[cur][0]} · ${RANK_NAMES[cur][1]}</b><br><span>${next}</span>${formula}`;
         // the progress inside the current rank: how far from its first value to the first value of the next
@@ -114,11 +114,34 @@
           (nm, k) =>
             `<div class="rkm-row${k === cur ? " cur" : ""}"${k === cur ? ` style="--p:${pct}%" title="${pct}% of the way to the next rank"` : ""}><span class="rkm-n">${k + 1}</span><span class="rkm-p">${rankPatchStep(k)}</span><span class="rkm-nm">${nm[0]} <small>· ${nm[1]}</small></span><span class="rkm-ja">${RANK_JA[k]}</span><span class="rkm-d">${rkRange(k, kind)}</span></div>`,
         ).join("");
+        rkRenderCalc(player);
         rkModal.classList.remove("hide");
         const row = rkModal.querySelector(".rkm-row.cur");
         if (row) row.scrollIntoView({ block: "center" });
         playClick();
       }
+      // The level of the player, task by task (an expandable list): rank × weight of every solved task
+      // and the sum. Hidden in the window of a task.
+      function rkRenderCalc(player) {
+        const el = document.getElementById("rkm-calc");
+        el.hidden = !player;
+        el.open = false;
+        if (!player) return;
+        const b = profileBreakdown();
+        const f2 = (v) => v.toFixed(3); // 3 decimals: the rows add up to the level without a visible gap
+        const pct = (v) => (v * 100).toFixed(2) + "%";
+        const rows = b.rows
+          .map((r) => `<div class="rkc-r"><span class="rkc-t">${r.name}</span><span class="rkc-d">${r.diff}</span><span class="rkc-w">${pct(r.weight)}</span><span class="rkc-k">${r.rank}</span><span class="rkc-p">${f2(r.points)}</span></div>`)
+          .join("");
+        el.innerHTML =
+          `<summary>How the level is counted: ${rankFmt(b.level, "player")}</summary>` +
+          `<div class="rkc-f">level = Σ rank × weight &nbsp;·&nbsp; weight = (1 / (11 − difficulty)) / S &nbsp;·&nbsp; S = ${b.S.toFixed(3)} (the sum over all ${b.rows.length + b.unsolved} tasks)</div>` +
+          `<div class="rkc-r rkc-h"><span class="rkc-t">Task</span><span class="rkc-d">Diff</span><span class="rkc-w">Weight</span><span class="rkc-k">Rank</span><span class="rkc-p">Points</span></div>` +
+          rows +
+          `<div class="rkc-r rkc-u"><span class="rkc-t">${b.unsolved} unsolved tasks</span><span class="rkc-d"></span><span class="rkc-w">${pct(b.unsolvedWeight)}</span><span class="rkc-k">0</span><span class="rkc-p">0.000</span></div>` +
+          `<div class="rkc-r rkc-s"><span class="rkc-t">Level</span><span class="rkc-d"></span><span class="rkc-w">100%</span><span class="rkc-k"></span><span class="rkc-p">${f2(b.level)}</span></div>`;
+      }
+
       function rkClose() {
         rkModal.classList.add("hide");
         playClick();
@@ -153,7 +176,7 @@
           const kind = b.dataset.kind || "task";
           const nm = rankInfo(+b.dataset.rank, kind).name;
           const ico = kind === "player" ? txProfileSvg(12) : rankIconSvg(11);
-          tip.innerHTML = `<span class="rk-t1">${ico}<b>${rankFmt(+b.dataset.rank, kind)}</b></span><span class="rk-t2">${kind === "player" ? nm[1] : `${nm[0]} · ${nm[1]}`}</span>`;
+          tip.innerHTML = `<span class="rk-t1">${ico}<b>${rankFmt(+b.dataset.rank, kind)}</b></span><span class="rk-t2">${kind === "player" ? nm[0] : `${nm[0]} · ${nm[1]}`}</span>`;
           tip.style.left = "0px";
           tip.style.top = "0px";
           const r = b.getBoundingClientRect(),
