@@ -359,7 +359,8 @@
       }
       function mkRankBadge(key) {
         const r = walletRank(key);
-        return `<span class="rank-badge${r ? "" : " zero"}" title="Rank ${r}: days accumulated between repeat solves">${rankIconSvg(11)}<b>${r}</b></span>`;
+        // the patch of the rank; the number of days is in the tooltip (js/rank-badge.js)
+        return `<span class="rank-badge${r ? "" : " zero"}" data-rank="${r}" aria-label="Rank ${r}: days accumulated between repeat solves">${rankPatchHtml(r)}</span>`;
       }
 
       // Ручная правка lastSolved (CLI). ts = ms | null (= "ни разу не решена")

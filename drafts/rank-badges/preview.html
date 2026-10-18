@@ -1,0 +1,126 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>RANK badge - patches instead of the bars</title>
+<style>
+  :root { --c:#00ffff; --cd:#00aaaa; --cm:#004455; --txd:#405c64; --tx:#839496; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background:#001a22; color:var(--tx); font:13px/1.5 "JetBrains Mono",monospace; margin:24px; }
+  h1 { font-size:14px; color:var(--c); font-weight:400; letter-spacing:.1em; margin-bottom:4px; }
+  h2 { font-size:12px; color:var(--cd); font-weight:400; letter-spacing:.1em; margin:30px 0 10px; }
+  p.note { color:var(--txd); margin-bottom:10px; }
+
+  /* ── the patch: rows of small squares; hover = a tooltip with the old bars icon and the number ── */
+  .rk { position:relative; display:inline-flex; flex-direction:column; justify-content:center; gap:1px; vertical-align:middle; cursor:default; }
+  .rk .r { display:flex; gap:1px; }
+  .rk i { display:block; width:5px; height:5px; }
+  .rk i.one { width:8px; height:8px; }
+  .rk i.w { background:#e6eef0; }
+  .rk i.y { background:#ffd84a; }
+  .rk i.r { background:#e0443f; }
+  .rk i.k { background:#02080c; box-shadow:inset 0 0 0 1px #6f8d95; }
+  .rk i.b { background:#3b9cf0; }
+  .rk.zero { opacity:.35; }
+  .rk .tip {
+    position:absolute; left:50%; bottom:calc(100% + 7px); transform:translate(-50%,3px);
+    display:flex; align-items:center; gap:5px; white-space:nowrap;
+    padding:3px 8px; background:rgba(0,20,35,.97); border:1px solid #6c71c4; color:#6c71c4;
+    font-size:.68rem; opacity:0; pointer-events:none; transition:opacity .12s, transform .12s; z-index:10;
+  }
+  .rk .tip svg { display:block; }
+  .rk .tip b { font-weight:400; }
+  .rk:hover .tip { opacity:1; transform:translate(-50%,0); }
+  .rk.big { transform:scale(2); transform-origin:left center; margin-right:30px; }
+  .rk.big .tip { transform:translate(-50%,3px) scale(.5); }
+  .rk.big:hover .tip { transform:translate(-50%,0) scale(.5); }
+
+  /* the ladder */
+  .lad { display:grid; grid-template-columns:repeat(auto-fill,minmax(390px,1fr)); gap:6px 24px; }
+  .lad div { display:flex; align-items:center; gap:12px; padding:6px 10px; border:1px solid rgba(0,255,255,.12); background:rgba(0,20,35,.6); }
+  .lad .n { width:22px; color:var(--txd); }
+  .lad .p { width:30px; display:flex; justify-content:center; }
+  .lad .d { margin-left:auto; color:var(--txd); }
+  .lad .nm { color:var(--c); }
+  .lad .nm small { color:var(--tx); }
+
+  /* mock rows, like the task list / the search rows of the app */
+  .rows { max-width:700px; }
+  .row { display:flex; align-items:center; gap:10px; padding:7px 12px; margin-bottom:4px; border:1px solid rgba(0,255,255,.18); background:rgba(0,24,35,.9); }
+  .row .id { color:var(--c); width:90px; }
+  .row .ds { flex:1; color:var(--txd); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .coin { color:#ffd84a; display:inline-flex; align-items:center; gap:4px; font-size:.68rem; min-width:56px; }
+  .row .st { color:#859900; letter-spacing:1px; font-size:.65rem; width:56px; text-align:right; }
+  .row .rkw { width:34px; display:flex; justify-content:center; }
+  .row .rkn { font-size:.68rem; color:#6c71c4; width:34px; }
+
+  /* the slider */
+  .try { display:flex; align-items:center; gap:18px; padding:14px 16px; border:1px solid rgba(0,255,255,.18); background:rgba(0,24,35,.9); max-width:700px; }
+  .try input { flex:1; accent-color:#00aaaa; }
+  .try .out { min-width:210px; }
+  .try .nm { color:var(--c); }
+</style>
+
+<h1>RANK BADGE - PATCHES INSTEAD OF THE BARS</h1>
+<p class="note">Hover a patch: a tooltip with the bars icon and the number of days. 21 ranks, the ranges are from docs/ranks.md.</p>
+
+<h2>THE LADDER (1x, hover) AND TWO RANKS AT 2x</h2>
+<div class="lad" id="lad"></div>
+
+<h2>IN THE ROWS OF THE LIST (the ranks 0, 12, 63, 120, 223, 480, 1000 days)</h2>
+<div class="rows" id="rows"></div>
+
+<h2>TRY A NUMBER OF DAYS</h2>
+<div class="try">
+  <input id="sl" type="range" min="0" max="1100" value="223">
+  <span id="slp"></span>
+  <span class="out"><span class="nm" id="slnm"></span><br><span id="sld"></span></span>
+</div>
+
+<script>
+// the 21 ranks of docs/ranks.md: a rank k starts at round(1000 * ((k - 1) / 20) ^ 1.2) days
+const NAMES = [
+  ["Рекрут","Recruit"],["Слуга","Servant"],["Ученик","Apprentice"],["Вестник","Herald"],["Посвящённый","Initiate"],
+  ["Охотник","Hunter"],["Воин","Warrior"],["Ветеран","Veteran"],["Мастер","Master"],["Ассасин","Assassin"],
+  ["Призрак","Phantom"],["Следопыт","Tracker"],["Тень","Shadow"],["Последняя Тень","The Last Shadow"],["Страж","Sentinel"],
+  ["Верховный Страж","Supreme Sentinel"],["Наставник","Instructor"],["Старейшина","Elder"],["Верховный Старейшина","High Elder"],
+  ["Властитель","Overlord"],["Верховный Властитель","Supreme Overlord"],
+];
+const START = Array.from({length:21}, (_, n) => Math.round(1000 * Math.pow(n / 20, 1.2)));
+// the patches (w white, y yellow, r red, k black, b blue); a row is a string
+const P = [
+  ["w"],["ww"],["www"],["y"],["yy"],["yyy"],["yy","yy"],["yy","yy","yy"],["yy","yy","rr"],["yy","rr","rr"],["rr","rr","rr"],
+  ["k"],["kk"],["kkk"],["kk","kk"],["kk","kk","kk"],["kkk","kkk"],["kkk","kkk","kkk"],["kkk","kkk","bbb"],["kkk","bbb","bbb"],["bbb","bbb","bbb"],
+];
+const BARS = '<svg width="11" height="11" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="11" width="2.6" height="4" rx=".6" fill="currentColor"/><rect x="5" y="8" width="2.6" height="7" rx=".6" fill="currentColor"/><rect x="9" y="5" width="2.6" height="10" rx=".6" fill="currentColor"/><rect x="13" y="1.5" width="2.6" height="13.5" rx=".6" fill="currentColor"/></svg>';
+
+const step = (days) => { let k = 0; for (let i = 0; i < 21; i++) if (days >= START[i]) k = i; return k; };
+const range = (k) => (k === 20 ? START[20] + "+" : START[k] + " - " + (START[k + 1] - 1));
+
+function patch(days, big) {
+  const k = step(days), rows = P[k];
+  const single = rows.length === 1 && rows[0].length === 1;
+  const html = rows.map((r) => '<span class="r">' + [...r].map((c) => '<i class="' + c + (single ? " one" : "") + '"></i>').join("") + "</span>").join("");
+  return '<span class="rk' + (days ? "" : " zero") + (big ? " big" : "") + '">' + html +
+    '<span class="tip">' + BARS + "<b>" + days + "</b></span></span>";
+}
+
+// the ladder: one example number per rank (its first day), the first two ranks with 2x too
+document.getElementById("lad").innerHTML = NAMES.map((nm, k) =>
+  '<div><span class="n">' + (k + 1) + '</span><span class="p">' + patch(START[k]) + '</span>' +
+  '<span class="nm">' + nm[0] + ' <small>· ' + nm[1] + '</small></span><span class="d">' + range(k) + "</span></div>").join("");
+
+const demo = [[ "REGEX_1","Remove all words cat",0 ],[ "REGEX_2","Remove Mr. and Mrs.",12 ],[ "REGEX_10","Find numbers in a text",63 ],
+  [ "REGEX_21","Words with the same first and last letter",120 ],[ "REGEX_29","Find the best password in the text",223 ],
+  [ "REGEX_25","Lookahead / lookbehind",480 ],[ "REGEX_27","Digit count logic",1000 ]];
+document.getElementById("rows").innerHTML = demo.map(([id, ds, d]) =>
+  '<div class="row"><span class="id">' + id + '</span><span class="ds">' + ds + '</span>' +
+  '<span class="coin">0.49</span><span class="rkw">' + patch(d) + '</span><span class="st">★★★★</span></div>').join("");
+
+const sl = document.getElementById("sl");
+const draw = () => {
+  const d = +sl.value, k = step(d);
+  document.getElementById("slp").innerHTML = patch(d, true);
+  document.getElementById("slnm").textContent = (k + 1) + " · " + NAMES[k][0] + " · " + NAMES[k][1];
+  document.getElementById("sld").textContent = d + " days (" + range(k) + ")";
+};
+sl.addEventListener("input", draw); draw();
+</script>

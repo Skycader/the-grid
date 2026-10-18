@@ -839,6 +839,25 @@
       </div>
     </div>
 
+    <!-- RANKS MODAL: opened by a click on the patch of a rank (js/rank-badge.js) -->
+    <div class="modal-bg hide" id="rk-modal">
+      <div class="modal tx-modal rk-modal">
+        <div class="m-head has-ico">
+          <span class="m-head-ico rk-head-ico" id="rk-head-ico"></span>
+          <div class="m-title">RANKS</div>
+          <button class="m-x" type="button" aria-label="Close" onclick="rkClose()">
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+              <path d="M2 2L12 12M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="m-content">
+          <div class="rkm-now" id="rkm-now"></div>
+          <div class="rkm-list" id="rkm-list"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- TRANSACTIONS MODAL: opened by the history button -->
     <div class="modal-bg hide" id="tx-modal">
       <div class="modal tx-modal">
@@ -1291,6 +1310,7 @@
     <script src="js/config.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/wallet.js"></script>
+    <script src="js/rank-badge.js"></script>
     <script src="js/hovermenu.js"></script>
     <script src="js/db.js"></script>
     <script src="js/transactions.js"></script>

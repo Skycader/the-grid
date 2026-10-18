@@ -206,18 +206,21 @@
       /* release notes modal: changelog/<version>.md rendered */
       /* the whole modal scrolls (the header stays on top), the document itself is as tall as the text */
       .modal.cl-modal,
-      .modal.pfm-modal {
+      .modal.pfm-modal,
+      .modal.rk-modal {
         display: flex;
         flex-direction: column;
         max-height: 90vh;
         overflow: hidden;
       }
       .cl-modal .m-head,
-      .pfm-modal .m-head {
+      .pfm-modal .m-head,
+      .rk-modal .m-head {
         flex: 0 0 auto;
       }
       .cl-modal .m-content,
-      .pfm-modal .m-content {
+      .pfm-modal .m-content,
+      .rk-modal .m-content {
         flex: 1 1 auto;
         min-height: 0;
         overflow-y: auto;
@@ -1847,30 +1850,162 @@
       .breadc-reward.off {
         opacity: 0.45;
       }
-      /* task rank: signal-bars icon + number (accumulated repeat-solve days) */
+      /* task rank: the patch of the rank (small squares, js/rank-badge.js); a pointer over it shows
+         the signal-bars icon and the number of days */
       .rank-badge,
       .breadc-rank .rank-badge {
         display: inline-flex;
         align-items: center;
-        justify-content: flex-start;
-        gap: 3px;
-        min-width: 30px;
-        font-size: 0.68rem;
-        color: #6c71c4;
-        white-space: nowrap;
-      }
-      .rank-badge b {
-        font-weight: 400;
+        justify-content: center;
+        width: 24px;
+        cursor: pointer;
       }
       .rank-badge.zero {
         opacity: 0.35;
       }
+      .rk {
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1px;
+      }
+      .rk-r {
+        display: flex;
+        gap: 1px;
+      }
+      .rk i {
+        display: block;
+        width: 5px;
+        height: 5px;
+      }
+      .rk i.one {
+        width: 8px;
+        height: 8px;
+      }
+      .rk i.w {
+        background: #e6eef0;
+      }
+      .rk i.y {
+        background: #ffd84a;
+      }
+      .rk i.r {
+        background: #e0443f;
+      }
+      .rk i.k {
+        background: #02080c;
+        box-shadow: inset 0 0 0 1px #6f8d95;
+      }
+      .rk i.b {
+        background: #3b9cf0;
+      }
+      /* the modal with all the ranks */
+      .modal.rk-modal {
+        max-width: 620px;
+      }
+      .rk-head-ico {
+        color: #6c71c4;
+        filter: drop-shadow(0 0 5px rgba(108, 113, 196, 0.5));
+      }
+      .rkm-now {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        color: var(--txd);
+        text-align: center;
+        line-height: 1.7;
+        margin-bottom: 12px;
+      }
+      .rkm-now b {
+        font-weight: 400;
+        color: #6c71c4;
+      }
+      .rkm-list {
+        border-top: 1px solid rgba(181, 137, 0, 0.55);
+        border-left: 3px solid rgba(181, 137, 0, 0.55);
+        background: rgba(0, 14, 24, 0.35);
+      }
+      .rkm-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+      }
+      .rkm-row:last-child {
+        border-bottom: none;
+      }
+      .rkm-row.cur {
+        background: rgba(108, 113, 196, 0.18);
+        box-shadow: inset 3px 0 0 #6c71c4;
+      }
+      .rkm-n {
+        width: 18px;
+        color: var(--txd);
+        text-align: right;
+      }
+      .rkm-p {
+        width: 28px;
+        display: flex;
+        justify-content: center;
+      }
+      .rkm-nm {
+        color: var(--c);
+        flex: 1;
+        min-width: 0;
+      }
+      .rkm-nm small {
+        color: var(--tx);
+        font-size: 0.65rem;
+      }
+      .rkm-ja {
+        color: var(--txd);
+        font-size: 0.65rem;
+      }
+      .rkm-d {
+        width: 84px;
+        text-align: right;
+        color: var(--tx);
+      }
+      #rk-tip {
+        position: fixed;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        padding: 3px 8px;
+        background: rgba(0, 20, 35, 0.97);
+        border: 1px solid #6c71c4;
+        color: #6c71c4;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+      }
+      #rk-tip.show {
+        opacity: 1;
+      }
+      #rk-tip .rk-t1 {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      #rk-tip .rk-t2 {
+        font-size: 0.62rem;
+        color: var(--tx);
+      }
+      #rk-tip svg {
+        display: block;
+      }
+      #rk-tip b {
+        font-weight: 400;
+      }
       .breadc-rank {
         margin-left: 10px;
         vertical-align: middle;
-      }
-      .breadc-rank .rank-badge {
-        min-width: 0;
       }
       .breadc-stars {
         font-size: 0.65rem;
