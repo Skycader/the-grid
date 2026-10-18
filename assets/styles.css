@@ -2074,6 +2074,76 @@
         text-align: right;
         color: var(--tx);
       }
+      /* the test animation of a rank-up (js/rank-anim.js): a plate under the rank of the task */
+      #rk-plate {
+        position: fixed;
+        z-index: 1500;
+        width: 320px;
+        padding: 8px 12px 10px;
+        background: rgba(0, 20, 35, 0.97);
+        border: 1px solid #6c71c4;
+        box-shadow: 0 0 14px rgba(108, 113, 196, 0.35);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--tx);
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        transition:
+          opacity 0.25s,
+          transform 0.25s;
+      }
+      #rk-plate.show {
+        opacity: 1;
+        transform: none;
+      }
+      #rk-plate.up {
+        box-shadow: 0 0 26px rgba(255, 216, 74, 0.8);
+        border-color: #ffd84a;
+      }
+      .rkp-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 7px;
+      }
+      .rkp-add {
+        font-weight: 400;
+        color: #859900;
+      }
+      .rkp-val {
+        color: #6c71c4;
+      }
+      .rkp-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .rkp-side {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+        color: var(--c);
+        white-space: nowrap;
+      }
+      .rkp-side .rk {
+        flex: 0 0 auto;
+      }
+      .rkp-bar {
+        position: relative;
+        flex: 1;
+        height: 6px;
+        background: rgba(108, 113, 196, 0.25);
+      }
+      .rkp-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        background: #6c71c4;
+        box-shadow: 0 0 8px rgba(108, 113, 196, 0.9);
+      }
       #rk-tip {
         position: fixed;
         z-index: 2000;

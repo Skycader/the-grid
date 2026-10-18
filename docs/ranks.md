@@ -22,7 +22,7 @@ grow smoothly from 27 days (the first one, as in the player's sketch) to 60 days
 | 9  | 333 - 383    | Master · Мастер · 達人 Tatsujin          | 🟨🟨<br>🟨🟨<br>🟥🟥 |
 | 10 | 384 - 434    | Assassin · Ассасин · 暗殺者 Ansatsusha    | 🟨🟨<br>🟥🟥<br>🟥🟥 |
 | 11 | 435 - 487    | Ghost · Призрак · 幽鬼 Yūki            | 🟥🟥<br>🟥🟥<br>🟥🟥 |
-| 12 | 488 - 541    | Tracker · Следопыт · 追跡者 Tsuisekisha   | ⬛ |
+| 12 | 488 - 541    | Stalker · Следопыт · 追跡者 Tsuisekisha   | ⬛ |
 | 13 | 542 - 595    | Shadow · Тень · 影 Kage                  | ⬛⬛ |
 | 14 | 596 - 651    | The Last Shadow · Последняя Тень · 最後の影 Saigo no Kage | ⬛⬛⬛ |
 | 15 | 652 - 707    | Sentinel · Страж · 哨兵 Shōhei           | ⬛⬛<br>⬛⬛ |
@@ -36,7 +36,7 @@ grow smoothly from 27 days (the first one, as in the player's sketch) to 60 days
 Rank 0 is the rank of a task that has just been solved for the first time (the first solve is free
 and only starts the timer), so every solved task begins as a Recruit.
 
-The EN names of 11, 12 and 17 (Ghost, Tracker, Instructor) are to be checked; the names are
+The EN names of 11, 12 and 17 (Ghost, Stalker, Instructor) are to be checked; the names are
 collected in `PLAN.md`, section 4.
 
 ## The rank of the player

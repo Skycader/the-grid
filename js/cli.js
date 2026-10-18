@@ -78,6 +78,9 @@
             'edit("regex_15 lastSolved none")',
           ],
         );
+        L("run(\"<command>\")", "run a test command (the quotes / backticks are needed as for edit)", [
+          'run("animation level-up +23 days")   // a plate under the rank of the open task: the bar goes from the rank to the next one (the data is not changed)',
+        ]);
         console.log(
           "%cКавычки/бэктики нужны: консоль не парсит голое `edit regex_15 ...` как JS. Голое `help` работает.",
           CLI_STYLE.dim,
@@ -127,6 +130,14 @@
         handler(hits[0].task, hits[0].cat, value);
       }
 
+      // run("animation level-up +23 days") — test commands (the same ways to call as edit)
+      function cliRun(line) {
+        const s = line.trim();
+        const m = s.match(/^animation\s+level-up\s+\+?(\d+(?:\.\d+)?)\s*days?$/i);
+        if (m) return rankAnimLevelUp(+m[1]);
+        cliErr('unknown command "' + s + '". Available: animation level-up +<N> days (see help)');
+      }
+
       Object.defineProperty(window, "help", {
         configurable: true,
         get() {
@@ -139,6 +150,14 @@
             ? String.raw({ raw: first }, ...rest)
             : [first, ...rest].join(" ");
         cliEdit(line);
+      };
+
+      window.run = function (first, ...rest) {
+        const line =
+          Array.isArray(first) && first.raw
+            ? String.raw({ raw: first }, ...rest)
+            : [first, ...rest].join(" ");
+        cliRun(line);
       };
 
       console.log("%cGRID::RUNNER CLI — введи help", CLI_STYLE.h);

@@ -13,7 +13,7 @@
       const RANK_NAMES = [
         ["Recruit", "Рекрут"], ["Servant", "Слуга"], ["Apprentice", "Ученик"], ["Herald", "Вестник"],
         ["Initiate", "Посвящённый"], ["Hunter", "Охотник"], ["Warrior", "Воин"], ["Veteran", "Ветеран"],
-        ["Master", "Мастер"], ["Assassin", "Ассасин"], ["Ghost", "Призрак"], ["Tracker", "Следопыт"],
+        ["Master", "Мастер"], ["Assassin", "Ассасин"], ["Ghost", "Призрак"], ["Stalker", "Следопыт"],
         ["Shadow", "Тень"], ["The Last Shadow", "Последняя Тень"], ["Sentinel", "Страж"],
         ["Supreme Sentinel", "Верховный Страж"], ["Instructor", "Наставник"], ["Elder", "Старейшина"],
         ["High Elder", "Верховный Старейшина"], ["Overlord", "Властитель"],

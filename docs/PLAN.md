@@ -95,7 +95,7 @@ black → blue (a `/` is a new row of the patch).
 | 9 | Master | Мастер | 達人 Tatsujin | 🟨🟨 / 🟨🟨 / 🟥🟥 |
 | 10 | Assassin | Ассасин | 暗殺者 Ansatsusha | 🟨🟨 / 🟥🟥 / 🟥🟥 |
 | 11 | Ghost | Призрак | 幽鬼 Yūki | 🟥🟥 / 🟥🟥 / 🟥🟥 |
-| 12 | Tracker | Следопыт | 追跡者 Tsuisekisha | ⬛ |
+| 12 | Stalker | Следопыт | 追跡者 Tsuisekisha | ⬛ |
 | 13 | Shadow | Тень | 影 Kage | ⬛⬛ |
 | 14 | The Last Shadow | Последняя Тень | 最後の影 Saigo no Kage | ⬛⬛⬛ |
 | 15 | Sentinel | Страж | 哨兵 Shōhei | ⬛⬛ / ⬛⬛ |
@@ -112,7 +112,7 @@ Open:
 - Where the name is shown: the task list and the search rows (next to the signal bars?), the editor
   task bar, the rank-update bar (item 1), the PROFILE cards. The badge could replace the signal bars.
 - The language of the name in the UI: RU, EN or kanji (a setting, or EN with the kanji in the tooltip).
-- The EN names of 11, 12 and 17 are mine (Ghost, Tracker, Instructor) — to be checked.
+- The EN names of 11, 12 and 17 are mine (Ghost, Stalker, Instructor) — to be checked.
 
 ---
 

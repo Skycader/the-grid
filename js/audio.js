@@ -74,6 +74,100 @@
             o.stop(t + 0.34);
           });
         });
+      // ── the rank-up animation (js/rank-anim.js) ──
+      // A rising tone while the bar fills: the pitch follows the progress inside the rank (300 Hz at the
+      // start of the rank, 1200 Hz at its end) and the same easing as the bar. p0 → p1 = the part of
+      // the rank that is filled in this segment, ease = the easing of the bar (0..1 → 0..1).
+      // Returns a function that stops the tone (a new run cancels the old one).
+      const playRankCharge = (ms, p0, p1, ease) => {
+        let stop = () => {};
+        snd((c) => {
+          const o = c.createOscillator(),
+            g = c.createGain(),
+            t = c.currentTime,
+            dur = Math.max(0.25, ms / 1000);
+          const N = 32,
+            curve = new Float32Array(N);
+          for (let i = 0; i < N; i++) curve[i] = 300 * Math.pow(4, p0 + (p1 - p0) * ease(i / (N - 1)));
+          o.type = "triangle";
+          o.connect(g);
+          g.connect(c.destination);
+          o.frequency.setValueCurveAtTime(curve, t, dur);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(0.034, t + 0.05);
+          g.gain.setValueAtTime(0.034, t + dur - 0.08);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          o.start(t);
+          o.stop(t + dur + 0.02);
+          stop = () => {
+            try {
+              g.gain.cancelScheduledValues(c.currentTime);
+              g.gain.setValueAtTime(g.gain.value, c.currentTime);
+              g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.04);
+              o.stop(c.currentTime + 0.05);
+            } catch (e) {}
+          };
+        });
+        return () => stop();
+      };
+      // the rank goes up: a bright arpeggio (C E G C) with a shimmer on top and a low thump
+      const playRankUp = () =>
+        snd((c) => {
+          [523.25, 659.25, 783.99, 1046.5].forEach((fr, i) => {
+            const o = c.createOscillator(),
+              g = c.createGain(),
+              t = c.currentTime + i * 0.075;
+            o.type = "triangle";
+            o.frequency.value = fr;
+            o.connect(g);
+            g.connect(c.destination);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(0.06, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+            o.start(t);
+            o.stop(t + 0.47);
+            const s = c.createOscillator(),
+              sg = c.createGain();
+            s.type = "sine";
+            s.frequency.value = fr * 2;
+            s.connect(sg);
+            sg.connect(c.destination);
+            sg.gain.setValueAtTime(0.0001, t);
+            sg.gain.linearRampToValueAtTime(0.022, t + 0.02);
+            sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+            s.start(t);
+            s.stop(t + 0.32);
+          });
+          const b = c.createOscillator(),
+            bg = c.createGain();
+          b.type = "sine";
+          b.frequency.setValueAtTime(130, c.currentTime);
+          b.frequency.exponentialRampToValueAtTime(55, c.currentTime + 0.22);
+          b.connect(bg);
+          bg.connect(c.destination);
+          bg.gain.setValueAtTime(0.09, c.currentTime);
+          bg.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.25);
+          b.start();
+          b.stop(c.currentTime + 0.27);
+        });
+      // the bar stopped inside the rank: a soft two-note "done"
+      const playRankDone = () =>
+        snd((c) => {
+          [659.25, 880].forEach((fr, i) => {
+            const o = c.createOscillator(),
+              g = c.createGain(),
+              t = c.currentTime + i * 0.09;
+            o.type = "sine";
+            o.frequency.value = fr;
+            o.connect(g);
+            g.connect(c.destination);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(0.045, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+            o.start(t);
+            o.stop(t + 0.3);
+          });
+        });
       const playFail = () =>
         snd((c) => {
           const o = c.createOscillator(),
