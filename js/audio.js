@@ -75,45 +75,54 @@
           });
         });
       // ── the rank-up animation (js/rank-anim.js) ──
-      // A rising tone while the bar fills: the pitch follows the progress inside the rank (300 Hz at the
-      // start of the rank, 1200 Hz at its end) and the same easing as the bar. p0 → p1 = the part of
-      // the rank that is filled in this segment, ease = the easing of the bar (0..1 → 0..1).
-      // Returns a function that stops the tone (a new run cancels the old one).
-      const playRankCharge = (ms, p0, p1, ease) => {
+      // While the bar fills: soft TICKS, like a counter (no continuous tone, no glide: nothing that can
+      // whistle). One tick every ~70 ms, a short low "bloop" (a triangle wave behind a low-pass filter at
+      // 800 Hz); the pitch of the ticks rises a little with the progress inside the rank (half an octave:
+      // base → 1.41 × base; base = 200 Hz for a task, 300 Hz for the level of the player).
+      // p0 → p1 = the part of the rank that is filled in this segment, ease = the easing of the bar
+      // (0..1 → 0..1). Returns a function that silences it (a new run cancels the old one).
+      const playRankCharge = (ms, p0, p1, ease, base = 200) => {
         let stop = () => {};
         snd((c) => {
-          const o = c.createOscillator(),
-            g = c.createGain(),
+          const master = c.createGain(),
+            lp = c.createBiquadFilter(),
             t = c.currentTime,
-            dur = Math.max(0.25, ms / 1000);
-          const N = 32,
-            curve = new Float32Array(N);
-          for (let i = 0; i < N; i++) curve[i] = 300 * Math.pow(4, p0 + (p1 - p0) * ease(i / (N - 1)));
-          o.type = "triangle";
-          o.connect(g);
-          g.connect(c.destination);
-          o.frequency.setValueCurveAtTime(curve, t, dur);
-          g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(0.034, t + 0.05);
-          g.gain.setValueAtTime(0.034, t + dur - 0.08);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-          o.start(t);
-          o.stop(t + dur + 0.02);
+            dur = Math.max(0.25, ms / 1000),
+            n = Math.max(3, Math.round(dur / 0.07));
+          lp.type = "lowpass";
+          lp.frequency.value = 800;
+          lp.Q.value = 0.5;
+          master.connect(lp);
+          lp.connect(c.destination);
+          for (let i = 0; i < n; i++) {
+            const at = t + (dur * i) / n,
+              f = base * Math.pow(2, 0.5 * (p0 + (p1 - p0) * ease(i / (n - 1)))),
+              o = c.createOscillator(),
+              g = c.createGain();
+            o.type = "triangle";
+            o.frequency.value = f;
+            o.connect(g);
+            g.connect(master);
+            g.gain.setValueAtTime(0.0001, at);
+            g.gain.linearRampToValueAtTime(0.07, at + 0.004);
+            g.gain.exponentialRampToValueAtTime(0.0001, at + 0.055);
+            o.start(at);
+            o.stop(at + 0.06);
+          }
           stop = () => {
             try {
-              g.gain.cancelScheduledValues(c.currentTime);
-              g.gain.setValueAtTime(g.gain.value, c.currentTime);
-              g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.04);
-              o.stop(c.currentTime + 0.05);
+              master.gain.cancelScheduledValues(c.currentTime);
+              master.gain.setValueAtTime(0, c.currentTime);
             } catch (e) {}
           };
         });
         return () => stop();
       };
-      // the rank goes up: a bright arpeggio (C E G C) with a shimmer on top and a low thump
+      // the rank goes up: a warm arpeggio (C E G C, from the 4th octave) with a quiet shimmer an octave
+      // above and a low thump
       const playRankUp = () =>
         snd((c) => {
-          [523.25, 659.25, 783.99, 1046.5].forEach((fr, i) => {
+          [261.63, 329.63, 392, 523.25].forEach((fr, i) => {
             const o = c.createOscillator(),
               g = c.createGain(),
               t = c.currentTime + i * 0.075;
@@ -122,10 +131,11 @@
             o.connect(g);
             g.connect(c.destination);
             g.gain.setValueAtTime(0.0001, t);
-            g.gain.linearRampToValueAtTime(0.06, t + 0.02);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+            g.gain.linearRampToValueAtTime(0.085, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
             o.start(t);
             o.stop(t + 0.47);
+            if (fr * 2 > 800) return; // no shimmer above 800 Hz: nothing shrill
             const s = c.createOscillator(),
               sg = c.createGain();
             s.type = "sine";
@@ -133,7 +143,7 @@
             s.connect(sg);
             sg.connect(c.destination);
             sg.gain.setValueAtTime(0.0001, t);
-            sg.gain.linearRampToValueAtTime(0.022, t + 0.02);
+            sg.gain.linearRampToValueAtTime(0.016, t + 0.02);
             sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
             s.start(t);
             s.stop(t + 0.32);
@@ -153,7 +163,7 @@
       // the bar stopped inside the rank: a soft two-note "done"
       const playRankDone = () =>
         snd((c) => {
-          [659.25, 880].forEach((fr, i) => {
+          [392, 523.25].forEach((fr, i) => {
             const o = c.createOscillator(),
               g = c.createGain(),
               t = c.currentTime + i * 0.09;
@@ -162,8 +172,8 @@
             o.connect(g);
             g.connect(c.destination);
             g.gain.setValueAtTime(0.0001, t);
-            g.gain.linearRampToValueAtTime(0.045, t + 0.02);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+            g.gain.linearRampToValueAtTime(0.06, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
             o.start(t);
             o.stop(t + 0.3);
           });
