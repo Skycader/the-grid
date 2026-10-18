@@ -5,7 +5,7 @@
 
       // The version shown on the home screen and in the boot log. Bump it together with a new
       // changelog/<version>.md (see changelog/README.md).
-      const APP_VERSION = "1.4.0";
+      const APP_VERSION = "1.5.0";
 
       // Strict mode: user minTime must not exceed ref minTime × (1 + STRICT_TOLERANCE).
       // 0.10 = 10% slower allowed (recommended). 0.0 = exact match required.

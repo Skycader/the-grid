@@ -6,6 +6,7 @@ opens that file in a modal, so every release needs its file.
 
 | Version | Date | Highlights |
 |---|---|---|
+| [1.5.0](1.5.0.md) | 2026-10-19 | Named ranks for tasks and for the player (a new level formula), rank-up animation, profile window, URL keeps the sort, draggable modals, Ex20 / Binary Search standardized |
 | [1.4.0](1.4.0.md) | 2026-10-10 | Coins and ranks, transactions, harvest / profile buttons, modal redesign, spec standard |
 
 ## How to add a release
@@ -22,7 +23,7 @@ release in which a key or an entry type appears.
 ## Collecting the next release
 
 Changes of a release that is not out yet are collected in its own file, whose first line says
-`unreleased` instead of a date (`# 1.15.0 — unreleased`). Until the release is cut, `APP_VERSION`
+`unreleased` instead of a date (`# 1.6.0 — unreleased`). Until the release is cut, `APP_VERSION`
 stays as it is and the table has no row for it. Cutting the release: bump `APP_VERSION`, replace
 `unreleased` with the date, delete the "work in progress" lines, add the table row.
 
