@@ -1,32 +1,30 @@
-      // ═══════════ RANK-UP ANIMATION (a test, started from the console) ═══════════
-      //   run("animation level-up +23 days")
+      // ═══════════ RANK-UP ANIMATION ═══════════
       // A small plate appears under the rank of the open task and plays TWO bars one after the other:
       //   1. the rank of the TASK: a bar from the current rank (on the left) to the next one (on the
       //      right), it fills from the old number of days to the new one;
-      //   2. the LEVEL of the PLAYER: the same, for the level (the level changes by the added days times the
-      //      weight of the task, js/profile.js).
+      //   2. the LEVEL of the PLAYER: the same, for the level (js/profile.js).
       // When a bar reaches its end the rank goes up (the plate flashes, the bar starts over in the next
-      // rank). The data is NOT changed: it is only a picture.
+      // rank).
+      //
+      // It is played after a successful solve that counts (js/wallet.js, walletOnSolved) and from the
+      // console as a test: run("animation level-up +23 days") — then the data is NOT changed.
       //
       // The ends of a bar are the first values of the current and of the next rank (docs/ranks.md); the
       // last rank has no next one, its bar is full.
       let _rkPlateRun = 0; // a new run cancels the previous one
 
-      function rankAnimLevelUp(addDays) {
-        if (!(addDays > 0)) return cliErr("the number of days must be positive");
-        if (view !== "task" || !curTask) return cliErr("open a task first: the plate stands under its rank");
+      // { key, taskFrom, taskTo (days), levelFrom, levelTo }; false when there is nothing to show it under
+      function rankAnimPlay({ key, taskFrom, taskTo, levelFrom, levelTo }) {
+        if (view !== "task" || !curTask) return false;
         const anchor = document.getElementById("task-rank");
-        if (!anchor) return cliErr("this task has no rank on the bar");
-        const key = `${curCat().id}/${curTask.id}`;
+        if (!anchor) return false;
 
         // the two bars: the rank of the task (days) and the level of the player
-        const bd = profileBreakdown();
-        const lvFrom = bd.level,
-          lvAdd = addDays * (profileWeight(curTask.diff) / bd.S),
-          rkFrom = Math.floor(_rank[key] || 0);
+        const addDays = taskTo - taskFrom,
+          lvAdd = levelTo - levelFrom;
         const bars = [
-          { kind: "task", title: "TASK RANK", from: rkFrom, to: rkFrom + addDays, add: `+${addDays} days`, unit: "days" },
-          { kind: "player", title: "PLAYER LEVEL", from: lvFrom, to: lvFrom + lvAdd, add: `+${lvAdd.toFixed(2)}`, unit: "level" },
+          { kind: "task", title: "TASK RANK", from: taskFrom, to: taskTo, add: `+${addDays >= 1 ? Math.round(addDays) : addDays.toFixed(2)} days`, unit: "days" },
+          { kind: "player", title: "PLAYER LEVEL", from: levelFrom, to: levelTo, add: `+${lvAdd.toFixed(2)}`, unit: "level" },
         ];
 
         let plate = document.getElementById("rk-plate");
@@ -48,6 +46,12 @@
           )
           .join("");
         const place = () => {
+          if (view !== "task") {
+            // the player left the task: the plate has nothing to stand under, stop it
+            _rkPlateRun++;
+            plate.classList.remove("show");
+            return;
+          }
           const r = anchor.getBoundingClientRect();
           plate.style.left = Math.round(Math.max(4, Math.min(r.left, innerWidth - 324))) + "px";
           plate.style.top = Math.round(r.bottom + 8) + "px";
@@ -134,8 +138,21 @@
           plate.classList.add("out");
           plate.classList.remove("show");
         })();
+        return true;
+      }
+
+      // the console test: run("animation level-up +23 days") — the current data plus N days, nothing is saved
+      function rankAnimLevelUp(addDays) {
+        if (!(addDays > 0)) return cliErr("the number of days must be positive");
+        if (view !== "task" || !curTask) return cliErr("open a task first: the plate stands under its rank");
+        if (!document.getElementById("task-rank")) return cliErr("this task has no rank on the bar");
+        const key = `${curCat().id}/${curTask.id}`;
+        const bd = profileBreakdown();
+        const taskFrom = Math.floor(_rank[key] || 0),
+          levelTo = bd.level + addDays * (profileWeight(curTask.diff) / bd.S);
+        rankAnimPlay({ key, taskFrom, taskTo: taskFrom + addDays, levelFrom: bd.level, levelTo });
         console.log(
-          `%c✓ ${key}: rank ${rkFrom} → ${bars[0].to} days (${RANK_NAMES[rankStep(rkFrom)][0]} → ${RANK_NAMES[rankStep(bars[0].to)][0]}); player level ${lvFrom.toFixed(2)} → ${bars[1].to.toFixed(2)} (${RANK_NAMES[rankStep(lvFrom, "player")][0]} → ${RANK_NAMES[rankStep(bars[1].to, "player")][0]}); the data is not changed`,
+          `%c✓ ${key}: rank ${taskFrom} → ${taskFrom + addDays} days (${RANK_NAMES[rankStep(taskFrom)][0]} → ${RANK_NAMES[rankStep(taskFrom + addDays)][0]}); player level ${bd.level.toFixed(2)} → ${levelTo.toFixed(2)} (${RANK_NAMES[rankStep(bd.level, "player")][0]} → ${RANK_NAMES[rankStep(levelTo, "player")][0]}); the data is not changed`,
           CLI_STYLE.ok,
         );
       }

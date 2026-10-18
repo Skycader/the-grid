@@ -261,6 +261,7 @@
           prev = _solved[key];
         const levelFrom = walletLevelValue(), // before lastSolved changes
           balanceFrom = _balance;
+        const levelExactFrom = typeof profileLevel === "function" ? profileLevel().level : 0; // for the animation
         _solved[key] = now;
         if (prev == null) {
           saveWallet();
@@ -293,6 +294,7 @@
         }
         // rank = accumulated days between counted solves (experience; doesn't affect rewards yet)
         const rankBefore = walletRank(key);
+        const rankDaysFrom = _rank[key] || 0; // for the animation (not rounded)
         _rank[key] = Math.round(((_rank[key] || 0) + days) * 10000) / 10000;
         saveWallet();
         walletLog({
@@ -313,6 +315,18 @@
           levelTo: walletLevelValue(),
         });
         if (payout.net > 0) walletFlyCoins(fromEl, payout.net, payout);
+        // a counted repeat solve moved the rank of the task and the level of the player: show it
+        // (js/rank-anim.js), a moment after the success sound and the coins have started
+        if (typeof rankAnimPlay === "function") {
+          const plan = {
+            key,
+            taskFrom: rankDaysFrom,
+            taskTo: _rank[key],
+            levelFrom: levelExactFrom,
+            levelTo: typeof profileLevel === "function" ? profileLevel().level : levelExactFrom,
+          };
+          setTimeout(() => rankAnimPlay(plan), 900);
+        }
       }
 
       // "Смотреть решение" = проиграл: таймер идёт заново с этого момента
