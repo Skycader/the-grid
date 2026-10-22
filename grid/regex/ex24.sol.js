@@ -1,7 +1,2 @@
-const f = (text) => {
-  return text.replace(/\D/g, "");
-};
-
-/**
- * Сложность: 1 — \D это литерал-семейство (как \d), не отдельный класс
- */
+const f = (text) => text.replace(/\D/g, "");
+module.exports = f;

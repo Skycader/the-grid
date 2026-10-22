@@ -1,12 +1,3 @@
-/**
- * Given [key: string]: string[] object,
- * render it into array of [key]: string
- * Example:
- * {
- * username: ['cannot be empty, minimal length is 3'],
- * password: ['must contain letters']
- * }
- */
+const f = (errors) => Object.entries(errors).flatMap(([key, messages]) => messages.map((message) => `${key} ${message}`));
 
-const f = (obj) =>
-  Object.entries(obj).flatMap(([key, msgs]) => msgs.map((m) => `${key} ${m}`));
+module.exports = f;
