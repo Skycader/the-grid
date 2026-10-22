@@ -1,5 +1,5 @@
 /* Ex15
- * 🎖CERTIFIED 2026-10-23
+ * 🎖CERTIFIED 2026-10-22
  * Check if the text is a valid HTML document: f(text) returns true or false.
  * A valid document is ONE <html> ... </html> pair: the text starts with <html>, ends with
  * </html> (spaces and new lines around them are fine) and has no other <html> or </html> inside.
