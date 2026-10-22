@@ -2096,6 +2096,8 @@
       #rk-plate.show {
         opacity: 1;
         transform: none;
+        pointer-events: auto; /* a click opens the profile window, the cursor on it keeps the plate open */
+        cursor: pointer;
       }
       #rk-plate.up {
         box-shadow: 0 0 26px rgba(255, 216, 74, 0.8);
@@ -2178,6 +2180,16 @@
         width: 0;
         background: #6c71c4;
         box-shadow: 0 0 8px rgba(108, 113, 196, 0.9);
+      }
+      /* the part of the bar that was just gained: gold, right after the old progress */
+      .rkp-gain {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        background: #ffd84a;
+        box-shadow: 0 0 8px rgba(255, 216, 74, 0.85);
       }
       #rk-tip {
         position: fixed;

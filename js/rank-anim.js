@@ -13,9 +13,24 @@
       // last rank has no next one, its bar is full.
       let _rkPlateRun = 0; // a new run cancels the previous one
 
+      // The plate does not close while the cursor is on it or the profile window (opened by a click on the
+      // plate) is open, and it stays at least 5 more seconds after the cursor leaves it or that window is closed.
+      let _rkHoldUntil = 0; // the time (ms) before which the plate is not closed
+      (function () {
+        const m = document.getElementById("pfm-modal");
+        if (!m) return;
+        let was = false;
+        new MutationObserver(() => {
+          const open = !m.classList.contains("hide");
+          if (was && !open) _rkHoldUntil = Math.max(_rkHoldUntil, Date.now() + 5000);
+          was = open;
+        }).observe(m, { attributes: true, attributeFilter: ["class"] });
+      })();
+
       // { key, taskFrom, taskTo (days), levelFrom, levelTo }; false when there is nothing to show it under
       function rankAnimPlay({ key, taskFrom, taskTo, levelFrom, levelTo }) {
         if (view !== "task" || !curTask) return false;
+        const startTask = curTask; // the plate belongs to this task: leaving it closes the plate
         const anchor = document.getElementById("task-rank");
         if (!anchor) return false;
 
@@ -31,9 +46,13 @@
         if (!plate) {
           plate = document.createElement("div");
           plate.id = "rk-plate";
+          plate.addEventListener("click", () => pfmOpen()); // the same as the click on the profile button
+          // the cursor left the plate: it stays at least 5 seconds more
+          plate.addEventListener("mouseleave", () => (_rkHoldUntil = Math.max(_rkHoldUntil, Date.now() + 5000)));
           document.body.appendChild(plate);
         }
         const run = ++_rkPlateRun;
+        _rkHoldUntil = 0;
         const side = (k, right) => {
           const nm = RANK_NAMES[k][0];
           return right ? `<span>${nm}</span>${rankPatchStep(k)}` : `${rankPatchStep(k)}<span>${nm}</span>`;
@@ -42,11 +61,11 @@
           .map(
             (b) =>
               `<div class="rkp-blk" data-kind="${b.kind}"><div class="rkp-top"><b class="rkp-title">${b.title}</b><b class="rkp-add">${b.add}</b><span class="rkp-val"></span></div>` +
-              `<div class="rkp-row"><span class="rkp-side rkp-l"></span><span class="rkp-bar"><i class="rkp-fill"></i></span><span class="rkp-side rkp-r"></span></div></div>`,
+              `<div class="rkp-row"><span class="rkp-side rkp-l"></span><span class="rkp-bar"><i class="rkp-fill"></i><i class="rkp-gain"></i></span><span class="rkp-side rkp-r"></span></div></div>`,
           )
           .join("");
         const place = () => {
-          if (view !== "task") {
+          if (view !== "task" || curTask !== startTask) {
             // the player left the task: the plate has nothing to stand under, stop it
             _rkPlateRun++;
             plate.classList.remove("show");
@@ -73,8 +92,14 @@
             el(".rkp-r").innerHTML = k === last ? "<span>MAX</span>" : side(k + 1, true);
           };
           const progress = (v, k) => (k === last ? 1 : Math.min(1, Math.max(0, (v - scale[k]) / (scale[k + 1] - scale[k]))));
+          // [===+++---]: the old progress (rkp-fill) stays as it was, the gained part (rkp-gain, gold)
+          // grows after it, the rest is empty. In a new rank the old part is 0: all of it is gained.
+          let base = 0;
           const setFill = (v, k) => {
-            el(".rkp-fill").style.width = (progress(v, k) * 100).toFixed(2) + "%";
+            const p = progress(v, k);
+            el(".rkp-fill").style.width = (base * 100).toFixed(2) + "%";
+            el(".rkp-gain").style.left = (base * 100).toFixed(2) + "%";
+            el(".rkp-gain").style.width = (Math.max(0, p - base) * 100).toFixed(2) + "%";
             el(".rkp-val").textContent = `${rankFmt(v, kind)} ${b.unit}`;
             place(); // the bar of the task can move (the fonts, the window): follow the rank
           };
@@ -99,6 +124,7 @@
 
           let v = b.from,
             k = rankStep(v, kind);
+          base = progress(v, k);
           setSides(k);
           setFill(v, k);
           blk.classList.add("on");
@@ -117,6 +143,7 @@
               await wait(350);
               if (run !== _rkPlateRun) return false;
               plate.classList.remove("up");
+              base = 0;
               setSides(k);
               setFill(v, k);
               playRankUp();
@@ -133,7 +160,12 @@
           playNav(); // the second bar: the level of the player
           if (!(await playBar(bars[1], blocks[1]))) return;
           playRankDone();
-          await wait(2600);
+          _rkHoldUntil = Math.max(_rkHoldUntil, Date.now() + 2600);
+          const pfm = document.getElementById("pfm-modal");
+          // hold: the cursor is on the plate, the profile window is open, or the 5 seconds after it are not over
+          // closing the editor (the menu, another task) closes the plate at once, whatever holds it
+          const here = () => view === "task" && curTask === startTask;
+          while (run === _rkPlateRun && here() && (plate.matches(":hover") || !pfm.classList.contains("hide") || Date.now() < _rkHoldUntil)) await wait(50);
           if (run !== _rkPlateRun) return;
           plate.classList.add("out");
           plate.classList.remove("show");
