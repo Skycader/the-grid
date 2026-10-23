@@ -19,7 +19,7 @@
  *   "<h1></h1>"                                     →  "<h1></h1>"
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

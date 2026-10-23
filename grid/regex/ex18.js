@@ -1,6 +1,6 @@
 /**
  * Ex18
- * Count SPECIAL* IP addresses in the given text. f(text) returns the number (0 when there are none).
+ * Count SPECIAL* IP addresses in the given text. f(txt) returns the number (0 when there are none).
  *
  * *A SPECIAL IP ADDRESS LOOKS LIKE: 192.168.92.102...55.34.204
  * THEY ARE PLACED IN A FORM OF LIST, ONE ON A LINE:
@@ -25,7 +25,7 @@
  *   ""                                        →  0
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

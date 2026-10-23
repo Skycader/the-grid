@@ -25,7 +25,7 @@ wow BTAG
  *   ""                                    →  ""
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

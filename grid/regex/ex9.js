@@ -1,7 +1,7 @@
 /*
  * Ex9
  * Count how many lines start with The.
- * f(text) returns the number of lines (0 when there are none).
+ * f(txt) returns the number of lines (0 when there are none).
  *
  * A line starts with The when the three letters The are the very first characters of the line
  * (a space or a tab before them does not count). Lines are separated by \n (or \r\n).
@@ -16,7 +16,7 @@
  *   ""                                                                     →  0
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

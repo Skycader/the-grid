@@ -2747,8 +2747,60 @@
         flex-shrink: 0;
         background: rgba(0, 0, 0, 0.2);
       }
-      .res-flt {
+      /* FAILED ONLY: a flat check in the line of the bar (not a boxed button like the STRICT one in the header) */
+      .res-bar .res-flt {
         margin-left: auto;
+        padding: 1px 2px;
+        gap: 5px;
+        border-color: transparent;
+        background: none;
+        font-size: 0.64rem;
+        transition: none;
+      }
+      .res-bar .res-flt:hover {
+        border-color: transparent;
+        color: var(--c);
+      }
+      /* the label looks the same in both states (colour, size, weight): only the check in the box changes */
+      .res-bar .res-flt.strict-on {
+        border-color: transparent;
+        background: none;
+        color: var(--txd);
+      }
+      .res-bar .res-flt.strict-on:hover {
+        color: var(--c);
+      }
+      .res-bar .res-flt > span {
+        font-size: 0.64rem;
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 13px;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+      /* the check is drawn with borders, not with a font glyph: a glyph of another font (a fallback for "✓")
+         has its own metrics and moves the label when the check is switched on */
+      .res-bar .res-flt .strict-chk {
+        position: relative;
+        width: 10px;
+        height: 10px;
+        font-size: 0;
+        line-height: 0;
+        overflow: hidden;
+      }
+      .res-bar .res-flt.strict-on .strict-chk {
+        color: #b58900;
+      }
+      .res-bar .res-flt.strict-on .strict-chk::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 3px;
+        height: 6px;
+        border: solid currentColor;
+        border-width: 0 1.5px 1.5px 0;
+        transform: translate(-50%, -62%) rotate(45deg);
       }
       .res-empty.in-list {
         height: auto;

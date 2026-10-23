@@ -6,7 +6,7 @@
  * +7 (987) 231 45-23 => 79872314523
  * etc.
  *
- * In short: f(text) keeps only the digits 0-9, in the same order. Every other character (a plus, a
+ * In short: f(txt) keeps only the digits 0-9, in the same order. Every other character (a plus, a
  * space, a bracket, a hyphen, a dot, a letter, a new line...) is removed.
  *
  * Examples:
@@ -20,7 +20,7 @@
  *   ""                            →  ""
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

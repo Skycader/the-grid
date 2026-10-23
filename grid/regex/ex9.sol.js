@@ -1,2 +1,2 @@
-const f = (text) => (text.match(/^The/gm) || []).length;
+const f = txt => (txt.match(/^The/gm) || []).length;
 module.exports = f;

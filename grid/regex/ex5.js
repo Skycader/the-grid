@@ -1,7 +1,7 @@
 /*
  * Ex5
  * Find people who own a rat or a cat and whose name is just 4 letters long.
- * f(text) returns how many such people there are in the text (a number, 0 when there are none).
+ * f(txt) returns how many such people there are in the text (a number, 0 when there are none).
  *
  * One owner is: a name of exactly 4 letters (a whole word), then 's, one space and the pet: the whole
  * word cat or rat. The case of the letters does not matter.
@@ -15,7 +15,7 @@
  *   ""                                                                         →  0
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

@@ -1,5 +1,5 @@
 /* ex15
- * Check if the given text is a valid HTML document: f(text) returns true or false.
+ * Check if the given text is a valid HTML document: f(txt) returns true or false.
  *
  * A valid document is ONE <html> ... </html> pair: the text starts with <html> and ends with
  * </html> (spaces and new lines around them are fine) and there is no other <html> or </html>
@@ -29,7 +29,7 @@
  *   ""                                     →  false
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

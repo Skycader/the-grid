@@ -5,7 +5,7 @@
  * ...
  * 90550: $550.25
  *
- * Count how many bills are less than $100. f(text) returns the number (0 when there are none).
+ * Count how many bills are less than $100. f(txt) returns the number (0 when there are none).
  *
  * A bill is a line "<id>: $<amount>": the id is digits, then a colon and a space, then $ and the amount.
  * The amount may have a decimal part ($50, $50.25). Leading zeros do not change the value:
@@ -19,7 +19,7 @@
  *   ""                                          →  0
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

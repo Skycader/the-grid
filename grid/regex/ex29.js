@@ -1,6 +1,6 @@
 /**
  * Ex29
- * Make a function f(text) that finds all the correct dates in format DD/MM/YYYY
+ * Make a function f(txt) that finds all the correct dates in format DD/MM/YYYY
  * and returns them as an array of strings, in the order of the text ([] when there are none).
  *
  * A correct date is: day 01-31, "/", month 01-12, "/", a year of four digits. The day and the month
@@ -19,7 +19,7 @@
  *   ""                                                         →  []
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

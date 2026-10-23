@@ -6,7 +6,7 @@
 - Allow only letters -> Digits or any other symbol are PROHIBITED
 - #danger! *missile* @fake@ &target# #non_2_valid# ===> missile fake
 
-f(text) returns an array of the targets, in the order of the text ([] when there are none).
+f(txt) returns an array of the targets, in the order of the text ([] when there are none).
 
 In short: a target is a word of Latin letters (A-Z a-z, any case) that has the SAME punctuation mark
 right before it and right after it: *missile*, @fake@, §rocket§. Punctuation is any punctuation mark,
@@ -23,7 +23,7 @@ Examples:
   ""                                                              →  []
 */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

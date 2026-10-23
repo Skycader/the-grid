@@ -1,6 +1,6 @@
 /**
  * Ex31
- * Find all the valid HEX color codes in the text. f(text) returns an array of the codes, in the order
+ * Find all the valid HEX color codes in the text. f(txt) returns an array of the codes, in the order
  * of the text ([] when there are none).
  * A color can be written as #RGB, #RGBA, #RRGGBB or #RRGGBBAA.
  * The characters are 0-9, a-f, A-F.
@@ -18,7 +18,7 @@
  *   ""                                               →  []
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

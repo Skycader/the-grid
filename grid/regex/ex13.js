@@ -5,7 +5,7 @@
  * ...
  * 90550: $550.25
  *
- * Count how many bills are in between $100 and $9999 (both ends count). f(text) returns the number
+ * Count how many bills are in between $100 and $9999 (both ends count). f(txt) returns the number
  * (0 when there are none).
  *
  * A bill is a line "<id>: $<amount>": the id is digits, then a colon and a space, then $ and the amount.
@@ -20,7 +20,7 @@
  *   ""                                          →  0
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

@@ -22,7 +22,7 @@
  *   "Ms. Dr. Miss Prof."                 →  "Ms. Dr. Miss Prof."      (other titles)
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

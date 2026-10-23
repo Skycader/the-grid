@@ -23,7 +23,7 @@
  *   "scat cat cats"                       →  "scat  cats"
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

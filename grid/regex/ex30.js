@@ -7,7 +7,7 @@
  * Password must NOT have spaces
  * Find all of them
  *
- * f(text) returns an array of the passwords, in the order of the text ([] when there are none).
+ * f(txt) returns an array of the passwords, in the order of the text ([] when there are none).
  *
  * In short: a password is made of letters A-Z a-z, digits 0-9 and the symbols ! @ # $ % ^ & *; any other
  * character (a space, a comma, a dot, a hyphen, a bracket...) ends it. The password is the whole run of
@@ -24,7 +24,7 @@
  *   ""                                                          →  []
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

@@ -1,2 +1,2 @@
-const f = (text) => text.replace(/\D/g, "");
+const f = txt => txt.replace(/\D/g, "");
 module.exports = f;

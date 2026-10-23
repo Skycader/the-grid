@@ -1,6 +1,6 @@
-const f = (text) => {
+const f = txt => {
   const r = /\bcat\b/gi;
-  return text.replace(r, "");
+  return txt.replace(r, "");
 };
 
 module.exports = f;

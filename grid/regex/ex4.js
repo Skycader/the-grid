@@ -14,7 +14,7 @@
  *   "ll. lool. lo."      →  unchanged          (not one letter between the l)
  */
 
-const f = (text) => {
+const f = txt => {
   const r = /sample/;
   return;
 };

@@ -1,5 +1,5 @@
-const f = (text) =>
-  text.match(
+const f = txt =>
+  txt.match(
     /(?<![A-Za-z0-9!@#$%^&*])(?=[A-Za-z0-9!@#$%^&*]*[A-Z])(?=[A-Za-z0-9!@#$%^&*]*[a-z])(?=[A-Za-z0-9!@#$%^&*]*[0-9])(?=[A-Za-z0-9!@#$%^&*]*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}/g,
   ) || [];
 module.exports = f;
