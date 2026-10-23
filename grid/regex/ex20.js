@@ -20,7 +20,7 @@
  */
 
 const f = (text) => {
-  const r = //g;
+  const r = /sample/;
   return;
 };
 

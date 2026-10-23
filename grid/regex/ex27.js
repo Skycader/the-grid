@@ -18,4 +18,8 @@
  *   "1\n2\n3"                     r1 → true    r2 → false   r3 → true
  */
 
+const r1 = /sample/;
+const r2 = /sample/;
+const r3 = /sample/;
+
 module.exports = [r1, r2, r3];

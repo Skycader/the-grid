@@ -20,4 +20,6 @@
  *   ""                             →  ""
  */
 
+const r = /sample/;
+
 module.exports = r;

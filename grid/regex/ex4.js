@@ -14,4 +14,9 @@
  *   "ll. lool. lo."      →  unchanged          (not one letter between the l)
  */
 
+const f = (text) => {
+  const r = /sample/;
+  return;
+};
+
 module.exports = f;

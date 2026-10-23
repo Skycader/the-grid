@@ -22,9 +22,9 @@ window.CFG_algo = [
     files: [
       {
         id: "find_murderer",
-        title: "Полицейский детектив",
+        title: "Police Detective",
         diff: 1,
-        desc: "Определить преступника, который видел всех убитых",
+        desc: "Find the criminal: the suspect who saw all the killed people",
         file: "find-murderer",
       },
     ],
@@ -36,9 +36,9 @@ window.CFG_algo = [
     files: [
       {
         id: "selection_sort",
-        title: "Selection Sort через API",
+        title: "Selection Sort via API",
         diff: 3,
-        desc: "Реализовать сортировку выбором используя только предоставленный API",
+        desc: "Implement selection sort using only the provided API",
         file: "selection-sort",
       },
     ],
@@ -52,14 +52,14 @@ window.CFG_algo = [
         id: "currying",
         title: "Create a function add(4)(4)()",
         diff: 4,
-        desc: "Практика каррирования",
+        desc: "Chain calls of a function until a call without arguments returns the sum",
         file: "currying",
       },
       {
         id: "errors",
         title: "Process an object into array",
         diff: 2,
-        desc: "Практика работы с объектами",
+        desc: "Turn an object of error lists into an array of messages, without loops",
         file: "errors",
       },
     ],

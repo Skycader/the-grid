@@ -3,7 +3,7 @@ const f = (api) => {
 
   for (let sorted = 0; sorted < length - 1; sorted++) {
     let minIndex = sorted;
-    let minValue = api.get(sorted); // Сохраняем, чтобы меньше читать
+    let minValue = api.get(sorted);
 
     for (let i = sorted + 1; i < length; i++) {
       const currentValue = api.get(i);
@@ -13,11 +13,11 @@ const f = (api) => {
       }
     }
 
-    // Делаем swap только если нашли элемент меньше текущего
     if (minIndex !== sorted) {
-      const temp = api.get(sorted);
-      api.set(sorted, api.get(minIndex));
-      api.set(minIndex, temp);
+      api.set(minIndex, api.get(sorted));
+      api.set(sorted, minValue);
     }
   }
 };
+
+module.exports = f;

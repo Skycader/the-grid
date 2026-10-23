@@ -20,4 +20,6 @@
  *   "no numbers here"                               →  null
  */
 
+const r = /sample/;
+
 module.exports = r;

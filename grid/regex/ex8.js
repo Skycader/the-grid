@@ -19,4 +19,9 @@
  *   ""                       →  false
  */
 
+const f = (message) => {
+  const r = /sample/;
+  return;
+};
+
 module.exports = f;

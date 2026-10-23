@@ -21,4 +21,8 @@
  *   {}                                       =>  []
  */
 
+const f = (errors) => {
+  return;
+};
+
 module.exports = f;

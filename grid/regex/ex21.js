@@ -25,8 +25,8 @@
  *   "ab"                         →  0     (two letters must be equal; the one-letter rule does not leak)
  */
 
-const f = txt => {
-  const r = //g;
+const f = (text) => {
+  const r = /sample/;
   return;
 };
 

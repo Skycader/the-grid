@@ -17,6 +17,8 @@ Legend: **M** — mandatory, **R** — recommended, **O** — only when it appli
 | | Rule |
 |---|---|
 | Name | `<task-file>.spec.js` next to `<task-file>.js` (stub) and `<task-file>.sol.js` (reference) |
+| Stub | `<task-file>.js` is what the player gets: the statement in a block comment, then a **ready, runnable scaffold** — never an empty file and never an undefined name (`module.exports = f;` with no `f`). It loads without an error and its tests simply fail. A function that works with a regex: `const f = (text) => { const r = /sample/; return; }; module.exports = f;` (the parameter is named after the task: `text`, `code`, `password`, `message`); an exported regex: `const r = /sample/; module.exports = r;` (several: `const r1 = /sample/; … module.exports = [r1, r2, r3];`); a function without a regex: `const f = (api, target) => { return; }; module.exports = f;` |
+| Reference | `<task-file>.sol.js` is bare: the code only and `module.exports` — no comments, no copy of the statement, no difficulty notes, everything in English |
 | Import | `const f = require("./<task-file>.js");` — `const`, never an implicit global |
 | Language | English everywhere: header, `describe`/`it` titles, comments |
 | Runner | the in-browser mini-Jest (see `index.html`, `makeRunner`). Available: `describe`, `it`/`test`, `it.each`/`test.each`, `expect`, `beforeEach`, `afterEach`, `beforeAll`, `afterAll`, `require`, `__source` |

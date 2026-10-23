@@ -35,4 +35,8 @@
  *   "Note: web:https"                           r3 →  null
  */
 
+const r1 = /sample/;
+const r2 = /sample/;
+const r3 = /sample/;
+
 module.exports = [r1, r2, r3];

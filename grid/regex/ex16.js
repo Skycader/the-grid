@@ -19,4 +19,9 @@
  *   ""                                         →  0
  */
 
+const f = (code) => {
+  const r = /sample/;
+  return;
+};
+
 module.exports = f;

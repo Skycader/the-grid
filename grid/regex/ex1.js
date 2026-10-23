@@ -23,9 +23,9 @@
  *   "scat cat cats"                       →  "scat  cats"
  */
 
-const f = txt => {
-  const r = //;
+const f = (text) => {
+  const r = /sample/;
   return;
-}
+};
 
 module.exports = f;

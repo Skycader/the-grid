@@ -22,4 +22,8 @@
  *   add(0.5)(0.25)()        =>  0.75
  */
 
+const f = (num) => {
+  return;
+};
+
 module.exports = f;

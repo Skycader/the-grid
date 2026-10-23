@@ -27,4 +27,6 @@
  *   "$SpaceBarsAre Forbidden"        →  false     (a space)
  */
 
+const r = /sample/;
+
 module.exports = r;

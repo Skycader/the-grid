@@ -21,4 +21,9 @@
  *   ""                     →  false
  */
 
+const f = (password) => {
+  const r = /sample/;
+  return;
+};
+
 module.exports = f;

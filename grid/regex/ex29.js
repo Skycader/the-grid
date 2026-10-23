@@ -19,4 +19,9 @@
  *   ""                                                         →  []
  */
 
+const f = (text) => {
+  const r = /sample/;
+  return;
+};
+
 module.exports = f;

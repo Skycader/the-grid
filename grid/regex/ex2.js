@@ -22,9 +22,9 @@
  *   "Ms. Dr. Miss Prof."                 →  "Ms. Dr. Miss Prof."      (other titles)
  */
 
-const f = txt => {
-  const r = //g;
+const f = (text) => {
+  const r = /sample/;
   return;
-}
+};
 
 module.exports = f;
