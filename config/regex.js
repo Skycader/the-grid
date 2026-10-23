@@ -65,8 +65,8 @@ window.CFG_regex = [
   {
     id: "regex_10",
     title: "Format lol-like words",
-    diff: 4,
-    desc: "Change lel, lil to l*l, but keep lol",
+    diff: 5,
+    desc: "Change lel, lil to lEl, lIl (a capital middle letter), but keep lol",
     file: "ex10",
   },
   {
