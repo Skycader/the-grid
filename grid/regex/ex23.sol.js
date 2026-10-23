@@ -1,1 +1,1 @@
-module.exports = /\bl[a-np-z]l\b/g;
+module.exports = /\bl[^o]l\b/g;

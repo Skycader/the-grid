@@ -2,21 +2,21 @@
  * 🎖CERTIFIED 2026-10-23
  * Export a regex that finds the words like lel, lil, lal but not lol itself. It is used as
  * text.replace(r, "l*l").
- * A word is l, one letter that is not o, l — a whole word.
+ * A word is l, ONE character that is not o, l — a whole word.
  *
  * Example:
  *   "lol lal lil lel lol lul"  →  "lol l*l l*l l*l lol l*l"
  *
  * Scope:
  *   ✓ every letter a-z in the middle is found, except o (the ends: a, n, p, z around o)
- *   ✓ the middle must be a letter: a digit, a space, a dot or another symbol is not a word
+ *   ✓ a digit or a symbol in the middle is a match too (l1l, l.l, l-l, l_l, l!l): any ONE character but o
  *   ✓ whole words only: lal glued to other letters, digits or "_" (slalom, lalal, lal1, _lal) is left alone
  *   ✓ punctuation, brackets, quotes, new lines and tabs around the word are fine
  *   ✓ every word in a text, not only the first; the regex is global and gives the same answer when used again
  *   ✓ a text without words and an empty text are unchanged
  *   ✓ speed: the timing test (7.4) replaces in short texts again and again — the solution is compared
  *     with the reference one by STRICT mode
- *   ✗ not pinned: upper case (LEL, lOl)
+ *   ✗ not pinned: upper case (LEL, lOl), a space, a tab or a new line in the middle ("l l")
  *
  * Difficulty: ★★★☆☆☆☆☆☆☆ (3/10)
  */
@@ -67,21 +67,23 @@ describe(":: Running test case for EX23 (words like lel but not lol)", () => {
   // ==========================================
   // 3️⃣ THE MIDDLE IS NOT A LETTER
   // ==========================================
-  // One row = one text that must stay as it is. Why these rows: [^o] takes any character, but the
-  // middle has to be a letter.
+  // One row = one text and its answer. Why these rows: the middle is any ONE character except o, so a digit
+  // or a symbol there is a word too (a regex of letters only would leave them).
   describe("3️⃣ The middle is not a letter", () => {
     const rows = [
-      ["l1l", "l1l"],
-      ["l0l", "l0l"],
-      ["l l", "l l"],
-      ["l.l", "l.l"],
-      ["l,l", "l,l"],
-      ["l-l", "l-l"],
-      ["l_l", "l_l"],
+      ["l1l", "l*l"],
+      ["l0l", "l*l"],
+      ["l9l", "l*l"],
+      ["l.l", "l*l"],
+      ["l,l", "l*l"],
+      ["l-l", "l*l"],
+      ["l_l", "l*l"],
       ["l*l", "l*l"],
-      ["l!l", "l!l"],
-      ["l\nl", "l\nl"],
-      ["l\tl", "l\tl"],
+      ["l!l", "l*l"],
+      ["l#l", "l*l"],
+      ["l$l", "l*l"],
+      ["l/l", "l*l"],
+      ["l1l l2l", "l*l l*l"],
     ];
 
     it.each(rows)("3️⃣.1️⃣ %j → %j", (text, expected) => {
