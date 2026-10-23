@@ -1,22 +1,23 @@
 /* Ex10
  * 🎖CERTIFIED 2026-10-23
  * Change lel, lil, lal and so on to l*l, but leave lol itself as it is.
- * A match is l, one lower case letter and l. Only the middle letter o keeps the word.
+ * A match is a whole word: l, ONE character that is not o, then l. Only the middle o keeps the word.
  *
  * Example:
  *   "lol lal lil lel lol lul"  →  "lol l*l l*l l*l lol l*l"
  *
  * Scope:
  *   ✓ every letter a-z in the middle becomes l*l, except o (the ends: a, n, p, z around o)
- *   ✓ the middle must be a letter: a digit, a space, a dot or another symbol is not a match
+ *   ✓ a digit or a symbol in the middle is a match too (l1l, l.l, l-l, l_l, l!l)
  *   ✓ exactly one character between the two l (ll, lool and l are not matches)
+ *   ✓ whole words only: lalel, lalal, lolal, slalom, lal1, _lal are left alone; a space, a punctuation mark,
+ *     a new line, the start and the end of the text separate the words
  *   ✓ every match in a text, not only the first; punctuation, new lines and tabs around stay
- *   ✓ matches next to each other are taken left to right without overlapping (lolal → lol*l)
  *   ✓ the answer is a string; a text without matches and an empty text stay as they are
  *   ✓ speed: the timing test (7.4) replaces in short texts again and again — the solution is compared
  *     with the reference one by STRICT mode
- *   ✗ not pinned: upper case (LEL, lOl), a match glued to other letters (slalom), letters of other
- *     alphabets in the middle
+ *   ✗ not pinned: upper case (LEL, lOl), a space, a tab or a new line in the middle ("l l"), letters of
+ *     other alphabets next to the word
  *
  * Difficulty: ★★★★☆☆☆☆☆☆ (4/10)
  */
@@ -63,21 +64,23 @@ describe(":: Running test case for EX10 (l*l but not lol)", () => {
   // ==========================================
   // 3️⃣ THE MIDDLE IS NOT A LETTER
   // ==========================================
-  // One row = one text that must stay as it is.
+  // One row = one text and its answer. Why these rows: the middle is any ONE character except o, so a digit
+  // or a symbol there is a match too (a regex of letters only would leave them).
   describe("3️⃣ The middle is not a letter", () => {
     const rows = [
-      ["l1l", "l1l"],
-      ["l0l", "l0l"],
-      ["l9l", "l9l"],
-      ["l l", "l l"],
-      ["l.l", "l.l"],
-      ["l,l", "l,l"],
-      ["l-l", "l-l"],
-      ["l_l", "l_l"],
+      ["l1l", "l*l"],
+      ["l0l", "l*l"],
+      ["l9l", "l*l"],
+      ["l.l", "l*l"],
+      ["l,l", "l*l"],
+      ["l-l", "l*l"],
+      ["l_l", "l*l"],
       ["l*l", "l*l"],
-      ["l!l", "l!l"],
-      ["l\nl", "l\nl"],
-      ["l\tl", "l\tl"],
+      ["l!l", "l*l"],
+      ["l#l", "l*l"],
+      ["l$l", "l*l"],
+      ["l/l", "l*l"],
+      ["l1l l2l", "l*l l*l"],
     ];
 
     it.each(rows)("3️⃣.1️⃣ %j → %j", (text, expected) => {
@@ -86,21 +89,36 @@ describe(":: Running test case for EX10 (l*l but not lol)", () => {
   });
 
   // ==========================================
-  // 4️⃣ EXACTLY ONE CHARACTER BETWEEN
+  // 4️⃣ WHOLE WORDS ONLY, ONE CHARACTER BETWEEN
   // ==========================================
-  // One row = one text and its answer. Why these rows: ll and lool are not l?l; a regex with `*` or `+`
-  // instead of one letter would change them.
-  describe("4️⃣ Exactly one character between", () => {
+  // One row = one text that must stay as it is. Why these rows: lalel is not lil; a match has exactly one
+  // character between the two l and is not a part of a longer word (a regex without \b would change
+  // lalal, slalom and lal1; a regex with `*` or `+` instead of one character would change lool).
+  describe("4️⃣ Whole words only, one character between", () => {
     const rows = [
+      ["lalel", "lalel"],
+      ["lalal", "lalal"],
+      ["lelel", "lelel"],
+      ["lolal", "lolal"],
+      ["lalol", "lalol"],
+      ["lalolal", "lalolal"],
+      ["slalom", "slalom"],
+      ["lally", "lally"],
+      ["ball", "ball"],
+      ["hello", "hello"],
+      ["salad", "salad"],
+      ["alal", "alal"],
+      ["lal1", "lal1"],
+      ["1lal", "1lal"],
+      ["_lal", "_lal"],
+      ["lal_", "lal_"],
+      ["xlalx", "xlalx"],
+      ["lalx", "lalx"],
+      ["xlal", "xlal"],
       ["ll", "ll"],
       ["lool", "lool"],
       ["laal", "laal"],
       ["leel", "leel"],
-      ["lalal", "l*lal"],
-      ["lolal", "lol*l"],
-      ["lalol", "l*lol"],
-      ["lalolal", "l*lol*l"],
-      ["lelel", "l*lel"],
       ["l", "l"],
       ["la", "la"],
       ["al", "al"],

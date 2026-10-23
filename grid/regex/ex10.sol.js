@@ -1,2 +1,5 @@
-const f = (text) => text.replace(/l[a-np-z]l/g, "l*l");
+const f = (txt) => {
+  const r = /\bl[^o]l\b/g;
+  return txt.replace(r, 'l*l');
+};
 module.exports = f;
