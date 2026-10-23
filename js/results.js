@@ -1,7 +1,28 @@
       // ═══════════ RENDER ═══════════
+      // The bar above the tests (the STRICT numbers, the FAILED ONLY check). FAILED ONLY is on by
+      // default: only the failed tests are listed, so the player sees at once what to fix. The choice is
+      // remembered; switching it redraws the last result without running the tests again.
+      const RES_FAILED_ONLY_KEY = "gr_res_failed_only";
+      let _resLast = null; // { r, benchData } of the last result on the screen
+      function resFailedOnly() {
+        try {
+          return localStorage.getItem(RES_FAILED_ONLY_KEY) !== "0";
+        } catch (e) {
+          return true;
+        }
+      }
+      function resToggleFailedOnly() {
+        try {
+          localStorage.setItem(RES_FAILED_ONLY_KEY, resFailedOnly() ? "0" : "1");
+        } catch (e) {}
+        playClick();
+        if (_resLast) renderResults(_resLast.r, _resLast.benchData);
+      }
+
       function renderResults(r, benchData) {
         const body = document.getElementById("res-body"),
           sum = document.getElementById("res-sum");
+        _resLast = r.error ? null : { r, benchData };
         if (r.error) {
           body.innerHTML = `<div style="padding:11px"><div style="color:#dc322f;font-family:'JetBrains Mono',monospace;font-size:.74rem;border-left:2px solid #dc322f;padding-left:9px"><div style="margin-bottom:3px;color:#cb4b16">⚠ ERROR</div><div style="white-space:pre-wrap;color:#a93020">${esc(r.error)}</div></div></div>`;
           sum.innerHTML = `<span class="bf">✗ ERROR</span>`;
@@ -15,7 +36,7 @@
         const totalMem = mems.length ? mems.reduce((a, b) => a + b, 0) : null;
         const memStr = totalMem != null ? fmtB(totalMem) : "";
 
-        // Strict banner (STRICT_TOLERANCE = 10%)
+        // Strict numbers for the bar (STRICT_TOLERANCE = 10%)
         let strictBanner = "";
         if (_strictOn && benchData) {
           const { userMinTime, userRuns, refMinTime, refRuns } = benchData;
@@ -24,30 +45,39 @@
             refMinTime > 0 ? (userMinTime - refMinTime) / refMinTime : 0;
           const ok = ratio <= TOLS;
           const color = ok ? "#859900" : "#dc322f";
-          strictBanner = `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:5px 9px 6px;font-family:'JetBrains Mono',monospace;font-size:.64rem;border-bottom:1px solid var(--bd);flex-shrink:0;background:rgba(0,0,0,.2)">
+          strictBanner = `
       <span style="color:${color};font-weight:bold;letter-spacing:.08em">⚡ ${ok ? "STRICT PASS" : "STRICT FAIL"}</span>
       <span style="color:var(--txd)">user min:</span><span style="color:${color}">${userMinTime.toFixed(3)}ms ×${userRuns}</span>
       <span style="color:var(--txd)">ref min:</span><span style="color:#2aa198">${refMinTime.toFixed(3)}ms ×${refRuns}</span>
-      <span style="color:var(--txd)">delta:</span><span style="color:${color}">${ratio >= 0 ? "+" : ""}${(ratio * 100).toFixed(1)}% (limit +${(TOLS * 100).toFixed(0)}%)</span>
-    </div>`;
+      <span style="color:var(--txd)">delta:</span><span style="color:${color}">${ratio >= 0 ? "+" : ""}${(ratio * 100).toFixed(1)}% (limit +${(TOLS * 100).toFixed(0)}%)</span>`;
         } else if (
           _strictOn &&
           !benchData &&
           files &&
           FILECACHE[`${curCat().id}/${curTask.id}`]?.sol == null
         ) {
-          strictBanner = `<div style="padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--txd);border-bottom:1px solid var(--bd)">⚡ STRICT: no .sol.js found — skipped</div>`;
+          strictBanner = `<span style="color:var(--txd)">⚡ STRICT: no .sol.js found — skipped</span>`;
         }
+        // the bar: the strict numbers on the left, the FAILED ONLY check on the right (the check of STRICT)
+        const onlyFailed = resFailedOnly();
+        const bar = (withFilter) =>
+          `<div class="res-bar">${strictBanner}${
+            withFilter
+              ? `<div class="strict-grp res-flt${onlyFailed ? " strict-on" : ""}" onclick="resToggleFailedOnly()" title="Show only the failed tests"><div class="strict-chk">${onlyFailed ? "✓" : ""}</div><span>FAILED ONLY</span></div>`
+              : ""
+          }</div>`;
 
         sum.innerHTML = `<span class="bp">✓ ${pass}</span>${fail ? `<span class="bf"> ✗ ${fail}</span>` : ""}<span class="bt">${(r.total || 0).toFixed(2)}ms</span>${memStr ? `<span class="bt" style="color:#2aa198">${memStr}</span>` : ""}`;
         if (!all.length) {
           body.innerHTML =
-            strictBanner +
+            (strictBanner ? bar(false) : "") +
             `<div class="res-empty"><div>NO TESTS FOUND</div></div>`;
           return;
         }
         let h = "";
-        Object.entries(suites).forEach(([sn, tests]) => {
+        Object.entries(suites).forEach(([sn, allTests]) => {
+          // FAILED ONLY: the passed tests are not listed, a group without failed tests is not shown
+          const tests = onlyFailed ? (allTests || []).filter((t) => t.status !== "pass") : allTests;
           if (!tests?.length) return;
           h += `<div class="r-suite">`;
           if (sn !== "__root__")
@@ -113,9 +143,13 @@
           });
           h += `</div>`;
         });
-        body.innerHTML = strictBanner + h;
+        // nothing failed and the passed ones are hidden: say it, so the list is not just empty
+        if (!h && onlyFailed)
+          h = `<div class="res-empty in-list"><div class="ico">✓</div><div>ALL ${pass} TESTS PASSED</div><div class="res-empty-sub">the passed tests are hidden — switch off FAILED ONLY to see them</div></div>`;
+        body.innerHTML = bar(true) + h;
       }
       function clearResults() {
+        _resLast = null;
         document.getElementById("res-body").innerHTML =
           `<div class="res-empty"><div class="ico">⬡</div><div>AWAITING EXECUTION</div><button onclick="formatAndRun()" class="run-btn" style="margin-top:18px;font-size:.85rem;padding:10px 36px;letter-spacing:.25em;box-shadow:0 0 18px rgba(0,255,255,.2)">▶ RUN</button></div>`;
         document.getElementById("res-sum").innerHTML = "";

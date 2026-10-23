@@ -2734,6 +2734,30 @@
         font-size: 1.7rem;
         opacity: 0.18;
       }
+      /* the bar above the tests: the STRICT numbers, and the FAILED ONLY check on the right */
+      .res-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 10px;
+        padding: 5px 9px 6px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.64rem;
+        border-bottom: 1px solid var(--bd);
+        flex-shrink: 0;
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .res-flt {
+        margin-left: auto;
+      }
+      .res-empty.in-list {
+        height: auto;
+        padding: 36px 12px;
+      }
+      .res-empty-sub {
+        font-size: 0.64rem;
+        opacity: 0.7;
+      }
       .statusbar {
         padding: 2px 11px;
         font-family: "JetBrains Mono", monospace;
