@@ -67,7 +67,7 @@
         const open = !document.getElementById("pfm-modal").classList.contains("hide");
         const id = p.get("profile");
         if (id) {
-          if (!open || MENU[_pfmTab].id !== id) pfmOpen(id);
+          if (!open || MENU[_pfmTab].id !== id) pfmOpen(id, true);
         } else if (open) pfmClose(true);
       }
 
@@ -75,7 +75,7 @@
         const profileId = new URLSearchParams(location.search).get("profile");
         await restorePage();
         // last: opening a page rewrites the URL, the profile param is put back by pfmOpen
-        if (profileId) pfmOpen(profileId);
+        if (profileId) pfmOpen(profileId, true);
       }
 
       async function restorePage() {

@@ -1,5 +1,12 @@
       // ═══════════ TASK ═══════════
+      // A task opened from a card of the profile window: BACK goes back to that window (the browser's back
+      // does it already: the history entry before the task is the profile one). Any other way to open a
+      // task (the list, the search, the random, the browser's forward) clears it.
+      let _nextTaskFromProfile = false,
+        _taskFromProfile = false;
       async function openTask(cat, task) {
+        _taskFromProfile = _nextTaskFromProfile;
+        _nextTaskFromProfile = false;
         curTask = task;
         // Sync URL — uses task.id as the task param (stable, matches config)
         setQueryParams({ cat: cat.id, task: task.id });
@@ -111,6 +118,15 @@
         if (editor && curTask && !_editorLoading && curTab === "ed") {
           solCode = editor.getValue();
           CODE[`${curCat().id}/${curTask.id}`] = solCode;
+        }
+        // opened from the profile window: back to it, like the back button of the browser (the popstate
+        // handler opens the window and the menu behind it)
+        if (_taskFromProfile) {
+          _taskFromProfile = false;
+          closeMobResults();
+          hideSolOverlay();
+          history.back();
+          return;
         }
         // Return to category URL (drop task param)
         const cat = curCat();

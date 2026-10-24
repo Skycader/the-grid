@@ -181,14 +181,18 @@
         modal.style.minHeight = h + "px";
       }
       window.addEventListener("resize", () => pfmFitHeight());
-      function pfmOpen(tabId) {
+      // silent: the window is opened by the URL (a reload, the back / forward of the browser, the BACK of a task
+      // that was opened from this window), not by a click: no click sound and no fade-in, so that it does not
+      // sound like several clicks and does not flicker
+      function pfmOpen(tabId, silent) {
         _pfmTab = Math.max(0, MENU.findIndex((t) => t.id === tabId)); // REGEX, the first catalog
         pfmRender();
+        pfmModal.style.animation = silent ? "none" : "";
         pfmModal.classList.remove("hide");
         pfmFitHeight();
         pfmModal.querySelector(".m-content").scrollTop = 0;
         pfmSyncUrl(true);
-        playClick();
+        if (!silent) playClick();
       }
       function pfmClose(silent) {
         pfmModal.classList.add("hide");
@@ -211,6 +215,7 @@
         if (card) {
           const x = _pfmCards[+card.dataset.i];
           pfmModal.classList.add("hide");
+          _nextTaskFromProfile = true; // the BACK of the task brings the player back to this window (js/task-view.js)
           navigateToTask(x.cat, x.task);
         }
       });
