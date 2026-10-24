@@ -162,10 +162,29 @@
         history.replaceState({}, "", url.toString());
       }
       // tabId: the id of a catalog (the URL) — absent / unknown means the first one
+      // The window is as tall as its tallest tab (REGEX has many cards, the others few), so switching the tabs
+      // does not change its height and the centered window does not jump. Measured by drawing every tab once.
+      function pfmFitHeight() {
+        const modal = pfmModal.querySelector(".modal");
+        if (!modal || pfmModal.classList.contains("hide")) return;
+        const keep = _pfmTab;
+        modal.style.minHeight = "";
+        let h = 0;
+        for (let i = 0; i < MENU.length; i++) {
+          _pfmTab = i;
+          pfmRender();
+          h = Math.max(h, modal.getBoundingClientRect().height);
+        }
+        _pfmTab = keep;
+        pfmRender();
+        modal.style.minHeight = h + "px";
+      }
+      window.addEventListener("resize", () => pfmFitHeight());
       function pfmOpen(tabId) {
         _pfmTab = Math.max(0, MENU.findIndex((t) => t.id === tabId)); // REGEX, the first catalog
         pfmRender();
         pfmModal.classList.remove("hide");
+        pfmFitHeight();
         pfmModal.querySelector(".m-content").scrollTop = 0;
         pfmSyncUrl(true);
         playClick();
@@ -183,7 +202,9 @@
           _pfmTab = +tab.dataset.t;
           playClick();
           pfmSyncUrl(true);
-          return pfmRender();
+          pfmRender();
+          pfmModal.querySelector(".m-content").scrollTop = 0;
+          return;
         }
         const card = e.target.closest(".pfm-card");
         if (card) {

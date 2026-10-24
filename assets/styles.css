@@ -229,6 +229,22 @@
       .modal.pfm-modal {
         max-width: 1000px;
       }
+      /* the scrollbar does not appear and disappear between the tabs and shift the cards (js/profile.js
+         also fixes the height of the window to its tallest tab) */
+      .pfm-modal .m-content {
+        scrollbar-gutter: stable;
+        /* the grid of the cards goes down to the bottom of the window even when there are few tasks */
+        display: flex;
+        flex-direction: column;
+      }
+      .pfm-modal .m-content > #pfm-sum,
+      .pfm-modal .m-content > .pfm-tabs {
+        flex: 0 0 auto;
+      }
+      .pfm-modal .m-content > .pfm-grid.tx-rows {
+        flex: 1 0 auto;
+        align-content: start; /* the cards keep their height, the free space is below them */
+      }
       .pfm-tabs {
         display: flex;
         gap: 3px;
