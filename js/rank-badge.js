@@ -165,29 +165,89 @@
       // One floating tooltip for all the badges (a tooltip inside a row would be clipped by the
       // scrolling list): an icon with the number (the signal bars for a task, the profile for the
       // player) and the name of the rank.
+      // A solved task shows three numbers in a row — the rank now, the average life, the longest life (the
+      // same icon, three colours: the rank colour, yellow, red). The words come only when the cursor is on
+      // an icon or a number: the line under the row turns from the name of the rank into what the number is.
+      // That tooltip can be entered (the cursor goes down to a number) and it is closed a moment after
+      // the cursor leaves both the badge and the tooltip.
       (function () {
         const tip = document.createElement("div");
         tip.id = "rk-tip";
         document.body.appendChild(tip);
-        const hide = () => tip.classList.remove("show");
+        let curBadge = null,
+          hideT = null,
+          nameHtml = "";
+        const hide = () => {
+          clearTimeout(hideT);
+          curBadge = null;
+          tip.classList.remove("show", "multi");
+        };
+        const later = () => {
+          clearTimeout(hideT);
+          hideT = setTimeout(hide, 220);
+        };
+        const sub = () => tip.querySelector(".rk-t2");
         document.addEventListener("mouseover", (e) => {
+          const inTip = e.target.closest && e.target.closest("#rk-tip");
+          if (inTip) {
+            // inside the tooltip: keep it, and say what the number under the cursor is
+            clearTimeout(hideT);
+            const it = e.target.closest(".rk-it");
+            if (sub()) sub().textContent = it ? it.dataset.hint : nameHtml;
+            return;
+          }
           const b = e.target.closest && e.target.closest(".rank-badge");
-          if (!b) return hide();
+          if (!b) return tip.classList.contains("multi") ? later() : hide();
+          clearTimeout(hideT);
+          if (b === curBadge && tip.classList.contains("show")) return; // moving inside the same badge
+          curBadge = b;
           const kind = b.dataset.kind || "task";
           const nm = rankInfo(+b.dataset.rank, kind).name;
           const ico = kind === "player" ? txProfileSvg(12) : rankIconSvg(11);
-          tip.innerHTML = `<span class="rk-t1">${ico}<b>${rankFmt(+b.dataset.rank, kind)}</b></span><span class="rk-t2">${kind === "player" ? nm[0] : `${nm[0]} · ${nm[1]}`}</span>`;
+          nameHtml = kind === "player" ? nm[0] : `${nm[0]} · ${nm[1]}`;
+          const st = kind === "task" && b.dataset.key && typeof walletLifeStats === "function" ? walletLifeStats(b.dataset.key) : null;
+          const days = (v) => `${v} ${v === 1 ? "day" : "days"}`;
+          const it = (cls, v, hint) => `<span class="rk-it ${cls}" data-hint="${hint}">${ico}<b>${rankFmt(v, kind)}</b></span>`;
+          let hints = [nameHtml];
+          if (st && st.lives > 0) {
+            const cur = +b.dataset.rank;
+            // short, so that the tooltip stays as narrow as its row of numbers
+            hints = [`current: ${days(cur)}`, `average: ${days(st.average)}`, `max life: ${days(st.max)}`];
+            tip.classList.add("multi");
+            tip.innerHTML =
+              `<span class="rk-row">${it("now", cur, hints[0])}${it("avg", st.average, hints[1])}${it("max", st.max, hints[2])}</span>` +
+              `<span class="rk-t2">${nameHtml}</span>`;
+            hints.push(nameHtml);
+          } else {
+            tip.classList.remove("multi");
+            tip.innerHTML = `<span class="rk-t1">${ico}<b>${rankFmt(+b.dataset.rank, kind)}</b></span><span class="rk-t2">${nameHtml}</span>`;
+          }
+          // the width does not jump when the line changes: the tooltip is as wide as its longest line
+          tip.style.minWidth = "0px";
           tip.style.left = "0px";
           tip.style.top = "0px";
+          if (tip.classList.contains("multi")) {
+            let w = 0;
+            hints.forEach((h) => {
+              sub().textContent = h;
+              w = Math.max(w, tip.getBoundingClientRect().width);
+            });
+            sub().textContent = nameHtml;
+            tip.style.minWidth = Math.ceil(w) + "px";
+          }
           const r = b.getBoundingClientRect(),
             t = tip.getBoundingClientRect();
           const x = Math.min(Math.max(4, r.left + r.width / 2 - t.width / 2), innerWidth - t.width - 4);
-          const y = r.top - t.height - 7 >= 4 ? r.top - t.height - 7 : r.bottom + 7;
+          const y = r.top - t.height - 3 >= 4 ? r.top - t.height - 3 : r.bottom + 3;
           tip.style.left = Math.round(x) + "px";
           tip.style.top = Math.round(y) + "px";
           tip.classList.add("show");
         });
-        document.addEventListener("mousedown", hide);
-        document.addEventListener("click", hide);
+        document.addEventListener("mousedown", (e) => {
+          if (!(e.target.closest && e.target.closest("#rk-tip"))) hide();
+        });
+        document.addEventListener("click", (e) => {
+          if (!(e.target.closest && e.target.closest("#rk-tip"))) hide();
+        });
         window.addEventListener("scroll", hide, true);
       })();

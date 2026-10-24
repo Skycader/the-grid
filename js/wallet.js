@@ -363,6 +363,31 @@
       function walletRank(key) {
         return Math.floor(_rank[key] || 0);
       }
+      // The lives of a task. A life is the rank (in days) from the first counted solve until the rank is wiped
+      // (the solution was viewed); the log has it: a "rank" entry ends a life, its rankFrom is the last value.
+      //   current  the rank now
+      //   max      the longest life ever (it stays even if the rank is wiped the next day)
+      //   average  the mean of all the lives, the one that goes on included: with one life it is the max
+      //   lives    how many lives there were (0: the task was never solved)
+      function walletLifeStats(key) {
+        const lives = [];
+        let peak = 0;
+        for (const e of _history) {
+          if (e.task !== key) continue;
+          if (e.type === "solve") peak = Math.max(peak, +(e.rankTo ?? e.rank) || 0);
+          else if (e.type === "rank") {
+            // the legacy entries have from instead of rankFrom
+            peak = Math.max(peak, +(e.rankFrom ?? e.from) || 0);
+            if (peak > 0) lives.push(peak);
+            peak = 0;
+          }
+        }
+        const current = walletRank(key);
+        peak = Math.max(peak, current);
+        if (peak > 0) lives.push(peak); // the life that goes on
+        const sum = lives.reduce((a, b) => a + b, 0);
+        return { current, max: lives.length ? Math.max(...lives) : 0, average: lives.length ? Math.round(sum / lives.length) : 0, lives: lives.length };
+      }
       // Signal-bars icon (4 ascending bars) followed by the rank number.
       function rankIconSvg(px) {
         return `<svg width="${px}" height="${px}" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="11" width="2.6" height="4" rx=".6" fill="currentColor"/><rect x="5" y="8" width="2.6" height="7" rx=".6" fill="currentColor"/><rect x="9" y="5" width="2.6" height="10" rx=".6" fill="currentColor"/><rect x="13" y="1.5" width="2.6" height="13.5" rx=".6" fill="currentColor"/></svg>`;
@@ -374,7 +399,7 @@
       function mkRankBadge(key) {
         const r = walletRank(key);
         // the patch of the rank; the number of days is in the tooltip (js/rank-badge.js)
-        return `<span class="rank-badge${r ? "" : " zero"}" data-rank="${r}" aria-label="Rank ${r}: days accumulated between repeat solves">${rankPatchHtml(r)}</span>`;
+        return `<span class="rank-badge${r ? "" : " zero"}" data-rank="${r}" data-key="${key}" aria-label="Rank ${r}: days accumulated between repeat solves">${rankPatchHtml(r)}</span>`;
       }
 
       // Ручная правка lastSolved (CLI). ts = ms | null (= "ни разу не решена")

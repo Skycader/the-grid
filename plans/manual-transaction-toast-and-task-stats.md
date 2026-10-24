@@ -63,5 +63,9 @@ Open:
   full words; how it behaves on a narrow screen next to the rank.
 - Old players: backfill the counters and the max from `gr_history` once on load, or start from zero.
 
+Done in 1.6.0: the **max term** is the "max life" of the rank tooltip (current / average / max life of
+a task, `walletLifeStats` in `js/wallet.js`); see `plans/storage-history-growth.md`. The counters of
+correct and wrong solves next to the rank are still open.
+
 Overlap: `docs/PLAN.md`, section 2, already describes the same place (solves + failed runs + a
 HISTORY button). Decide whether this item replaces that section or extends it, then keep one of them.

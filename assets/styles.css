@@ -2221,6 +2221,40 @@
         font-size: 0.62rem;
         color: var(--tx);
       }
+      /* a solved task: the rank now / the average life / the max life in a row; the words come under the row
+         only when the cursor is on an icon or a number (the tooltip can be entered, see js/rank-badge.js) */
+      #rk-tip.multi {
+        pointer-events: auto;
+        gap: 3px;
+      }
+      #rk-tip .rk-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      #rk-tip .rk-it {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 1px 2px;
+        cursor: default;
+      }
+      #rk-tip .rk-it:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      #rk-tip .rk-it.avg {
+        color: #ffd84a;
+      }
+      #rk-tip .rk-it.max {
+        color: #dc322f;
+      }
+      #rk-tip.multi .rk-t2 {
+        margin-top: 1px;
+        padding-top: 3px;
+        border-top: 1px solid rgba(108, 113, 196, 0.3);
+        text-align: center;
+      }
       #rk-tip svg {
         display: block;
       }
