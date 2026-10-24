@@ -122,7 +122,8 @@
             <div class="pfm-head">${PFM_SYMBOL}<span>${name}</span></div>
             <div class="pfm-mid">${icon}</div>
             <div class="pfm-foot">
-              <span title="Rank">${rankIconSvg(10)}${walletRank(key)}</span>
+              <span class="pfm-rank">${mkRankBadge(key)}</span>
+              <span title="Rank: days accumulated between repeat solves">${rankIconSvg(10)}${walletRank(key)}</span>
               <span class="ok" title="Successful runs">✓ ${st.ok}</span>
               <span class="bad" title="Failed runs">✗ ${st.fail}</span>
               <span class="coins" title="Coins earned from this task">${coinSvg(11)}${fmtCoins(st.coins)}</span>
