@@ -2238,7 +2238,7 @@
         align-items: center;
         gap: 4px;
         padding: 1px 2px;
-        cursor: default;
+        cursor: help;
       }
       #rk-tip .rk-it:hover {
         background: rgba(255, 255, 255, 0.06);
