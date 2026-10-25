@@ -132,11 +132,29 @@
       }
 
       // EXPERIMENT: the square button fills up with the total need of the tasks for a repeat solve (0-100 %)
-      // and a ball with the number floats in it. How the need is counted is not decided yet (plans: the weighted
-      // mean of the need meters), so for now it shows 0 until the console sets it:
-      // run("override global_need 100") (nothing is saved).
+      // and a ball floats in it. The total need is the MEDIAN of the need meters (days since the last solve /
+      // the max life of the task, at most 1 each) of the solved tasks: one overdue or one fresh task does not
+      // move it. run("override global_need 100") sets it by hand for a test (nothing is saved).
       let _hvNeedOverride = null;
-      const hvNeedValue = () => (_hvNeedOverride == null ? 0 : _hvNeedOverride);
+      let _hvNeedCount = 0; // how many solved tasks the measured need is made of
+      function hvMeasuredNeed() {
+        const f = [];
+        MENU.forEach((top) => {
+          const res = [];
+          gatherAllTasks(top, res);
+          res.forEach(({ cat, task }) => {
+            const key = `${cat.id}/${task.id}`,
+              d = walletNeedDays(key);
+            if (d != null) f.push(Math.min(1, d / walletNeedBase(key).days));
+          });
+        });
+        _hvNeedCount = f.length;
+        if (!f.length) return 0;
+        f.sort((a, b) => a - b);
+        const m = f.length >> 1;
+        return 100 * (f.length % 2 ? f[m] : (f[m - 1] + f[m]) / 2);
+      }
+      const hvNeedValue = () => (_hvNeedOverride == null ? hvMeasuredNeed() : _hvNeedOverride);
       function hvNeedOverride(percent) {
         _hvNeedOverride = percent;
         hvNeedRender();
@@ -265,7 +283,11 @@
         const btn = document.getElementById("hv-need-btn");
         btn.title =
           `Total need for a repeat solve: ${Math.round(v)}%` +
-          (_hvNeedOverride == null ? " (not measured yet)" : " (set from the console)") +
+          (_hvNeedOverride != null
+            ? " (set from the console)"
+            : _hvNeedCount
+              ? ` (the median over ${_hvNeedCount} solved ${_hvNeedCount === 1 ? "task" : "tasks"})`
+              : " (no solved tasks yet)") +
           " · click to open the most overdue task";
         hvPoolWake();
       }
