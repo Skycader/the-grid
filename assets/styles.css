@@ -1262,29 +1262,26 @@
         color: var(--txd);
         font-variant-numeric: tabular-nums;
       }
-      /* the square button left of HARVEST: the vial of the total need inside, the click is the same as HARVEST's */
+      /* the square button left of HARVEST: the whole button is the pool of the total need, the click is the same
+         as HARVEST's */
       .hv-need-btn {
+        position: relative;
         width: 38px;
         min-width: 0;
         padding: 0;
         justify-content: center;
+        overflow: hidden;
       }
-      /* EXPERIMENT: the vial of the total need (js/harvest.js, --n is the percent): a vertical scale that
-         fills from the bottom with a glowing blue liquid; two wave layers run on the surface */
+      /* EXPERIMENT: the pool of the total need (js/harvest.js, --n is the percent): fills the button inside its
+         border from the bottom with a glowing blue liquid; two wave layers run on the surface */
       .hv-need {
-        position: relative;
-        flex: 0 0 auto;
-        width: 22px;
-        height: 22px;
-        box-sizing: border-box;
-        border: 1px solid rgba(38, 139, 210, 0.7);
+        position: absolute;
+        inset: 0;
         overflow: hidden;
         transition: box-shadow 0.4s;
       }
       .hv-need.on {
-        box-shadow:
-          0 0 7px rgba(38, 139, 210, 0.6),
-          inset 0 0 5px rgba(42, 190, 255, 0.35);
+        box-shadow: inset 0 0 6px rgba(42, 190, 255, 0.35);
       }
       /* the liquid: the body is the height of the level (minus 4 px for the waves on top of it) */
       .hv-need i {
