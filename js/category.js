@@ -118,6 +118,7 @@
       //   rich / poor — by the reward one solve would pay right now (walletReward):
       //                 highest / lowest first. Never-solved pay 0 (first solve is free).
       //   ranked / novice — by task rank (walletRank): highest / lowest first.
+      //   az / za — by the name (EX_2 before EX_10): A to Z / Z to A.
       const DEFAULT_SORT = "easy";
       let _taskSortDir = DEFAULT_SORT; // the URL keeps it: &sort=… (js/routing.js)
       const SORT_MODES = {
@@ -129,6 +130,8 @@
         poor: { icon: coinSvg(13) + "▼", label: "Lowest reward first" },
         ranked: { icon: rankIconSvg(13) + "▲", label: "Highest rank first" },
         novice: { icon: rankIconSvg(13) + "▼", label: "Lowest rank first" },
+        az: { icon: "A→Z", label: "Name, A to Z" },
+        za: { icon: "Z→A", label: "Name, Z to A" },
       };
       const SORT_NEXT = {
         easy: "hard",
@@ -138,31 +141,42 @@
         rich: "poor",
         poor: "ranked",
         ranked: "novice",
-        novice: "easy",
+        novice: "az",
+        az: "za",
+        za: "easy",
       };
 
       // Current category's tasks in display order.
       // All rendering/search indices are relative to THIS array, not cat.tasks.
       function getDisplayTasks() {
         if (!_vsCat || !_vsCat.tasks) return [];
-        const key = (t) => `${_vsCat.id}/${t.id}`;
-        return _vsCat.tasks.slice().sort((a, b) => {
-          if (_taskSortDir === "need" || _taskSortDir === "calm") {
-            const na = walletNeedSort(key(a)),
-              nb = walletNeedSort(key(b));
-            return _taskSortDir === "need" ? nb - na : na - nb;
+        return sortByMode(_vsCat.tasks, _taskSortDir, (t) => `${_vsCat.id}/${t.id}`, (t) => t.diff, (t) => t.id);
+      }
+      // A copy of items in the order of a sort mode (SORT_MODES); keyOf(item) is the wallet key
+      // ("cat/task"), diffOf(item) the difficulty, nameOf(item) the name. The list of the profile window sorts
+      // with it too.
+      function sortByMode(items, mode, keyOf, diffOf, nameOf) {
+        return items.slice().sort((a, b) => {
+          if (mode === "az" || mode === "za") {
+            const c = String(nameOf(a)).localeCompare(String(nameOf(b)), undefined, { numeric: true });
+            return mode === "az" ? c : -c;
           }
-          if (_taskSortDir === "rich" || _taskSortDir === "poor") {
-            const ra = walletReward(key(a), a.diff),
-              rb = walletReward(key(b), b.diff);
-            return _taskSortDir === "rich" ? rb - ra : ra - rb;
+          if (mode === "need" || mode === "calm") {
+            const na = walletNeedSort(keyOf(a)),
+              nb = walletNeedSort(keyOf(b));
+            return mode === "need" ? nb - na : na - nb;
           }
-          if (_taskSortDir === "ranked" || _taskSortDir === "novice") {
-            const ra = walletRank(key(a)),
-              rb = walletRank(key(b));
-            return _taskSortDir === "ranked" ? rb - ra : ra - rb;
+          if (mode === "rich" || mode === "poor") {
+            const ra = walletReward(keyOf(a), diffOf(a)),
+              rb = walletReward(keyOf(b), diffOf(b));
+            return mode === "rich" ? rb - ra : ra - rb;
           }
-          return _taskSortDir === "easy" ? a.diff - b.diff : b.diff - a.diff;
+          if (mode === "ranked" || mode === "novice") {
+            const ra = walletRank(keyOf(a)),
+              rb = walletRank(keyOf(b));
+            return mode === "ranked" ? rb - ra : ra - rb;
+          }
+          return mode === "easy" ? diffOf(a) - diffOf(b) : diffOf(b) - diffOf(a);
         });
       }
 

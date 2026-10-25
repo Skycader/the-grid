@@ -252,6 +252,42 @@
         position: relative;
         z-index: 1;
       }
+      /* the sort dropdown of the task list, at the right end of the tabs, in the shape of a tab (the slant on
+         the left, the mirror of the tabs) */
+      .pfm-tabs .pfm-sort {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 0;
+        margin: 0 0 0 auto;
+        position: relative;
+        top: 1px;
+      }
+      .pfm-tabs .pfm-sort .sort-btn {
+        flex: 0 0 auto;
+        padding: 5px 12px 4px 24px;
+        background: rgba(181, 137, 0, 0.06);
+        border: 1px solid rgba(181, 137, 0, 0.3);
+        border-bottom: none;
+        clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%);
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .pfm-tabs .pfm-sort .sort-btn:hover {
+        background: rgba(181, 137, 0, 0.14);
+        border-color: rgba(181, 137, 0, 0.3);
+        box-shadow: none;
+      }
+      .pfm-tabs .pfm-sort.open .sort-btn {
+        background: rgba(181, 137, 0, 0.22);
+        border-color: rgba(181, 137, 0, 0.7);
+      }
+      .sort-btn.sort-az,
+      .sort-btn.sort-za,
+      .sort-ico.sort-az,
+      .sort-ico.sort-za {
+        color: #93a1a1;
+      }
       .pfm-tab {
         display: inline-flex;
         align-items: baseline;

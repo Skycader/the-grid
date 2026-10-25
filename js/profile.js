@@ -133,8 +133,60 @@
         </div>`;
       }
 
+      // The sort of the cards: the same modes and the same dropdown as the task list (SORT_MODES and
+      // sortByMode, js/category.js), at the right end of the tabs, in the shape of a tab. By the name (A to Z)
+      // by default; the choice is remembered.
+      const PFM_SORT_KEY = "gr_pfm_sort";
+      let _pfmSort = "az";
+      try {
+        _pfmSort = localStorage.getItem(PFM_SORT_KEY) || _pfmSort;
+      } catch (e) {}
+      let _pfmSortWrap = null;
+      function pfmSortUpdate() {
+        const btn = _pfmSortWrap.querySelector(".sort-btn");
+        for (const m in SORT_MODES) btn.classList.toggle("sort-" + m, m === _pfmSort);
+        btn.innerHTML = SORT_MODES[_pfmSort].icon;
+        btn.title = "Sort: " + SORT_MODES[_pfmSort].label.toLowerCase();
+        _pfmSortWrap.querySelectorAll(".sort-opt").forEach((o) => o.classList.toggle("active", o.dataset.mode === _pfmSort));
+      }
+      function pfmSortBuild() {
+        if (!(_pfmSort in SORT_MODES)) _pfmSort = "az";
+        const wrap = document.createElement("div");
+        wrap.className = "sort-wrap pfm-sort";
+        wrap.innerHTML = '<button class="sort-btn" type="button"></button><div class="sort-menu"></div>';
+        const hover = attachHoverMenu(wrap, 450);
+        const set = (m) => {
+          _pfmSort = m;
+          try {
+            localStorage.setItem(PFM_SORT_KEY, m);
+          } catch (e) {}
+          pfmSortUpdate();
+          pfmRender();
+        };
+        wrap.querySelector(".sort-btn").onclick = () => {
+          playClick();
+          set(SORT_NEXT[_pfmSort]);
+        };
+        const menu = wrap.querySelector(".sort-menu");
+        for (const m in SORT_MODES) {
+          const o = document.createElement("div");
+          o.className = "sort-opt";
+          o.dataset.mode = m;
+          o.innerHTML = `<span class="sort-ico sort-${m}">${SORT_MODES[m].icon}</span><span>${SORT_MODES[m].label}</span>`;
+          o.onclick = () => {
+            playClick();
+            set(m);
+            hover.close();
+          };
+          menu.appendChild(o);
+        }
+        _pfmSortWrap = wrap;
+        pfmSortUpdate();
+      }
+
       function pfmRender() {
         const tops = MENU;
+        if (!_pfmSortWrap) pfmSortBuild();
         _pfmTab = Math.min(_pfmTab, tops.length - 1);
         document.getElementById("pfm-tabs").innerHTML = tops
           .map((top, i) => {
@@ -143,8 +195,9 @@
             return `<button class="pfm-tab${i === _pfmTab ? " on" : ""}" data-t="${i}" type="button"><b>${top.name}</b><i>${done}/${all.length}</i></button>`;
           })
           .join("");
+        document.getElementById("pfm-tabs").appendChild(_pfmSortWrap); // innerHTML above took it out
         const top = tops[_pfmTab];
-        _pfmCards = pfmTasks(top);
+        _pfmCards = sortByMode(pfmTasks(top), _pfmSort, (x) => `${x.cat.id}/${x.task.id}`, (x) => x.task.diff, (x) => pfmName(x.task));
         document.getElementById("pfm-grid").innerHTML =
           _pfmCards.map((x, i) => pfmCard(x, top, i)).join("") ||
           '<div class="tx-empty">// NO TASKS //</div>';
