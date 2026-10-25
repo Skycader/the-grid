@@ -369,7 +369,12 @@
       //   max      the longest life ever (it stays even if the rank is wiped the next day)
       //   average  the mean of all the lives, the one that goes on included: with one life it is the max
       //   lives    how many lives there were (0: the task was never solved)
+      // (remembered per task while the log and the rank stay the same: the task list asks for every row)
+      let _lifeCache = {};
       function walletLifeStats(key) {
+        const sig = _history.length + "|" + (_rank[key] || 0);
+        const hit = _lifeCache[key];
+        if (hit && hit.sig === sig) return hit.stats;
         const lives = [];
         let peak = 0;
         for (const e of _history) {
@@ -386,7 +391,9 @@
         peak = Math.max(peak, current);
         if (peak > 0) lives.push(peak); // the life that goes on
         const sum = lives.reduce((a, b) => a + b, 0);
-        return { current, max: lives.length ? Math.max(...lives) : 0, average: lives.length ? Math.round(sum / lives.length) : 0, lives: lives.length };
+        const stats = { current, max: lives.length ? Math.max(...lives) : 0, average: lives.length ? Math.round(sum / lives.length) : 0, lives: lives.length };
+        _lifeCache[key] = { sig, stats };
+        return stats;
       }
       // Signal-bars icon (4 ascending bars) followed by the rank number.
       function rankIconSvg(px) {
@@ -428,6 +435,7 @@
         } catch (e) {
           _history = [];
         }
+        _lifeCache = {};
         statsLoad();
         _walletShown = _balance;
         renderWallet();
@@ -540,16 +548,29 @@
         const d = walletNeedDays(key);
         return d == null ? -1 : d;
       };
+      // The meter is full (red) when the time since the last solve reaches the MAX LIFE of the task (its
+      // longest life in days, walletLifeStats): 10 days since the last solve and a max life of 20 days is
+      // a half. A task that has no life yet (solved once, rank 0) has nothing to measure against: the old
+      // base of NEED_DAYS is used. The colour steps are the same fractions as before (3/7, 5/7, 1).
+      function walletNeedBase(key) {
+        const max = walletLifeStats(key).max;
+        return max > 0 ? { days: max, life: true } : { days: NEED_DAYS, life: false };
+      }
       function mkNeedMeter(key, diff) {
         const d = walletNeedDays(key);
         if (d == null) {
-          return `<span class="need-meter need-new" title="Ещё не решена"><i></i></span>`;
+          return `<span class="need-meter need-new" title="Not solved yet"><i></i></span>`;
         }
-        const lvl = d >= NEED_DAYS ? "crit" : d >= 5 ? "hot" : d >= 3 ? "warn" : "ok";
-        const pct = Math.min(100, (d / NEED_DAYS) * 100).toFixed(1);
-        const days = d.toFixed(1);
+        const base = walletNeedBase(key);
+        const f = d / base.days;
+        const lvl = f >= 1 ? "crit" : f >= 5 / 7 ? "hot" : f >= 3 / 7 ? "warn" : "ok";
+        const pct = Math.min(100, f * 100).toFixed(1);
         const p = walletPayout(diff, d);
-        const tip = `Решена ${days} дн. назад · сейчас принесла бы +${fmtCoins(p.net)} (${fmtCoins(p.gross)} − комиссия ${p.feePct}%)`;
+        const fmtD = (v) => `${Math.round(v * 10) / 10} ${Math.round(v * 10) / 10 === 1 ? "day" : "days"}`;
+        const why = base.life
+          ? `${fmtD(d)} since the last solve, the max life of this task is ${fmtD(base.days)}: ${Math.round(f * 100)}% of it. The bar is full when the wait reaches the max life.`
+          : `${fmtD(d)} since the last solve. The task has no life yet (rank 0), so the bar fills in ${fmtD(base.days)}.`;
+        const tip = `${why} Solving now would pay +${fmtCoins(p.net)} (${fmtCoins(p.gross)} − ${p.feePct}% fee).`;
         return `<span class="need-meter n-${lvl}" title="${tip}"><i><b style="width:${pct}%"></b></i></span>`;
       }
 

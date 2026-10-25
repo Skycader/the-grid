@@ -1768,7 +1768,7 @@
         text-shadow: 0 0 5px #dc322f;
       }
 
-      /* ── NEED METER: одна тонкая шкала, 100% = 7 суток с lastSolved ── */
+      /* ── NEED METER: one thin bar, 100% = the max life of the task since lastSolved (7 days while it has none) ── */
       .need-meter {
         --nc: #859900;
         display: inline-flex;
