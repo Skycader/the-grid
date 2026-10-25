@@ -2207,6 +2207,27 @@
         background: #ffd84a;
         box-shadow: 0 0 8px rgba(255, 216, 74, 0.85);
       }
+      /* the tooltip of the whole page (js/tooltip.js): it replaces the native hints (title) */
+      #ui-tip {
+        position: fixed;
+        z-index: 3000;
+        max-width: 300px;
+        padding: 4px 9px;
+        background: rgba(0, 20, 35, 0.97);
+        border: 1px solid #6c71c4;
+        box-shadow: 0 0 10px rgba(108, 113, 196, 0.25);
+        color: var(--tx);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.66rem;
+        line-height: 1.5;
+        white-space: pre-line;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+      }
+      #ui-tip.show {
+        opacity: 1;
+      }
       #rk-tip {
         position: fixed;
         z-index: 2000;

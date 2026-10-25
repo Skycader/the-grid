@@ -329,8 +329,9 @@ ${mkRankBadge(`${_vsCat.id}/${t.id}`)}${mkNeedMeter(`${_vsCat.id}/${t.id}`, t.di
       function mkStars(d) {
         const rows = STAR_ROWS[d];
         if (!rows) return "";
+        // the hint (js/tooltip.js) is on the grid of the stars: the task list, the task bar and the search show it
         return (
-          '<span class="star-grid">' +
+          `<span class="star-grid" title="Difficulty ${d} / 10\nThe harder the task, the more it counts in the player level">` +
           rows
             .map(
               (n) => `<span class="star-row">${"★".repeat(n)}</span>`,
