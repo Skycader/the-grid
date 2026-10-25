@@ -1291,7 +1291,30 @@
         bottom: 0;
         height: calc((100% - 4px) * var(--n, 0) / 100);
         background: linear-gradient(#2aa5e0, #268bd2 45%, #1a6ea8);
-        transition: height 0.8s cubic-bezier(0.3, 0.8, 0.3, 1);
+      }
+      /* the ball: js/harvest.js moves it (translate) by the physics, it floats on the waves */
+      .hv-ball {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 12.75px;
+        height: 12.75px;
+        border-radius: 50%;
+        background: var(--c);
+        box-shadow:
+          0 0 6px rgba(0, 255, 255, 0.8),
+          0 0 14px rgba(0, 255, 255, 0.25);
+        animation: hv-ball-pulse 3s ease-in-out infinite; /* the same pulse as the logo */
+        pointer-events: none;
+        will-change: transform;
+      }
+      @keyframes hv-ball-pulse {
+        50% {
+          box-shadow:
+            0 0 10px #0ff,
+            0 0 20px rgba(0, 255, 255, 0.42),
+            0 0 28px rgba(0, 255, 255, 0.1);
+        }
       }
       .hv-need i::before,
       .hv-need i::after {
@@ -1339,7 +1362,8 @@
       }
       @media (prefers-reduced-motion: reduce) {
         .hv-need i::before,
-        .hv-need i::after {
+        .hv-need i::after,
+        .hv-ball {
           animation: none;
         }
       }
