@@ -152,10 +152,16 @@
         W: 36, H: 36, R: 6.375, raf: 0, last: 0, shown: -1, anims: null, seen: false };
 
       // the height of the liquid surface above the floor at x (a sum of the body and the wave layer on it)
-      function hvSurface(x, tw, ts, body) {
+      function hvSurface(x, tw, ts, body, k) {
         const y = 2.2 - 1.3 * Math.sin((2 * Math.PI * (x - 12 * tw)) / 12); // the wave of the drawn SVG
         const squeeze = 0.8 + 0.2 * Math.cos(2 * Math.PI * ts); // the slosh animation squeezes the layer 1 -> 0.6
-        return Math.max(0, body + (4 - y) * squeeze - 1);
+        return Math.max(0, body + k * ((4 - y) * squeeze - 1));
+      }
+      // The waves need room above the liquid: below ~94 % the body leaves 4 px for them (k = 1), and on the last
+      // 6 % the room and the waves fade out, so 100 % is a pool filled to the brim and calm (k = 0)
+      function hvGeom(level, H) {
+        const k = Math.min(1, Math.max(0, (100 - level) / 6));
+        return { k, body: ((H - 4 * k) * level) / 100 };
       }
       // the running phases of the two CSS animations (0..1), so the ball and the picture are the same wave
       function hvWavePhase() {
@@ -176,14 +182,14 @@
         s.level += (s.target - s.level) * (1 - Math.exp(-dt / 0.22));
         if (Math.abs(s.target - s.level) < 0.02) s.level = s.target;
         const water = s.el.classList.contains("on");
-        const body = ((s.H - 4) * s.level) / 100;
+        const { k: kw, body } = hvGeom(s.level, s.H);
         const { tw, ts } = hvWavePhase();
         // the surface under the ball: averaged over its width, so the ball floats on the swell and does not
         // jump on every ripple
         const surf = (x, d = 0) => {
           if (!water) return 0;
           let sum = 0;
-          for (let k = -2; k <= 2; k++) sum += hvSurface(x + (k * R) / 2, tw + d / 1.7, ts + d / 2.9, body);
+          for (let k = -2; k <= 2; k++) sum += hvSurface(x + (k * R) / 2, tw + d / 1.7, ts + d / 2.9, body, kw);
           return sum / 5;
         };
         const n = Math.max(1, Math.ceil(dt / (1 / 120))), h = dt / n;
@@ -203,13 +209,16 @@
             if (s.vy > 0) s.vy = 0;
           }
         }
-        return !(!water && s.level === 0 && s.h === R && s.vy === 0);
+        const settled = s.level === s.target && s.vy === 0;
+        // nothing moves in an empty pool and in a full one (calm water, the ball pressed to the lid)
+        return !(settled && ((!water && s.level === 0 && s.h === R) || (s.level === 100 && s.h === s.H - R)));
       }
       function hvPoolDraw() {
         const s = _hvPool;
         if (s.level !== s.shown) {
           s.shown = s.level;
           s.el.style.setProperty("--n", s.level);
+          s.el.style.setProperty("--k", hvGeom(s.level, s.H).k);
         }
         s.ball.style.transform = `translate(${(s.W / 2 - s.R).toFixed(2)}px, ${(s.R - s.h).toFixed(2)}px)`;
       }
@@ -230,8 +239,7 @@
         const s = _hvPool;
         if (HV_REDUCED.matches) {
           s.level = s.target; // no motion: the level at once, the ball on the surface (or on the floor)
-          const body = ((s.H - 4) * s.level) / 100;
-          s.h = Math.min(s.H - s.R, Math.max(s.R, body)); // it floats half-submerged: the centre is at the surface
+          s.h = Math.min(s.H - s.R, Math.max(s.R, hvGeom(s.level, s.H).body));// it floats half-submerged: the centre is at the surface
           s.vy = 0;
           hvPoolDraw();
         } else if (!s.raf && s.seen) s.raf = requestAnimationFrame(hvPoolTick);
