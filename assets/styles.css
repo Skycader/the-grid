@@ -1262,12 +1262,19 @@
         color: var(--txd);
         font-variant-numeric: tabular-nums;
       }
+      /* the square button left of HARVEST: the vial of the total need inside, the click is the same as HARVEST's */
+      .hv-need-btn {
+        width: 38px;
+        min-width: 0;
+        padding: 0;
+        justify-content: center;
+      }
       /* EXPERIMENT: the vial of the total need (js/harvest.js, --n is the percent): a vertical scale that
          fills from the bottom with a glowing blue liquid; two wave layers run on the surface */
       .hv-need {
         position: relative;
         flex: 0 0 auto;
-        width: 12px;
+        width: 22px;
         height: 22px;
         box-sizing: border-box;
         border: 1px solid rgba(38, 139, 210, 0.7);

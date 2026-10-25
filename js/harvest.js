@@ -146,7 +146,11 @@
         const v = hvNeedValue();
         el.style.setProperty("--n", v);
         el.classList.toggle("on", v > 0);
-        el.title = `Total need for a repeat solve: ${Math.round(v)}%` + (_hvNeedOverride == null ? " (not measured yet)" : " (set from the console)");
+        const btn = document.getElementById("hv-need-btn");
+        btn.title =
+          `Total need for a repeat solve: ${Math.round(v)}%` +
+          (_hvNeedOverride == null ? " (not measured yet)" : " (set from the console)") +
+          " · click to open the most overdue task";
       }
 
       // Update the number on the button (also called on a timer: rewards keep growing)
@@ -173,10 +177,12 @@
         pool.sort((a, b) => b.days - a.days || b.net - a.net);
         navigateToTask(pool[0].cat, pool[0].task);
       }
-      document.getElementById("hv-btn").addEventListener("click", (e) => {
-        e.preventDefault();
-        hvPick();
-      });
+      ["hv-btn", "hv-need-btn"].forEach((id) =>
+        document.getElementById(id).addEventListener("click", (e) => {
+          e.preventDefault();
+          hvPick();
+        }),
+      );
 
       hvClamp();
       hvRefresh();
