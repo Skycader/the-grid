@@ -160,7 +160,7 @@
         const url = new URL(location.href);
         if (open) url.searchParams.set("profile", MENU[_pfmTab].id);
         else url.searchParams.delete("profile");
-        history.replaceState({}, "", url.toString());
+        histReplace(url.toString());
       }
       // tabId: the id of a catalog (the URL) — absent / unknown means the first one
       // The window is as tall as its tallest tab (REGEX has many cards, the others few), so switching the tabs
@@ -215,7 +215,6 @@
         if (card) {
           const x = _pfmCards[+card.dataset.i];
           pfmModal.classList.add("hide");
-          _nextTaskFromProfile = true; // the BACK of the task brings the player back to this window (js/task-view.js)
           navigateToTask(x.cat, x.task);
         }
       });

@@ -6,13 +6,22 @@
       //                        default one (easy). It goes with every URL that has a category.
       // ?profile=regex       → the profile window is open on that catalog's tab (js/profile.js)
 
+      // Every history entry of the page carries its number (state.i, 0 = the entry the page was loaded on, it
+      // survives a reload): the BACK of a task goes back in the history only while there is an entry of the page
+      // behind (histCanGoBack), else it falls back to the category list.
+      const histPush = (url) => history.pushState({ i: ((history.state && history.state.i) || 0) + 1 }, "", url);
+      const histReplace = (url) => history.replaceState(history.state || {}, "", url);
+      const histCanGoBack = () => !!(history.state && history.state.i > 0);
+
       function setQueryParams(params) {
         const url = new URL(location.href);
         // Clear all first, then set new ones
         [...url.searchParams.keys()].forEach((k) => url.searchParams.delete(k));
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
         if (params.cat && _taskSortDir !== DEFAULT_SORT) url.searchParams.set("sort", _taskSortDir);
-        history.pushState({}, "", url.toString());
+        // the same address (the page was opened by the back / forward of the browser): no new entry
+        if (url.toString() === location.href) return;
+        histPush(url.toString());
       }
 
       // The sort of the list was changed: put it into the URL without a new history entry
@@ -21,7 +30,7 @@
         if (!url.searchParams.has("cat")) return;
         if (_taskSortDir === DEFAULT_SORT) url.searchParams.delete("sort");
         else url.searchParams.set("sort", _taskSortDir);
-        history.replaceState({}, "", url.toString());
+        histReplace(url.toString());
       }
 
       // The sort from the URL (a valid mode, else the default one)
@@ -35,7 +44,7 @@
       function clearQueryParams() {
         const url = new URL(location.href);
         ["cat", "task", "sort"].forEach((k) => url.searchParams.delete(k));
-        history.pushState({}, "", url.toString());
+        histPush(url.toString());
       }
 
       // Recursively find a node by id in MENU tree
@@ -113,7 +122,7 @@
         }
         const cat = findNode(catId, MENU);
         if (!cat) {
-          history.replaceState({}, "", location.pathname); // unknown category: just the menu
+          history.replaceState(history.state || {}, "", location.pathname); // unknown category: just the menu
           showView("home");
           return;
         }
