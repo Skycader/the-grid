@@ -336,6 +336,10 @@
         color: var(--c);
         flex: 0 0 auto;
       }
+      /* the need meter of the task list, in the right corner of the head */
+      .pfm-head .need-meter {
+        margin: 0 0 0 auto;
+      }
       .pfm-mid {
         flex: 1;
         display: flex;

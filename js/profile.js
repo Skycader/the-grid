@@ -119,7 +119,7 @@
         const name = pfmName(task);
         return `<div class="pfm-card${solved ? "" : " locked"}" data-i="${index}" title="${solved ? "Open " + name : "Not solved yet: open " + name}">
           <div class="pfm-inner">
-            <div class="pfm-head">${PFM_SYMBOL}<span>${name}</span></div>
+            <div class="pfm-head">${PFM_SYMBOL}<span>${name}</span>${mkNeedMeter(key, task.diff)}</div>
             <div class="pfm-mid">${icon}</div>
             <div class="pfm-foot">
               <span class="pfm-rank">${mkRankBadge(key)}</span>
