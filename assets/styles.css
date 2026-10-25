@@ -1262,6 +1262,82 @@
         color: var(--txd);
         font-variant-numeric: tabular-nums;
       }
+      /* EXPERIMENT: the vial of the total need (js/harvest.js, --n is the percent): a vertical scale that
+         fills from the bottom with a glowing blue liquid; two wave layers run on the surface */
+      .hv-need {
+        position: relative;
+        flex: 0 0 auto;
+        width: 12px;
+        height: 22px;
+        box-sizing: border-box;
+        border: 1px solid rgba(38, 139, 210, 0.7);
+        overflow: hidden;
+        transition: box-shadow 0.4s;
+      }
+      .hv-need.on {
+        box-shadow:
+          0 0 7px rgba(38, 139, 210, 0.6),
+          inset 0 0 5px rgba(42, 190, 255, 0.35);
+      }
+      /* the liquid: the body is the height of the level (minus 4 px for the waves on top of it) */
+      .hv-need i {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: calc((100% - 4px) * var(--n, 0) / 100);
+        background: linear-gradient(#2aa5e0, #268bd2 45%, #1a6ea8);
+        transition: height 0.8s cubic-bezier(0.3, 0.8, 0.3, 1);
+      }
+      .hv-need i::before,
+      .hv-need i::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 100%;
+        height: 4px;
+        background-repeat: repeat-x;
+        background-size: 12px 4px;
+        opacity: 0;
+      }
+      .hv-need.on i::before,
+      .hv-need.on i::after {
+        opacity: 1;
+      }
+      .hv-need i::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 4'%3E%3Cpath d='M0 2.2Q3 -0.4 6 2.2T12 2.2V4H0Z' fill='%232aa5e0'/%3E%3C/svg%3E");
+        animation: hv-wave-a 1.7s linear infinite, hv-slosh 2.9s ease-in-out infinite;
+      }
+      .hv-need i::after {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 4'%3E%3Cpath d='M0 2.6Q3 4.6 6 2.6T12 2.6V4H0Z' fill='%2300d4ff' fill-opacity='.55'/%3E%3C/svg%3E");
+        animation: hv-wave-b 2.6s linear infinite, hv-slosh 2.3s ease-in-out infinite reverse;
+      }
+      @keyframes hv-wave-a {
+        to {
+          background-position-x: 12px;
+        }
+      }
+      @keyframes hv-wave-b {
+        to {
+          background-position-x: -12px;
+        }
+      }
+      @keyframes hv-slosh {
+        0%,
+        100% {
+          transform: translateY(0) scaleY(1);
+        }
+        50% {
+          transform: translateY(1px) scaleY(0.6);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hv-need i::before,
+        .hv-need i::after {
+          animation: none;
+        }
+      }
       .hv-btn.has-yield {
         border-color: rgba(255, 200, 40, 0.5);
       }

@@ -131,11 +131,30 @@
         return pool;
       }
 
+      // EXPERIMENT: the square before the amount fills up with the total need of the tasks for a repeat solve
+      // (0-100 %). How it is counted is not decided yet (plans: the weighted mean of the need meters), so for
+      // now it shows 0 until the console sets it: run("override global_need 100") (nothing is saved).
+      let _hvNeedOverride = null;
+      const hvNeedValue = () => (_hvNeedOverride == null ? 0 : _hvNeedOverride);
+      function hvNeedOverride(percent) {
+        _hvNeedOverride = percent;
+        hvNeedRender();
+      }
+      function hvNeedRender() {
+        const el = document.getElementById("hv-need");
+        if (!el) return;
+        const v = hvNeedValue();
+        el.style.setProperty("--n", v);
+        el.classList.toggle("on", v > 0);
+        el.title = `Total need for a repeat solve: ${Math.round(v)}%` + (_hvNeedOverride == null ? " (not measured yet)" : " (set from the console)");
+      }
+
       // Update the number on the button (also called on a timer: rewards keep growing)
       function hvRefresh() {
         const pool = hvPool();
         const total = round2(pool.reduce((s, p) => s + p.net, 0));
         document.getElementById("hv-amt").textContent = fmtCoins(total);
+        hvNeedRender();
         document.getElementById("hv-btn").classList.toggle("has-yield", total > 0);
         hvRefreshSafe();
         if (pool.length)
