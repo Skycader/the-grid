@@ -39,10 +39,16 @@
               <input
                 id="srch"
                 type="text"
-                placeholder="SEARCH_PROTOCOL... [F]"
+                aria-label="Search tasks"
+                title="Press F to search"
                 autocomplete="off"
                 spellcheck="false"
               />
+              <!-- the hint of the empty field is not a text to read: a ghost types an example and erases it -->
+              <div class="srch-ghost" id="srch-ghost" aria-hidden="true">
+                <span id="srch-ghost-chars"></span><span class="ghost-caret"></span>
+              </div>
+              <kbd class="srch-key" aria-hidden="true">F</kbd>
               <button
                 class="srch-x"
                 id="srch-x"

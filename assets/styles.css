@@ -549,9 +549,77 @@
           var(--glow),
           inset 0 0 14px rgba(0, 255, 255, 0.03);
       }
-      #srch::placeholder {
+      /* the hint of the empty field is not a text to read: a ghost types an example query and erases it
+         (the same trick as the text field of entropy-forge, js/search.js) */
+      .srch-ghost {
+        position: absolute;
+        left: 32px; /* where the text of the field starts */
+        right: 44px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.84rem;
+        letter-spacing: 0.08em;
+        line-height: 1.2;
+        color: var(--c);
+        opacity: 0.5;
+        text-shadow: var(--glow);
+        white-space: nowrap;
+        overflow: hidden;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .srch-ghost.off {
+        opacity: 0;
+      }
+      .ghost-caret {
+        display: inline-block;
+        width: 1px; /* a thin text cursor | */
+        height: 1.15em;
+        margin-left: 1px;
+        background: var(--c);
+        vertical-align: -0.2em;
+        box-shadow: 0 0 4px var(--c);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .ghost-caret {
+          animation: ghostCaret 1s steps(1) infinite;
+        }
+      }
+      @keyframes ghostCaret {
+        50% {
+          opacity: 0;
+        }
+      }
+      /* the hotkey of the field: a keycap on the right, gone while the field is focused or has text */
+      .srch-key {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        width: 18px; /* a square keycap */
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid var(--bd);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        line-height: 1;
         color: var(--txd);
-        letter-spacing: 0.12em;
+        pointer-events: none;
+      }
+      .search-wrap.has-text .srch-key,
+      .search-wrap:focus-within .srch-key {
+        display: none;
+      }
+      @media (max-width: 640px) {
+        .srch-key {
+          display: none;
+        }
       }
       /* clear button: shown only while the field has text */
       #srch {

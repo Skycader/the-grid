@@ -36,6 +36,55 @@
       const PAGE_SRCH = 5;
 
       const srchWrap = document.getElementById("srch").closest(".search-wrap");
+
+      // Ghost typist (the idea of the text field of entropy-forge): while the field is empty and not focused a
+      // ghost types an example query (a name of a catalog or of a task) with a human jitter, holds it, erases it and
+      // types the next one. No text to read; reduced motion: just the blinking caret.
+      const srchGhost = document.getElementById("srch-ghost"),
+        srchGhostChars = document.getElementById("srch-ghost-chars"),
+        srchInput = document.getElementById("srch");
+      let _srchGhostTimer = 0,
+        _srchGhostWord = "";
+      function srchGhostPick() {
+        const words = [];
+        MENU.forEach((top) => {
+          words.push(top.id);
+          const res = [];
+          gatherAllTasks(top, res);
+          res.forEach(({ task }) => words.push(String(task.file || task.id).toLowerCase()));
+        });
+        const pool = words.filter((w) => w && w !== _srchGhostWord);
+        return pool.length ? pool[Math.floor(Math.random() * pool.length)] : "regex";
+      }
+      function srchGhostStep(typing) {
+        const len = srchGhostChars.textContent.length;
+        if (!srchWrap.offsetParent) {
+          _srchGhostTimer = setTimeout(() => srchGhostStep(typing), 600); // the home screen is not shown
+        } else if (typing && len < _srchGhostWord.length) {
+          srchGhostChars.textContent = _srchGhostWord.slice(0, len + 1);
+          _srchGhostTimer = setTimeout(() => srchGhostStep(true), 70 + Math.random() * 140);
+        } else if (typing) {
+          _srchGhostTimer = setTimeout(() => srchGhostStep(false), 1300); // hold the finished query
+        } else if (len > 0) {
+          srchGhostChars.textContent = srchGhostChars.textContent.slice(0, -1);
+          _srchGhostTimer = setTimeout(() => srchGhostStep(false), 35);
+        } else {
+          _srchGhostWord = srchGhostPick();
+          _srchGhostTimer = setTimeout(() => srchGhostStep(true), 500);
+        }
+      }
+      function srchGhostUpdate() {
+        const visible = srchInput.value === "" && document.activeElement !== srchInput;
+        srchGhost.classList.toggle("off", !visible);
+        clearTimeout(_srchGhostTimer);
+        _srchGhostTimer = 0;
+        srchGhostChars.textContent = "";
+        if (visible && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) srchGhostStep(false);
+      }
+      srchInput.addEventListener("focus", srchGhostUpdate);
+      srchInput.addEventListener("blur", srchGhostUpdate);
+      srchInput.addEventListener("input", srchGhostUpdate);
+      srchGhostUpdate();
       document.getElementById("srch").addEventListener("input", (e) => {
         clearTimeout(_srchTimer);
         srchWrap.classList.toggle("has-text", !!e.target.value);
@@ -110,6 +159,7 @@
         renderCats("");
         document.querySelector(".cat-grid-wrap").style.display = "";
         document.getElementById("srch").blur();
+        srchGhostUpdate();
       }
       function hideSrch() {
         const sr = document.getElementById("srch-results");
