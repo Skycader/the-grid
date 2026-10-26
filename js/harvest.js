@@ -137,11 +137,14 @@
       // move it. run("override global_need 100") sets it by hand for a test (nothing is saved).
       let _hvNeedOverride = null;
       let _hvNeedCount = 0; // how many solved tasks the measured need is made of
+      let _hvCatalogSize = 0; // how many tasks the catalog has (0 until the boot has loaded it)
       function hvMeasuredNeed() {
         const f = [];
+        _hvCatalogSize = 0;
         MENU.forEach((top) => {
           const res = [];
           gatherAllTasks(top, res);
+          _hvCatalogSize += res.length;
           res.forEach(({ cat, task }) => {
             const key = `${cat.id}/${task.id}`,
               d = walletNeedDays(key);
@@ -278,8 +281,12 @@
           }).observe(s.el);
         }
         const v = hvNeedValue();
-        s.target = v;
-        s.el.classList.toggle("on", v > 0 || s.level > 0.02);
+        // the tasks are not loaded yet (the boot): the pool waits, so it does not fill up and drain at the start
+        if (_hvNeedOverride == null && !_hvCatalogSize) return;
+        // "fill in" (the default setting, js/settings.js): the pool shows the calm, 80 % need = 20 % water
+        const water = SETTINGS.needFill === "in" ? 100 - v : v;
+        s.target = water;
+        s.el.classList.toggle("on", water > 0 || s.level > 0.02);
         const btn = document.getElementById("hv-need-btn");
         btn.title =
           `Total need for a repeat solve: ${Math.round(v)}%` +
@@ -288,6 +295,7 @@
             : _hvNeedCount
               ? ` (the median over ${_hvNeedCount} solved ${_hvNeedCount === 1 ? "task" : "tasks"})`
               : " (no solved tasks yet)") +
+          ` · the pool shows ${Math.round(water)}% (${SETTINGS.needFill === "in" ? "fill in" : "fill out"}, see the settings)` +
           " · click to open the most overdue task";
         hvPoolWake();
       }

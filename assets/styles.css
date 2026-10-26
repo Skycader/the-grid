@@ -1437,8 +1437,77 @@
         color: var(--c);
       }
       /* TRANSACTIONS button (home): history icon, opens the transactions modal */
-      .tx-btn svg {
+      .tx-btn svg,
+      .st-btn svg {
         display: block;
+      }
+      /* SETTINGS (js/settings.js): the gear button on the home screen and its window */
+      .modal.st-modal {
+        max-width: 440px;
+      }
+      .st-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 18px 8px;
+      }
+      .st-name {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--txd);
+      }
+      .st-hint {
+        padding: 4px 18px 18px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.64rem;
+        line-height: 1.6;
+        color: var(--txd);
+        text-align: left;
+        display: grid;
+      }
+      .st-hint > span {
+        grid-area: 1 / 1;
+        visibility: hidden;
+      }
+      .st-hint > span.on {
+        visibility: visible;
+      }
+      /* segmented control: a group of buttons, exactly one is on */
+      .seg {
+        display: inline-flex;
+        flex: 0 0 auto;
+        border: 1px solid rgba(181, 137, 0, 0.3);
+      }
+      .seg-btn {
+        padding: 6px 14px;
+        background: rgba(181, 137, 0, 0.06);
+        border: none;
+        color: var(--txd);
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .seg-btn + .seg-btn {
+        border-left: 1px solid rgba(181, 137, 0, 0.3);
+      }
+      .seg-btn:hover {
+        background: rgba(181, 137, 0, 0.14);
+      }
+      .seg-btn.on {
+        background: rgba(181, 137, 0, 0.26);
+        color: #b58900;
+      }
+      .seg-btn:focus-visible {
+        outline: 1px solid var(--c);
+        outline-offset: -3px;
       }
       /* button: <amount> <coin> <gap> <safe> */
       .hv-btn {

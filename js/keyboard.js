@@ -31,6 +31,10 @@
             txClose();
             return;
           }
+          if (!document.getElementById("st-modal").classList.contains("hide")) {
+            stClose();
+            return;
+          }
           if (
             !document.getElementById("confirm-modal").classList.contains("hide")
           ) {
