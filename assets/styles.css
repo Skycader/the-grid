@@ -1456,12 +1456,19 @@
       }
       .st-name {
         flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
         font-family: "Orbitron", sans-serif;
         font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 0.12em;
         color: var(--txd);
         text-align: left;
+      }
+      .st-name svg {
+        display: block;
+        filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.45));
       }
       .st-demo {
         flex: 0 0 auto;
