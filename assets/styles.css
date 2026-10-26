@@ -535,7 +535,7 @@
         color: var(--c);
         font-family: "JetBrains Mono", monospace;
         font-size: 0.84rem;
-        padding: 9px 12px 9px 32px;
+        padding: 9px 12px 9px 38px; /* the magnifier (10 + 17 px) and a gap of 11 px */
         outline: none;
         letter-spacing: 0.08em;
         transition:
@@ -553,7 +553,7 @@
          (the same trick as the text field of entropy-forge, js/search.js) */
       .srch-ghost {
         position: absolute;
-        left: 32px; /* where the text of the field starts */
+        left: 38px; /* where the text of the field starts */
         right: 44px;
         top: 50%;
         transform: translateY(-50%);
