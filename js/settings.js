@@ -6,12 +6,6 @@
       const ST_KEY = "gr_settings";
       const SETTINGS = { needFill: "in" };
       const ST_CHOICES = { needFill: ["in", "out"] };
-      const ST_HINTS = {
-        needFill: {
-          in: "Fill in: the more the tasks need a repeat, the emptier the pool (80% need = 20% water). Nothing to repeat: a full pool.",
-          out: "Fill out: the pool fills with the need (80% need = 80% water). Nothing to repeat: an empty pool.",
-        },
-      };
       try {
         const saved = JSON.parse(localStorage.getItem(ST_KEY) || "{}");
         for (const k in ST_CHOICES) if (ST_CHOICES[k].includes(saved[k])) SETTINGS[k] = saved[k];
@@ -27,12 +21,6 @@
           b.setAttribute("aria-checked", on);
           b.tabIndex = on ? 0 : -1; // one stop in the group, the arrows move inside it
         });
-        // the hints of all the choices sit in one cell of a grid, so the window is as tall as the longest of
-        // them and does not jump when the choice changes
-        const hint = document.getElementById("st-fill-hint");
-        if (!hint.children.length)
-          hint.innerHTML = ST_CHOICES.needFill.map((v) => `<span data-v="${v}">${ST_HINTS.needFill[v]}</span>`).join("");
-        hint.querySelectorAll("span").forEach((s) => s.classList.toggle("on", s.dataset.v === SETTINGS.needFill));
       }
       function stSet(name, value) {
         if (SETTINGS[name] === value) return;
@@ -41,11 +29,25 @@
           localStorage.setItem(ST_KEY, JSON.stringify(SETTINGS));
         } catch (e) {}
         stRender();
+        stDemoRender();
         if (name === "needFill" && typeof hvNeedRender === "function") hvNeedRender();
       }
+      // The demo: the pool of the need button (js/harvest.js), with a slider of the need to try the
+      // setting on. The slider starts at the real need (60 % when there is nothing solved yet to measure).
+      let _stPool = null;
+      const stNeed = document.getElementById("st-need");
+      function stDemoRender() {
+        document.getElementById("st-need-val").textContent = stNeed.value + "%";
+        if (_stPool) hvPoolSetWater(_stPool, hvWaterOf(+stNeed.value));
+      }
+      stNeed.addEventListener("input", stDemoRender);
       function stOpen() {
+        if (!_stPool) _stPool = hvPoolMake(document.getElementById("st-pool"));
+        const real = hvMeasuredNeed();
+        stNeed.value = _hvNeedCount ? Math.round(real) : 60;
         stRender();
         stModal.classList.remove("hide");
+        stDemoRender();
         playClick();
       }
       function stClose() {

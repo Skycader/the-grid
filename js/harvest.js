@@ -168,9 +168,31 @@
       // floor (h). Gravity pulls it down, the liquid pushes it up in proportion to how deep it is in (the surface
       // under the ball is the two wave layers of the CSS, recomputed from their running animations, so the ball
       // rides the drawn waves), the water damps it; the floor and the ceiling stop it.
+      // Every pool is its own object (hvPoolMake): the one of the need button and the demo in the settings window.
       const HV_G = 520, HV_BUOY = 2 * HV_G, HV_DRAG = 20;
-      const _hvPool = { el: null, fill: null, ball: null, level: 0, target: 0, h: 6.375, vy: 0,
-        W: 36, H: 36, R: 6.375, raf: 0, last: 0, shown: -1, anims: null, seen: false };
+      const HV_REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      // el: .hv-need with <i> (the liquid) and .hv-ball inside
+      function hvPoolMake(el) {
+        const s = { el, fill: el.querySelector("i"), ball: el.querySelector(".hv-ball"), level: 0, target: 0, h: 6.375, vy: 0,
+          W: 36, H: 36, R: 6.375, raf: 0, last: 0, shown: -1, anims: null, seen: false };
+        s.tick = (ts) => hvPoolTick(s, ts);
+        // the loop runs only while the pool is on the screen (the home screen, the open window)
+        new IntersectionObserver((e) => {
+          s.seen = e[e.length - 1].isIntersecting;
+          if (s.seen) hvPoolWake(s);
+        }).observe(el);
+        return s;
+      }
+      // the level of the water (0-100 %) the pool goes to
+      function hvPoolSetWater(s, water) {
+        s.target = water;
+        s.el.classList.toggle("on", water > 0 || s.level > 0.02);
+        hvPoolWake(s);
+      }
+      // "fill in" (the default setting, js/settings.js): the pool shows the calm, 80 % need = 20 % water
+      const hvWaterOf = (need) => (SETTINGS.needFill === "in" ? 100 - need : need);
+      const _hvPool = hvPoolMake(document.getElementById("hv-need"));
 
       // the height of the liquid surface above the floor at x (a sum of the body and the wave layer on it)
       function hvSurface(x, tw, ts, body, k) {
@@ -184,13 +206,14 @@
         const k = Math.min(1, Math.max(0, (100 - level) / 6));
         return { k, body: ((H - 4 * k) * level) / 100 };
       }
-      // the running phases of the two CSS animations (0..1), so the ball and the picture are the same wave
-      function hvWavePhase() {
-        const s = _hvPool;
+      // the running phases of the two CSS animations of the pool (0..1), so the ball and the picture are the same wave
+      function hvWavePhase(s) {
+        // the animations are cancelled when the pool is hidden (the settings window closed): look for them again
+        if (s.anims && (s.anims.wave.playState === "idle" || s.anims.slosh.playState === "idle")) s.anims = null;
         if (!s.anims) {
-          const all = document.getAnimations();
-          const wave = all.find((a) => a.animationName === "hv-wave-a");
-          const slosh = all.find((a) => a.animationName === "hv-slosh" && a.effect.pseudoElement === "::before");
+          const mine = document.getAnimations().filter((a) => a.effect && a.effect.target && s.el.contains(a.effect.target));
+          const wave = mine.find((a) => a.animationName === "hv-wave-a");
+          const slosh = mine.find((a) => a.animationName === "hv-slosh" && a.effect.pseudoElement === "::before");
           if (wave && slosh) s.anims = { wave, slosh };
         }
         const now = performance.now();
@@ -198,13 +221,13 @@
         return { tw: t(s.anims && s.anims.wave, 1700, now), ts: t(s.anims && s.anims.slosh, 2900, now) };
       }
 
-      function hvPoolStep(dt) {
-        const s = _hvPool, R = s.R;
+      function hvPoolStep(s, dt) {
+        const R = s.R;
         s.level += (s.target - s.level) * (1 - Math.exp(-dt / 0.22));
         if (Math.abs(s.target - s.level) < 0.02) s.level = s.target;
         const water = s.el.classList.contains("on");
         const { k: kw, body } = hvGeom(s.level, s.H);
-        const { tw, ts } = hvWavePhase();
+        const { tw, ts } = hvWavePhase(s);
         // the surface under the ball: averaged over its width, so the ball floats on the swell and does not
         // jump on every ripple
         const surf = (x, d = 0) => {
@@ -234,8 +257,7 @@
         // nothing moves in an empty pool and in a full one (calm water, the ball pressed to the lid)
         return !(settled && ((!water && s.level === 0 && s.h === R) || (s.level === 100 && s.h === s.H - R)));
       }
-      function hvPoolDraw() {
-        const s = _hvPool;
+      function hvPoolDraw(s) {
         if (s.level !== s.shown) {
           s.shown = s.level;
           s.el.style.setProperty("--n", s.level);
@@ -243,50 +265,33 @@
         }
         s.ball.style.transform = `translate(${(s.W / 2 - s.R).toFixed(2)}px, ${(s.R - s.h).toFixed(2)}px)`;
       }
-      function hvPoolTick(ts) {
-        const s = _hvPool;
+      function hvPoolTick(s, ts) {
         s.raf = 0;
         s.W = s.el.clientWidth || s.W;
         s.H = s.el.clientHeight || s.H;
         const dt = s.last ? Math.min(0.05, (ts - s.last) / 1000) : 1 / 60;
         s.last = ts;
-        const alive = hvPoolStep(dt);
+        const alive = hvPoolStep(s, dt);
         s.el.classList.toggle("on", s.target > 0 || s.level > 0.02);
-        hvPoolDraw();
-        if (alive && s.seen) s.raf = requestAnimationFrame(hvPoolTick);
+        hvPoolDraw(s);
+        if (alive && s.seen) s.raf = requestAnimationFrame(s.tick);
         else s.last = 0;
       }
-      function hvPoolWake() {
-        const s = _hvPool;
+      function hvPoolWake(s) {
         if (HV_REDUCED.matches) {
           s.level = s.target; // no motion: the level at once, the ball on the surface (or on the floor)
-          s.h = Math.min(s.H - s.R, Math.max(s.R, hvGeom(s.level, s.H).body));// it floats half-submerged: the centre is at the surface
+          s.h = Math.min(s.H - s.R, Math.max(s.R, hvGeom(s.level, s.H).body)); // it floats half-submerged: the centre is at the surface
           s.vy = 0;
-          hvPoolDraw();
-        } else if (!s.raf && s.seen) s.raf = requestAnimationFrame(hvPoolTick);
+          hvPoolDraw(s);
+        } else if (!s.raf && s.seen) s.raf = requestAnimationFrame(s.tick);
       }
-      const HV_REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       function hvNeedRender() {
-        const s = _hvPool;
-        if (!s.el) {
-          s.el = document.getElementById("hv-need");
-          if (!s.el) return;
-          s.fill = s.el.querySelector("i");
-          s.ball = s.el.querySelector(".hv-ball");
-          // the loop runs only while the button is on the screen (the home screen)
-          new IntersectionObserver((e) => {
-            s.seen = e[e.length - 1].isIntersecting;
-            if (s.seen) hvPoolWake();
-          }).observe(s.el);
-        }
         const v = hvNeedValue();
         // the tasks are not loaded yet (the boot): the pool waits, so it does not fill up and drain at the start
         if (_hvNeedOverride == null && !_hvCatalogSize) return;
-        // "fill in" (the default setting, js/settings.js): the pool shows the calm, 80 % need = 20 % water
-        const water = SETTINGS.needFill === "in" ? 100 - v : v;
-        s.target = water;
-        s.el.classList.toggle("on", water > 0 || s.level > 0.02);
+        const water = hvWaterOf(v);
+        hvPoolSetWater(_hvPool, water);
         const btn = document.getElementById("hv-need-btn");
         btn.title =
           `Total need for a repeat solve: ${Math.round(v)}%` +
@@ -297,7 +302,6 @@
               : " (no solved tasks yet)") +
           ` · the pool shows ${Math.round(water)}% (${SETTINGS.needFill === "in" ? "fill in" : "fill out"}, see the settings)` +
           " · click to open the most overdue task";
-        hvPoolWake();
       }
 
       // Update the number on the button (also called on a timer: rewards keep growing)

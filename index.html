@@ -945,9 +945,14 @@
           </button>
         </div>
         <div class="m-content">
+          <!-- one row: the name, the pool of the need button (js/harvest.js) to see the setting at once, the control
+               of the setting and a slider of the need to try it on -->
           <div class="st-row">
             <div class="st-name">NEED POOL</div>
-            <div class="seg" id="st-fill" role="radiogroup" aria-label="Need pool">
+            <div class="rnd-btn hv-need-btn st-demo" aria-hidden="true">
+              <span class="hv-need" id="st-pool"><i></i><b class="hv-ball"></b></span>
+            </div>
+            <div class="seg" id="st-fill" role="radiogroup" aria-label="Need pool" title="Fill in: the pool shows the calm (80% need = 20% water). Fill out: the pool shows the need (80% need = 80% water).">
               <button type="button" class="seg-btn" role="radio" data-v="in">
                 Fill in
               </button>
@@ -955,8 +960,20 @@
                 Fill out
               </button>
             </div>
+            <label class="st-need" title="The need to try the pool on (it starts at the real one)">
+              <input
+                type="range"
+                class="st-range"
+                id="st-need"
+                min="0"
+                max="100"
+                step="1"
+                value="60"
+                aria-label="The need to try the pool on"
+              />
+              <b id="st-need-val">60%</b>
+            </label>
           </div>
-          <div class="st-hint" id="st-fill-hint"></div>
         </div>
       </div>
     </div>
