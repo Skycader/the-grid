@@ -2305,6 +2305,14 @@
         justify-content: center;
         width: 24px;
         cursor: pointer;
+        position: relative;
+      }
+      /* the patch is tiny: an invisible area around it takes the pointer too (a click, the hover tooltip), so the
+         cursor does not have to hit the squares themselves */
+      .rank-badge::after {
+        content: "";
+        position: absolute;
+        inset: -12px -9px;
       }
       .rank-badge.zero {
         opacity: 0.35;
