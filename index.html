@@ -953,10 +953,19 @@
               <span class="hv-need" id="st-pool"><i></i><b class="hv-ball"></b></span>
             </div>
             <div class="seg" id="st-fill" role="radiogroup" aria-label="Need pool" title="Fill in: the pool shows the calm (80% need = 20% water). Fill out: the pool shows the need (80% need = 80% water).">
+              <!-- the icons are the pool at 80 % need: fill in = 20 % water, fill out = 80 % water -->
               <button type="button" class="seg-btn" role="radio" data-v="in">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <rect x="2" y="2" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.3" />
+                  <path d="M3 11.2Q5.5 9.6 8 11.2T13 11.2V13H3Z" fill="currentColor" />
+                </svg>
                 Fill in
               </button>
               <button type="button" class="seg-btn" role="radio" data-v="out">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <rect x="2" y="2" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.3" />
+                  <path d="M3 5.2Q5.5 3.6 8 5.2T13 5.2V13H3Z" fill="currentColor" />
+                </svg>
                 Fill out
               </button>
             </div>

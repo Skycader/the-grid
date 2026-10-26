@@ -1530,6 +1530,9 @@
         border: 1px solid rgba(181, 137, 0, 0.3);
       }
       .seg-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         padding: 6px 14px;
         background: rgba(181, 137, 0, 0.06);
         border: none;
@@ -1542,6 +1545,10 @@
         transition:
           background 0.15s,
           color 0.15s;
+      }
+      .seg-btn svg {
+        display: block;
+        flex: 0 0 auto;
       }
       .seg-btn + .seg-btn {
         border-left: 1px solid rgba(181, 137, 0, 0.3);
