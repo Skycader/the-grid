@@ -59,6 +59,14 @@
         background: rgba(0, 220, 255, 0.62);
       }
 
+      /* ── KEYBOARD FOCUS ── (Tab) The browser draws its own white / blue ring: ours is a thin cyan line with
+         a small gap, the colour of the theme. It stays visible on purpose (it is the way to see where the
+         keyboard is); the elements with their own focus look (inputs, tabs, the safe...) override it. */
+      :focus-visible {
+        outline: 1px solid var(--c);
+        outline-offset: 2px;
+      }
+
       #bg {
         position: fixed;
         inset: 0;
@@ -698,6 +706,10 @@
       }
       .rnd-dice {
         display: block;
+      }
+      /* the top buttons show the focus with the cyan border and the glow (the rule below), no ring on top of it */
+      .rnd-btn:focus-visible {
+        outline: none;
       }
       .rnd-wrap:hover .rnd-btn,
       .rnd-btn:focus-visible {
