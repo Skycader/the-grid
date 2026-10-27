@@ -36,6 +36,7 @@ Seen while working (a window of 490 px, a phone width):
 
 Done (1.6.0): the main menu (the home row, the panels under it, the bottom bar, the boot logo) at 320-640 px.
 Done (1.6.0): the task view up to 680 px - the editor on the upper half, the results on the lower half, the bar between them.
+Done (1.6.0): the task bar on a tablet (681-1100 px) - the path on a row of its own.
 
 Not there:
 - A list of the target sizes and a way to check them (a table of widths x heights to look at, or a

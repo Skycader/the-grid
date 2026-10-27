@@ -4247,3 +4247,40 @@
           grid-row: 5 / 6;
         }
       }
+
+      /* ── TASK BAR ON A TABLET (681-1100 px) ──
+         All the controls (BACK, the path, the tabs, the font size, STRICT, MEM, RUN, the balance) need about
+         1000 px in one row; below that the path was squeezed to nothing and the balance left the screen. Now
+         BACK + the path take the first row and the controls stand under them; RUN and the balance sit together at the right end. */
+      @media (min-width: 681px) and (max-width: 1100px) {
+        .task-bar {
+          flex-wrap: wrap;
+          row-gap: 5px;
+        }
+        .task-bar .bk {
+          order: -2;
+        }
+        .task-bar .breadc {
+          order: -1;
+          flex: 1 1 calc(100% - 80px);
+        }
+        .task-bar .run-btn {
+          margin-left: auto;
+        }
+      }
+      /* the controls row of the narrowest tablets (681-760 px) is too short for a big balance: the memory limit
+         goes away, as on a phone */
+      @media (min-width: 681px) and (max-width: 760px) {
+        .task-bar .mem-grp {
+          display: none;
+        }
+      }
+
+      /* RUN stands next to the balance in the task bar: the same height (the balance is 30 px, RUN was 27) */
+      @media (min-width: 681px) {
+        .task-bar .run-btn,
+        .task-bar .wallet {
+          height: 30px;
+          box-sizing: border-box;
+        }
+      }
