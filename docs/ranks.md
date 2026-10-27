@@ -49,12 +49,12 @@ The level is the **average rank of all the tasks of the catalog, weighted by the
 ```
 level  = sum over ALL the tasks of   rank of the task (whole days) * weight
 weight = (1 / (11 - difficulty)) / S
-S      = sum over ALL the tasks of 1 / (11 - difficulty)      (today S = 6.696, 37 tasks)
+S      = sum over ALL the tasks of 1 / (11 - difficulty)      (today S = 6.946, 38 tasks)
 ```
 
 The weights add up to 1, so the level is 0 ... 1000, and **1000 means that every task of the catalog is at
 the rank 1000** (the 21st rank, Supreme Overlord). A harder task weighs more: the weight of a task of
-difficulty 9 is 7.47%, of difficulty 1 is 1.49%. A task that has never been solved again has the rank 0 but
+difficulty 9 is 7.20%, of difficulty 1 is 1.44%. A task that has never been solved again has the rank 0 but
 its weight stays in S: the unsolved tasks are 61.7% of the level for the sample below, and a new task of the
 catalog lowers every level until it is solved (the total weight grows).
 

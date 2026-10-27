@@ -223,4 +223,11 @@ window.CFG_regex = [
     desc: "Find the real target",
     file: "ex32",
   },
+  {
+    id: "regex_33",
+    title: "Clean Words",
+    diff: 7,
+    desc: "Return the words made of letters only, whole or not at all",
+    file: "ex33",
+  },
 ];
