@@ -35,6 +35,7 @@ Seen while working (a window of 490 px, a phone width):
   MEM, RUN and the wallet) is the most crowded screen; on a phone the code editor is hardly usable.
 
 Done (1.6.0): the main menu (the home row, the panels under it, the bottom bar, the boot logo) at 320-640 px.
+Done (1.6.0): the task view up to 680 px - the editor on the upper half, the results on the lower half, the bar between them.
 
 Not there:
 - A list of the target sizes and a way to check them (a table of widths x heights to look at, or a

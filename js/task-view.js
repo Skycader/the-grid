@@ -116,7 +116,6 @@
         }
         // like the back button of the browser (the popstate handler (js/routing.js) opens the page behind)
         if (histCanGoBack()) {
-          closeMobResults();
           hideSolOverlay();
           history.back();
           return;
@@ -125,7 +124,6 @@
         // Return to category URL (drop task param)
         const cat = curCat();
         if (cat) setQueryParams({ cat: cat.id });
-        closeMobResults();
         hideSolOverlay();
         // refresh the need meters; if the task was opened directly (search / random /
         // harvest) the category list was never built — build it now

@@ -62,7 +62,6 @@
         btn.classList.remove("go");
         btn.textContent = "▶ RUN";
         renderResults(r, benchData);
-        openMobResults();
         if (!r.error) {
           const all = Object.values(r.suites).flat();
           const st =

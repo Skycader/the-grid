@@ -3345,95 +3345,8 @@
         color: #dc322f;
       }
 
-      /* ── MOBILE RESULTS SHEET (slide up after RUN) ── */
-      .res-close {
-        display: none;
-      }
-
+      /* ── MAIN MENU / CATEGORIES ON A NARROW SCREEN ── (the task view has its own block at the end of the file) */
       @media (max-width: 680px) {
-        /* Task bar: wrap into two rows */
-        .task-bar {
-          flex-wrap: wrap;
-          gap: 4px;
-          padding: 4px 6px;
-        }
-        .breadc {
-          order: -1;
-          width: 100%;
-          font-size: 0.64rem;
-        }
-        .wallet {
-          padding: 2px 8px 2px 10px;
-        }
-        .wallet-val {
-          font-size: 0.72rem;
-        }
-        .need-meter i {
-          width: 44px;
-        }
-        .mem-grp {
-          display: none;
-        } /* hide on tiny screens */
-        .tab {
-          font-size: 0.64rem;
-          padding: 3px 7px;
-        }
-        .run-btn {
-          font-size: 0.66rem;
-          padding: 5px 10px;
-          letter-spacing: 0.12em;
-        }
-
-        /* Editor fills the whole area */
-        .editor-area {
-          flex-direction: column;
-        }
-        .ed-panel {
-          flex: 1;
-          border-right: none;
-          min-height: 0;
-        }
-
-        /* Results panel becomes a fixed bottom sheet */
-        .res-panel {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 60vh;
-          z-index: 200;
-          border-top: 1px solid var(--c);
-          box-shadow: 0 -4px 40px rgba(0, 200, 255, 0.12);
-          transform: translateY(110%);
-          transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .res-panel.mob-open {
-          transform: translateY(0);
-        }
-
-        /* Close handle for the sheet */
-        .res-close {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 22px;
-          cursor: pointer;
-          flex-shrink: 0;
-          background: rgba(0, 255, 255, 0.04);
-          border-bottom: 1px solid var(--bd);
-        }
-        .res-close::before {
-          content: "";
-          display: block;
-          width: 32px;
-          height: 3px;
-          background: var(--cm);
-          border-radius: 2px;
-        }
-        .res-close:hover::before {
-          background: var(--c);
-        }
-
         /* Cat grid: 2 columns on mobile */
         .cat-grid {
           grid-template-columns: repeat(2, 1fr);
@@ -3450,19 +3363,6 @@
         .logo-sub {
           font-size: 0.55rem;
           letter-spacing: 0.08em;
-        }
-      }
-
-      @media (max-width: 400px) {
-        .cat-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .tab-grp {
-          gap: 1px;
-        }
-        .tab {
-          font-size: 0.6rem;
-          padding: 2px 6px;
         }
       }
       /* ── STRICT MODE TOGGLE ── */
@@ -4193,4 +4093,157 @@
       .m-btn.go:hover {
         background: rgba(181, 137, 0, 0.12);
         box-shadow: 0 0 8px rgba(181, 137, 0, 0.28);
+      }
+
+      /* ── TASK ON A PHONE (up to 680 px) ──
+         The screen is split in two halves, top to bottom:
+           [ BACK, the path, the difficulty, the reward, the rank ]
+           [ the editor: 50% ]
+           [ EDITOR / SPEC / SOLUTIONS, STRICT, the font size, the balance ]
+           [ the test results: 50%, RUN in the corner of their header ]
+         The bars of the desktop layout (.task-bar) and the editor / results pair (.editor-area) disappear
+         (display: contents) and their children are placed on one grid; the dark bands of the two bars are
+         drawn by ::before / ::after of the view. Up to 440 px the lower bar is two rows (tabs + the balance,
+         STRICT + the font size). */
+      @media (max-width: 680px) {
+        #view-task.active {
+          display: grid;
+          grid-template-columns: auto auto 1fr auto auto;
+          grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr);
+          column-gap: 6px;
+          row-gap: 0;
+        }
+        .task-bar,
+        .editor-area {
+          display: contents;
+        }
+        #view-task::before,
+        #view-task::after {
+          content: "";
+          background: rgba(0, 20, 30, 0.98);
+          pointer-events: none;
+          z-index: 0;
+        }
+        #view-task::before {
+          grid-area: 1 / 1 / 2 / -1;
+          border-bottom: 1px solid var(--bd);
+        }
+        #view-task::after {
+          grid-area: 3 / 1 / 4 / -1;
+          border-top: 1px solid var(--bd);
+          border-bottom: 1px solid var(--bd);
+        }
+
+        /* the top bar: BACK on the left, the path wraps beside it */
+        #bk-task {
+          grid-area: 1 / 1;
+          align-self: start;
+          justify-self: start;
+          margin: 6px 0 0 8px;
+          z-index: 2;
+        }
+        .breadc {
+          grid-area: 1 / 1 / 2 / -1;
+          z-index: 1;
+          order: 0;
+          width: auto;
+          padding: 6px 8px 6px 94px;
+          min-height: 34px;
+          box-sizing: border-box;
+          display: block;
+          white-space: normal;
+          overflow: visible;
+          line-height: 1.7;
+          font-size: 0.68rem;
+        }
+
+        /* the editor: the upper half */
+        .ed-panel {
+          grid-area: 2 / 1 / 3 / -1;
+          min-height: 0;
+          border-right: none;
+        }
+
+        /* the lower bar */
+        .tab-grp {
+          grid-area: 3 / 1;
+          justify-self: start;
+          margin: 4px 0 4px 8px;
+          z-index: 1;
+        }
+        .tab {
+          font-size: 0.64rem;
+          padding: 4px 8px;
+        }
+        #strict-grp {
+          grid-area: 3 / 2;
+          justify-self: start;
+          margin: 4px 0;
+          z-index: 1;
+        }
+        #fz-grp {
+          grid-area: 3 / 4;
+          margin: 4px 0;
+          z-index: 1;
+        }
+        .wallet {
+          grid-area: 3 / 5;
+          margin: 4px 8px 4px 0;
+          padding: 2px 8px 2px 10px;
+          z-index: 1;
+        }
+        .wallet-val {
+          font-size: 0.72rem;
+        }
+        .mem-grp {
+          display: none;
+        }
+
+        /* the results: the lower half, RUN sits in the corner of their header */
+        .res-panel {
+          grid-area: 4 / 1 / 5 / -1;
+          min-height: 0;
+          min-width: 0;
+          border-top: none;
+        }
+        .res-hdr {
+          min-height: 34px;
+          padding-right: 100px;
+          box-sizing: border-box;
+        }
+        #run-btn {
+          grid-area: 4 / 1 / 5 / -1;
+          justify-self: end;
+          align-self: start;
+          margin: 5px 8px 0 0;
+          padding: 4px 12px;
+          font-size: 0.66rem;
+          z-index: 3;
+        }
+      }
+      @media (max-width: 440px) {
+        #view-task.active {
+          grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+        }
+        #view-task::after {
+          grid-area: 3 / 1 / 5 / -1;
+        }
+        .wallet {
+          grid-area: 3 / 4 / 4 / 6;
+          justify-self: end;
+        }
+        #strict-grp {
+          grid-area: 4 / 1;
+          justify-self: start;
+          margin-left: 8px;
+        }
+        #fz-grp {
+          grid-area: 4 / 4 / 5 / 6;
+          justify-self: end;
+          margin-right: 8px;
+        }
+        .res-panel,
+        #run-btn {
+          grid-row: 5 / 6;
+        }
       }

@@ -31,15 +31,3 @@
         if (typeof walletRenderTaskReward === "function") walletRenderTaskReward();
       }
 
-      // ═══════════ MOBILE RESULTS SHEET ═══════════
-      function isMobile() {
-        return window.innerWidth <= 680;
-      }
-      function openMobResults() {
-        if (isMobile())
-          document.getElementById("res-panel").classList.add("mob-open");
-      }
-      function closeMobResults() {
-        document.getElementById("res-panel").classList.remove("mob-open");
-      }
-

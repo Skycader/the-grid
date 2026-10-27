@@ -255,7 +255,6 @@
         if (!line || !curTask || !editor) return;
         const files = FILECACHE[curCat().id + "/" + curTask.id];
         if (!files || !files.spec) return;
-        if (typeof closeMobResults === "function") closeMobResults(); // phones: results cover the editor
         const r = specStatementRange(files.spec, line);
         const go = () => {
           editor.revealLineInCenter(r.start, monaco.editor.ScrollType.Immediate); // no smooth scroll: the flash must not start before the target is on screen
