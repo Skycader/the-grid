@@ -11,7 +11,8 @@
  *   ✓ every number has 1 to 3 digits (0, 00, 007, 255, 999); a number of 4 digits and more does not count
  *   ✓ the range of a number is not checked: 312.999.0.1 is special
  *   ✓ the line is only the address: a dot at the start or at the end, two dots in a row, a letter, a text
- *     before or after it, another separator (comma, colon, hyphen) — not special
+ *     before or after it, a port (1.1.1.1:8080), brackets, a semicolon, another separator (comma, colon,
+ *     hyphen) — not special
  *   ✓ many lines: every special line counts once, repeated lines count each; blank lines, \r\n, the first
  *     and the last line
  *   ✓ the answer is a number, 0 for an empty text and for a text without special addresses
