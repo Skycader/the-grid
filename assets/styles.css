@@ -3590,6 +3590,73 @@
         color: #dc322f;
       }
 
+      /* ── HOME ON A NARROW SCREEN ──
+         up to 640 px the search field takes a row of its own and the buttons go under it as a grid (one row;
+         the HARVEST button takes what is left). Up to 440 px HARVEST goes to a row of its own and the other
+         five buttons stay under it. The panels of RANDOM / HARVEST open under the whole block, not to the
+         left of their button (a panel anchored to the right edge of a left button left the screen). The
+         bottom bar (HUD + credit) shrinks to the width and the credit stands above it, not under it. */
+      @media (max-width: 640px) {
+        .search-row {
+          display: grid;
+          grid-template-columns: auto auto 1fr auto auto auto;
+          grid-auto-rows: 38px;
+          gap: 6px;
+          position: relative;
+        }
+        .search-row .search-wrap {
+          grid-column: 1 / -1;
+        }
+        .search-row .rnd-wrap {
+          position: static;
+        }
+        .search-row .rnd-btn:not(.hv-need-btn) {
+          width: 100%;
+          justify-content: center;
+        }
+        .search-row .rnd-panel {
+          left: 0;
+          right: auto;
+          width: min(100%, 280px);
+        }
+        #boot-logo {
+          font-size: clamp(1.3rem, 8vw, 2.2rem);
+        }
+        #view-home .home-content {
+          padding-bottom: 76px;
+        }
+        #hud {
+          left: 8px;
+          right: 8px;
+          bottom: 8px;
+          gap: 4px;
+        }
+        #hud .hud-btn {
+          flex: 1 1 auto;
+          padding: 4px 4px;
+          font-size: 0.58rem;
+          letter-spacing: 0.04em;
+          text-align: center;
+          white-space: nowrap;
+        }
+        #credit {
+          left: 8px;
+          right: 8px;
+          bottom: 40px;
+          justify-content: center;
+          font-size: 0.58rem;
+          letter-spacing: 0.04em;
+        }
+      }
+      @media (max-width: 440px) {
+        .search-row {
+          grid-template-columns: auto auto 1fr auto auto;
+        }
+        .search-row .hv-wrap {
+          grid-column: 1 / -1;
+          grid-row: 2;
+        }
+      }
       /* ── WALLET ── */
       .wallet {
         flex-shrink: 0;
