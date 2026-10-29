@@ -395,6 +395,25 @@
         _lifeCache[key] = { sig, stats };
         return stats;
       }
+      // The points of the rank chart of a task (js/rank-progress.js), in the order of the log: a "solve" entry
+      // ({ t, from, to, wipe: false }) and a wipe of the rank by viewing the solution ({ t, from, to: 0, wipe: true });
+      // the entries without the rank numbers (written before the log had them) are skipped.
+      function walletRankSeries(key) {
+        const out = [];
+        for (const e of _history) {
+          if (e.task !== key) continue;
+          if (e.type === "solve") {
+            const to = +(e.rankTo ?? e.rank);
+            if (!isFinite(to)) continue;
+            const from = +(e.rankFrom ?? NaN);
+            out.push({ t: e.t, from: isFinite(from) ? from : null, to, wipe: false });
+          } else if (e.type === "rank") {
+            const from = +(e.rankFrom ?? e.from);
+            if (isFinite(from)) out.push({ t: e.t, from, to: 0, wipe: true });
+          }
+        }
+        return out;
+      }
       // Signal-bars icon (4 ascending bars) followed by the rank number.
       function rankIconSvg(px) {
         return `<svg width="${px}" height="${px}" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="11" width="2.6" height="4" rx=".6" fill="currentColor"/><rect x="5" y="8" width="2.6" height="7" rx=".6" fill="currentColor"/><rect x="9" y="5" width="2.6" height="10" rx=".6" fill="currentColor"/><rect x="13" y="1.5" width="2.6" height="13.5" rx=".6" fill="currentColor"/></svg>`;

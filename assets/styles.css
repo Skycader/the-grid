@@ -2534,6 +2534,132 @@
         text-align: right;
         color: var(--tx);
       }
+      /* the tabs of the RANKS window of a task: CURRENT RANK / PROGRESS (the shape of the tabs of the profile) */
+      .rkm-tabs {
+        margin: 0 0 12px;
+        border-bottom: 1px solid rgba(181, 137, 0, 0.3);
+      }
+      .rkm-tabs[hidden],
+      #rkm-cur[hidden],
+      #rkm-prog[hidden] {
+        display: none;
+      }
+      /* PROGRESS: vertical bars on a time axis (js/rank-progress.js). --x is the place on the axis (0..1), --h the height */
+      .rkg-sum,
+      .rkg-key,
+      .rkg-empty {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--txd);
+      }
+      .rkg-sum {
+        text-align: center;
+        margin-bottom: 14px;
+      }
+      .rkg-sum b {
+        font-weight: 400;
+        color: #6c71c4;
+      }
+      .rkg-empty {
+        text-align: center;
+        padding: 40px 10px;
+      }
+      .rkg-chart {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        grid-template-rows: 220px auto;
+        column-gap: 6px;
+      }
+      .rkg-y {
+        position: relative;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        color: var(--txd);
+        text-align: right;
+      }
+      .rkg-y span {
+        position: absolute;
+        right: 0;
+        transform: translateY(50%);
+      }
+      .rkg-plot {
+        position: relative;
+        border-left: 1px solid rgba(181, 137, 0, 0.55);
+        border-bottom: 1px solid rgba(181, 137, 0, 0.55);
+        background: rgba(0, 14, 24, 0.35);
+      }
+      .rkg-tier {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed rgba(108, 113, 196, 0.28);
+        pointer-events: none;
+      }
+      .rkg-tier span {
+        position: absolute;
+        right: 4px;
+        bottom: 1px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.5rem;
+        color: rgba(108, 113, 196, 0.7);
+      }
+      .rkg-bar {
+        position: absolute;
+        bottom: 0;
+        left: calc((100% - var(--bw)) * var(--x));
+        width: var(--bw);
+        height: var(--h);
+        min-height: 2px;
+        background: linear-gradient(to top, rgba(0, 255, 255, 0.25), var(--c));
+        box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
+      }
+      .rkg-bar.wipe {
+        background: repeating-linear-gradient(45deg, rgba(220, 50, 47, 0.55) 0 3px, rgba(220, 50, 47, 0.15) 3px 6px);
+        box-shadow: 0 0 6px rgba(220, 50, 47, 0.45);
+        outline: 1px solid rgba(220, 50, 47, 0.8);
+      }
+      .rkg-bar:hover {
+        filter: brightness(1.4);
+      }
+      .rkg-x {
+        grid-column: 2;
+        position: relative;
+        height: 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        color: var(--txd);
+      }
+      .rkg-x span {
+        position: absolute;
+        top: 5px;
+        left: calc(100% * var(--x));
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+      .rkg-x span.l {
+        transform: none;
+      }
+      .rkg-x span.r {
+        transform: translateX(-100%);
+      }
+      .rkg-key {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        margin-top: 10px;
+        font-size: 0.6rem;
+      }
+      .rkg-key i {
+        display: inline-block;
+        width: 8px;
+        height: 10px;
+        background: var(--c);
+      }
+      .rkg-key i.wipe {
+        background: rgba(220, 50, 47, 0.6);
+        margin-left: 10px;
+      }
       /* the test animation of a rank-up (js/rank-anim.js): a plate under the rank of the task */
       #rk-plate {
         position: fixed;

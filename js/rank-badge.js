@@ -95,7 +95,21 @@
         const i = rankInfo(RANK_SCALES[kind].start[k], kind);
         return i.to === null ? `${rankFmt(i.from, kind)}+` : `${rankFmt(i.from, kind)} - ${rankFmt(i.to, kind)}`;
       }
-      function rkOpen(value, kind = "task") {
+      // the task of the open window (the PROGRESS tab draws its chart) and the tab that is on
+      let rkKey = "";
+      function rkTab(t) {
+        document.querySelectorAll("#rkm-tabs .pfm-tab").forEach((b) => b.classList.toggle("on", b.dataset.t === t));
+        document.getElementById("rkm-cur").hidden = t !== "cur";
+        document.getElementById("rkm-prog").hidden = t !== "prog";
+        if (t === "prog") rkpRender(rkKey);
+      }
+      document.getElementById("rkm-tabs").addEventListener("click", (e) => {
+        const b = e.target.closest(".pfm-tab");
+        if (!b || b.classList.contains("on")) return;
+        rkTab(b.dataset.t);
+        playClick();
+      });
+      function rkOpen(value, kind = "task", key = "") {
         const start = RANK_SCALES[kind].start;
         const player = kind === "player";
         const cur = rankStep(value, kind);
@@ -115,9 +129,19 @@
             `<div class="rkm-row${k === cur ? " cur" : ""}"${k === cur ? ` style="--p:${pct}%" title="${pct}% of the way to the next rank"` : ""}><span class="rkm-n">${k + 1}</span><span class="rkm-p">${rankPatchStep(k)}</span><span class="rkm-nm">${nm[0]} <small>· ${nm[1]}</small></span><span class="rkm-ja">${RANK_JA[k]}</span><span class="rkm-d">${rkRange(k, kind)}</span></div>`,
         ).join("");
         rkRenderCalc(player);
+        // the tabs: only the window of a task has them; it opens on the current rank
+        rkKey = !player && key ? key : "";
+        const tabs = document.getElementById("rkm-tabs");
+        tabs.hidden = !rkKey;
+        if (rkKey) document.getElementById("rkm-prog-n").textContent = rkpDays(rkKey).length || "";
+        const mc = rkModal.querySelector(".m-content");
+        mc.style.height = "";
+        rkTab("cur");
         rkModal.classList.remove("hide");
         const row = rkModal.querySelector(".rkm-row.cur");
         if (row) row.scrollIntoView({ block: "center" });
+        // the window keeps the height of the first tab, so it does not jump when the shorter chart is shown
+        if (rkKey && mc.offsetHeight > 150) mc.style.height = mc.offsetHeight + "px";
         playClick();
       }
       // The level of the player, task by task (an expandable list): rank × weight of every solved task
@@ -157,7 +181,7 @@
           if (!b) return;
           e.stopPropagation();
           e.preventDefault();
-          rkOpen(+b.dataset.rank, b.dataset.kind || "task");
+          rkOpen(+b.dataset.rank, b.dataset.kind || "task", b.dataset.key || "");
         },
         true,
       );

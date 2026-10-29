@@ -893,9 +893,17 @@
           </button>
         </div>
         <div class="m-content">
-          <div class="rkm-now" id="rkm-now"></div>
-          <details class="rkm-calc" id="rkm-calc" hidden></details>
-          <div class="rkm-list" id="rkm-list"></div>
+          <!-- the window of a task has two tabs; the window of the player has none -->
+          <div class="pfm-tabs rkm-tabs" id="rkm-tabs" hidden>
+            <button class="pfm-tab on" data-t="cur" type="button"><b>CURRENT RANK</b></button>
+            <button class="pfm-tab" data-t="prog" type="button"><b>PROGRESS</b><i id="rkm-prog-n"></i></button>
+          </div>
+          <div id="rkm-cur">
+            <div class="rkm-now" id="rkm-now"></div>
+            <details class="rkm-calc" id="rkm-calc" hidden></details>
+            <div class="rkm-list" id="rkm-list"></div>
+          </div>
+          <div id="rkm-prog" hidden></div>
         </div>
       </div>
     </div>
@@ -1449,6 +1457,7 @@
     <script src="js/tooltip.js"></script>
     <script src="js/wallet.js"></script>
     <script src="js/rank-badge.js"></script>
+    <script src="js/rank-progress.js"></script>
     <script src="js/rank-anim.js"></script>
     <script src="js/hovermenu.js"></script>
     <script src="js/settings.js"></script>
