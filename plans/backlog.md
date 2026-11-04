@@ -47,6 +47,23 @@ Every transaction gets a unique id built from the time.
 Open:
 - SHA-1 of time + salt, or `crypto.randomUUID()`; the full hash or its first 8-12 characters in the menu.
 
+### 6. Personal comments: the player's own notes
+
+Introduce a system of personal comments: the player can keep notes. Open: attached to a task, to a
+transaction, or both; where they are shown and edited; they have to go into Export / Import.
+
+See also `plans/earnings-rate-and-task-notes.md` (task notes).
+
+### 7. Transactions modal: right click, "replay the animation"
+
+In the transactions modal the right-click menu gets an item **replay the animation**. The player can
+watch again how the rank grew: from which rank to which, for **the task's own rank** and for the
+**player's overall level**.
+
+The same context menu as in micro-task 5 (copy the hash); see also `docs/PLAN.md` item 1 (the
+rank-update progress bar). Needs the old and new rank to be stored in the log entry, or restored from
+the entries before it.
+
 ---
 
 ## Big tasks
