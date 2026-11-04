@@ -17,15 +17,10 @@
         // Font size
         applyFZ();
         const starsHtml = task.diff
-          ? ` <span class="breadc-stars ${diffCls(task.diff)}">${mkStars(task.diff)}</span>` +
+          ? // a click on the stars opens the difficulty scale (the RANKS drawer; there is no separate ⓘ button)
+            ` <span class="breadc-stars ${diffCls(task.diff)}" onclick="openRanksDrawer()" title="Difficulty scale">${mkStars(task.diff)}</span>` +
             ` <span class="breadc-reward" id="task-reward"></span>` +
-            ` <span class="breadc-rank" id="task-rank"></span>` +
-            ` <button class="ranks-btn visible" onclick="openRanksDrawer()" title="Difficulty scale" style="margin-left:4px">` +
-            `<svg width="15" height="15" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">` +
-            `<circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.3"/>` +
-            `<rect x="9.15" y="8.5" width="1.7" height="6" rx=".85" fill="currentColor"/>` +
-            `<circle cx="10" cy="6.2" r=".95" fill="currentColor"/>` +
-            `</svg></button>`
+            ` <span class="breadc-rank" id="task-rank"></span>`
           : "";
         document.getElementById("breadc").innerHTML =
           `<span>${cat.name}</span> <span style="color:var(--txd)">/</span> <span class="act">${task.id.toUpperCase()}</span>${starsHtml}`;

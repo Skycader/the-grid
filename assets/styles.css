@@ -2879,6 +2879,11 @@
         opacity: 0.9;
         white-space: nowrap;
         flex-shrink: 0;
+        cursor: pointer; /* a click opens the difficulty scale (the ⓘ button used to do it) */
+        transition: opacity 0.15s;
+      }
+      .breadc-stars:hover {
+        opacity: 1;
       }
 
       .tab-grp {
