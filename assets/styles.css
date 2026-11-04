@@ -2869,6 +2869,8 @@
         font-weight: 400;
       }
       .breadc-rank {
+        display: inline-flex;
+        align-items: center;
         margin-left: 10px;
         vertical-align: middle;
       }
