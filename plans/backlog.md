@@ -64,6 +64,16 @@ The same context menu as in micro-task 5 (copy the hash); see also `docs/PLAN.md
 rank-update progress bar). Needs the old and new rank to be stored in the log entry, or restored from
 the entries before it.
 
+### 8. Tell the player when the solution is slower than the reference
+
+If the player's solution is slower than `ref` (the reference solution), inform the player **how many
+times slower** it is (e.g. "3.2x slower than the reference").
+
+Open:
+- What is compared: the run time of the same tests, or the complexity (the number of steps).
+- Where it is shown: in the results panel, a toast after the run, or both.
+- A threshold under which nothing is shown (noise: 1.05x is not worth a message).
+
 ---
 
 ## Big tasks
