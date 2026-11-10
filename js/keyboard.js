@@ -1,10 +1,23 @@
       // ═══════════ KEYBOARD ═══════════
-      document.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      // Ctrl/Cmd+S: never the browser's "Save page" — it only runs the tests.
+      // Capture phase on window: fires before Monaco or any other handler can swallow
+      // the event. The physical key (e.code) is checked together with e.key, so it also
+      // works with Caps Lock / Shift ("S") and non-Latin layouts (RU: "ы").
+      window.addEventListener(
+        "keydown",
+        (e) => {
+          const isS =
+            e.code === "KeyS" || (e.key && e.key.toLowerCase() === "s");
+          if (!(e.ctrlKey || e.metaKey) || !isS) return;
           e.preventDefault();
+          e.stopPropagation();
+          if (e.repeat) return; // a held key must not start a run per repeat
           if (TEST_ON_SAVE && view === "task") formatAndRun();
-          return;
-        }
+        },
+        true,
+      );
+
+      document.addEventListener("keydown", (e) => {
 
         if (e.key === "Escape") {
           if (!document.getElementById("rk-modal").classList.contains("hide")) {
