@@ -1,10 +1,9 @@
-/* DEMO: the crane. The rig in the style of the app: flat, angular, thin cyan lines on the dark teal; no
-   rounding, no steel gradients. Loaded after crane.css and overrides it. The sizes that crane-draw.js
-   measures (the trolley, the chain height, the bottom of the magnet core at 28px, the bay) are kept.
-   Magnet off: nothing glows (dim lines only). Magnet on: a blue light pours from the underside. */
+/* DEMO: the crane. The rig in the style of the app: thin cyan lines on the dark teal, HUD-like.
+   Loaded after crane.css and overrides it. The sizes that crane-draw.js measures (the trolley, the line height,
+   the bottom of the magnet core at 28px, the bay) are kept. */
 
 .scene {
-  --ln: rgba(0, 255, 255, 0.38);
+  --ln: rgba(0, 255, 255, 0.42);
   --ln-dim: rgba(0, 255, 255, 0.18);
   --ink: #001a22;
   --fill: #073642;
@@ -12,88 +11,69 @@
   --blue-hi: #bfe6ff;
 }
 
-/* —— trolley: a flat box with corner ticks —— */
-.crane-trolley {
-  width: 76px;
-  padding: 5px 6px 6px;
-  background: var(--ink);
-  border: 1px solid var(--ln);
+/* —— the rail (horizontal): a scale with ticks between two thin lines, end stops —— */
+.gantry-rail {
+  top: 19px;
+  height: 7px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 255, 255, 0.55) 0 1px, transparent 1px 12px) center / 100% 3px no-repeat,
+    linear-gradient(var(--ln), var(--ln)) top / 100% 1px no-repeat,
+    linear-gradient(var(--ln), var(--ln)) bottom / 100% 1px no-repeat;
   border-radius: 0;
   box-shadow: none;
+}
+.gantry-rail::before,
+.gantry-rail::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  width: 6px;
+  height: 17px;
+  border: 1px solid #00ffff;
+  border-bottom: 0;
+  border-top: 0;
+}
+.gantry-rail::before { left: -2px; border-right: 0; }
+.gantry-rail::after { right: -2px; border-left: 0; }
+
+/* —— the trolley: open frame, corner brackets, wheels on the rail —— */
+.crane-trolley {
+  width: 74px;
+  padding: 5px 7px 6px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background:
+    linear-gradient(var(--ink), var(--ink)),
+    linear-gradient(#00ffff, #00ffff) 0 0 / 7px 1px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 0 0 / 1px 7px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 100% 0 / 7px 1px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 100% 0 / 1px 7px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 0 100% / 7px 1px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 0 100% / 1px 7px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 100% 100% / 7px 1px no-repeat,
+    linear-gradient(#00ffff, #00ffff) 100% 100% / 1px 7px no-repeat;
+  outline: 1px solid var(--ln-dim);
+  outline-offset: -1px;
 }
 .crane-trolley::before,
 .crane-trolley::after {
   content: "";
   position: absolute;
-  top: -3px;
-  width: 5px;
-  height: 5px;
-  border-top: 1px solid #00ffff;
+  top: 17px;
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+  border: 1px solid #00ffff;
+  transform: rotate(45deg);
+  border-top-width: 1px;
 }
-.crane-trolley::before { left: -1px; border-left: 1px solid #00ffff; }
-.crane-trolley::after { right: -1px; border-right: 1px solid #00ffff; }
+.crane-trolley::before { left: -5px; }
+.crane-trolley::after { right: -5px; }
 .crane-cabin {
-  height: 4px;
+  height: 3px;
   margin-bottom: 5px;
-  background: repeating-linear-gradient(135deg, #b58900 0 3px, transparent 3px 6px);
-  opacity: 0.8;
+  background: repeating-linear-gradient(90deg, #b58900 0 6px, transparent 6px 9px);
+  opacity: 0.85;
   box-shadow: none;
 }
-
-/* —— the winch: a drum, its ribs run while the chain moves —— */
-.crane-winch {
-  display: flex;
-  gap: 0;
-  height: 11px;
-}
-.crane-winch span { box-shadow: none; border-radius: 0; }
-.crane-winch span:nth-child(1),
-.crane-winch span:nth-child(3) {
-  flex: 0 0 3px;
-  background: var(--fill);
-  border: 1px solid var(--ln);
-}
-.crane-winch span:nth-child(2) {
-  flex: 1;
-  border: 1px solid var(--ln-dim);
-  border-left: 0;
-  border-right: 0;
-  background: repeating-linear-gradient(90deg, rgba(0, 255, 255, 0.5) 0 1px, var(--fill) 1px 5px);
-}
-.crane.is-winding .crane-winch span:nth-child(2) { animation: drum-run 0.16s linear infinite; }
-.crane.is-winding.is-up .crane-winch span:nth-child(2) { animation-direction: reverse; }
-@keyframes drum-run {
-  from { background-position: 0 0; }
-  to { background-position: 5px 0; }
-}
-
-/* —— the chain: two thin rails with cross links —— */
-.crane-cable {
-  width: 5px;
-  background-color: transparent;
-  background-image: repeating-linear-gradient(180deg, rgba(0, 255, 255, 0.7) 0 1px, transparent 1px 6px);
-  background-position: left bottom;
-  border-left: 1px solid var(--ln);
-  border-right: 1px solid var(--ln);
-  box-shadow: none;
-}
-.crane-cable::before { display: none; }
-
-/* —— the head the magnet hangs from —— */
-.spreader-beam {
-  width: 66px;
-  height: 8px;
-  background: var(--fill);
-  border: 1px solid var(--ln);
-  border-radius: 0;
-  box-shadow: none;
-}
-.spreader-beam em {
-  width: 4px;
-  height: 4px;
-  margin-top: -2px;
-  background: #b58900;
-  border-radius: 0;
-  box-shadow: none;
-}
-.crane.is-working .spreader-beam { border-color: #00ffff; }

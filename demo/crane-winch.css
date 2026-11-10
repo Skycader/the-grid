@@ -1,0 +1,153 @@
+/* DEMO: the crane. The winch (a reel with spokes between two guide pulleys), the hoist line with its markers,
+   the hook plate, and the laser head. HUD style: thin cyan lines, no gradients of steel. */
+
+/* —— the reel: a ring with spokes; the spokes turn while the line is paid out / hauled in —— */
+.crane-winch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 14px;
+}
+.crane-winch span { box-shadow: none; border-radius: 0; background: none; border: 0; }
+/* the guide pulleys: two short lines with a dot */
+.crane-winch span:nth-child(1),
+.crane-winch span:nth-child(3) {
+  flex: 1;
+  height: 1px;
+  background:
+    linear-gradient(90deg, transparent, var(--ln)),
+    radial-gradient(circle at 100% 50%, #00ffff 0 1.5px, transparent 2px);
+}
+.crane-winch span:nth-child(3) { transform: scaleX(-1); }
+.crane-winch span:nth-child(2) {
+  flex: 0 0 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #00ffff;
+  background:
+    radial-gradient(circle, #00ffff 0 1.5px, var(--ink) 2px 3px, transparent 3.5px),
+    repeating-conic-gradient(from 0deg, var(--ln) 0 6deg, transparent 6deg 90deg);
+}
+.crane.is-winding .crane-winch span:nth-child(2) { animation: reel-turn 0.5s linear infinite; }
+.crane.is-winding.is-up .crane-winch span:nth-child(2) { animation-direction: reverse; }
+@keyframes reel-turn { to { transform: rotate(360deg); } }
+
+/* —— the hoist line: one thin line, a bead every few px; the beads run with the line —— */
+.crane-cable {
+  width: 1px;
+  background-color: var(--ln);
+  background-image: repeating-linear-gradient(180deg, #00ffff 0 2px, transparent 2px 14px);
+  background-position: left bottom;
+  border: 0;
+  box-shadow: none;
+}
+.crane-cable::before { display: none; }
+
+/* —— the hook plate under the line: a flat pentagon outlined by two layers —— */
+.spreader-beam {
+  width: 40px;
+  height: 9px;
+  background: var(--ln);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(0 0, 100% 0, 100% 55%, calc(100% - 6px) 100%, 6px 100%, 0 55%);
+}
+.spreader-beam::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 55%, calc(100% - 6px) 100%, 6px 100%, 0 55%);
+}
+.spreader-beam em {
+  top: 3px;
+  margin: 0;
+  width: 3px;
+  height: 3px;
+  background: #b58900;
+  border-radius: 0;
+  box-shadow: none;
+  z-index: 1;
+}
+.spreader-beam em:first-child { left: 8px; }
+.spreader-beam em:last-child { right: 8px; }
+.crane.is-working .spreader-beam { background: #00ffff; }
+
+/* —— the laser head: a small angular turret on the magnet; the lens is a diamond —— */
+.laser-gun { width: 22px; height: 28px; margin-left: -11px; top: 8px; }
+.laser-gun-body {
+  left: 3px;
+  top: 0;
+  width: 16px;
+  height: 10px;
+  background: var(--ln);
+  border: 0;
+  box-shadow: none;
+  clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 100%, 0 100%);
+}
+.laser-gun-body::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  left: 1px;
+  top: 1px;
+  width: auto;
+  height: auto;
+  background: var(--ink);
+  box-shadow: none;
+  clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 100%, 0 100%);
+}
+.laser-gun-body::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 4px;
+  height: 2px;
+  margin-left: -2px;
+  background: #b58900;
+}
+.laser-gun-barrel {
+  left: 9px;
+  top: 10px;
+  width: 4px;
+  height: 9px;
+  background: var(--ink);
+  border: 0;
+  border-left: 1px solid var(--ln);
+  border-right: 1px solid var(--ln);
+  box-shadow: none;
+}
+.laser-gun-lens {
+  left: 8px;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
+  background: var(--ink);
+  border: 1px solid var(--ln);
+  border-radius: 0;
+  transform: rotate(45deg);
+}
+.laser-gun.is-firing .laser-gun-lens {
+  background: #eee8d5;
+  border-color: #eee8d5;
+  box-shadow: 0 0 6px #eee8d5, 0 0 12px #00ffff;
+}
+.laser-gun.is-firing .laser-gun-barrel { border-color: #00ffff; box-shadow: none; }
+.laser-gun.is-firing .laser-gun-body { background: #00ffff; }
+
+/* the beam: a thin line; the spot on the container is a ring with a cross */
+.crane-laser-core { inset: 0 1px; background: linear-gradient(180deg, #eee8d5, #00ffff 20%, rgba(0, 255, 255, 0.7)); }
+.crane-laser-glow { filter: blur(1.5px); }
+.crane-laser-spot {
+  width: 12px;
+  height: 12px;
+  bottom: -6px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #eee8d5 0 1.5px, transparent 2px);
+  border: 1px solid #00ffff;
+  box-shadow: 0 0 8px #00ffff;
+}
