@@ -814,3 +814,7 @@ body { display: flex; flex-direction: column; }
 .bar { font-size: 12px; }
 .bar button { font-size: 14px; }
 #stat { font-size: 12px; }
+
+/* the status line: its own row above the scene, so the crane never covers it */
+#opbar.op-badge { position: static; flex: 0 0 auto; margin: 0; border: 0; border-bottom: 1px solid var(--line); background: var(--bg0); padding: 4px 10px; font-size: 14px; min-height: 28px; }
+#opbar .op-detail { font-size: 15px; }

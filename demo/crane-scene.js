@@ -45,9 +45,8 @@ class Scene {
       `<div class="crane-laser" hidden><span class="crane-laser-core"></span><span class="crane-laser-glow"></span><span class="crane-laser-spot"></span></div>` +
       `<div class="deck"><div class="deck-hull"></div><div class="deck-slots" style="--n:${n}"></div><div class="deck-water"></div></div>`;
     this.stage.appendChild(s);
-    // the status badge lives outside the scaled scene, so its text keeps a readable size at any window size
-    const badge = el("op-badge", `<span class="op-kind"></span><span class="op-detail"></span>`);
-    this.stage.appendChild(badge);
+    // the status line is a row of its own above the stage (crane.html): it keeps a readable size and the crane never covers it
+    const badge = document.getElementById("opbar");
     this.root = s;
     const q = (c) => s.querySelector(c);
     this.q = {
