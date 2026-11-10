@@ -71,9 +71,10 @@
 .crane-trolley::before { left: -5px; }
 .crane-trolley::after { right: -5px; }
 .crane-cabin {
-  height: 3px;
-  margin-bottom: 5px;
-  background: repeating-linear-gradient(90deg, #b58900 0 6px, transparent 6px 9px);
+  height: 5px;
+  margin-bottom: 3px;
+  /* the stripes lean to the right: the gradient runs at 125deg, so the bars are "/" */
+  background: repeating-linear-gradient(125deg, #b58900 0 4px, transparent 4px 8px);
   opacity: 0.85;
   box-shadow: none;
 }
