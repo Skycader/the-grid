@@ -54,11 +54,14 @@ function tick() {
     show();
     return;
   }
+  // the scan is a short blink while the crane glides on: it must not feel like a stop at every cell
+  const scanNext = frames[index].op.type === "scan" && frames[index + 1] && frames[index + 1].op.type === "move";
+  const wait = Math.max(40, scanNext ? speed() * 0.22 : speed());
   timer = setTimeout(() => {
     index++;
     show();
     tick();
-  }, Math.max(40, speed()));
+  }, wait);
 }
 
 function play() {

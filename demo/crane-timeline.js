@@ -38,6 +38,7 @@ function compileTimeline(initial, events) {
 
   const push = (op) => {
     if (op.type === "move") craneIndex = op.index;
+    if (op.type === "move" && op.lift) craneLowered = false; // the arm rises while the crane already starts to ride
     if (op.type === "lower") craneLowered = true;
     if (op.type === "raise") craneLowered = false;
     if (op.type === "hoist") hoisting = true;
@@ -68,10 +69,11 @@ function compileTimeline(initial, events) {
   // one slide; the hold frames keep the playback time close to the travel time
   const moveTo = (index) => {
     if (craneIndex === index) return;
-    raiseArm();
-    const from = craneIndex,
+    // no stop to raise the arm first: the arm goes up during the first step of the ride (the scene delays the ride a bit)
+    const lift = craneLowered,
+      from = craneIndex,
       steps = Math.abs(index - from);
-    for (let i = 0; i < steps; i++) push({ type: "move", index, from, steps });
+    for (let i = 0; i < steps; i++) push({ type: "move", index, from, steps, lift: lift && i === 0 });
   };
 
   for (const ev of events) {

@@ -94,7 +94,7 @@ body { display: flex; flex-direction: column; }
   width: 100px;
   margin-left: -50px;
   /* One continuous rail slide — duration matches travel hold frames. */
-  transition: left var(--move-ms, 220ms) linear;
+  transition: left var(--move-ms, 220ms) var(--move-ease, linear) var(--move-lead, 0ms);
   z-index: 4;
 }
 

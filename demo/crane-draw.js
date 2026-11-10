@@ -30,9 +30,14 @@ Scene.prototype.draw = function (frame, target, speedMs) {
     op = frame.op;
   const armMs = Math.max(160, Math.round(speedMs * 0.92));
   const steps = op.type === "move" ? Math.max(1, op.steps || 1) : 1;
-  const moveMs = op.type === "move" ? Math.max(speedMs, Math.round(speedMs * steps)) : speedMs;
+  // a ride that starts with the arm up waits a little, so the load clears the neighbours; the slot of the frames is kept
+  const lead = op.type === "move" && op.lift ? Math.round(armMs * 0.4) : 0;
+  const moveMs = op.type === "move" ? Math.max(120, Math.round(speedMs * steps) - lead) : speedMs;
   this.root.style.setProperty("--arm-ms", armMs + "ms");
   this.root.style.setProperty("--move-ms", moveMs + "ms");
+  this.root.style.setProperty("--move-lead", lead + "ms");
+  // one cell at a time (the scan walk): constant speed, no brake at every cell; a long ride accelerates and brakes softly
+  this.root.style.setProperty("--move-ease", op.type === "move" && steps === 1 && !op.lift ? "linear" : "cubic-bezier(0.45, 0.05, 0.25, 1)");
 
   const scanning = op.type === "scan";
   const scanIndex = scanning ? op.index : -1;
