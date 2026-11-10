@@ -22,11 +22,8 @@
           solCode = code;
           CODE[key] = code;
           _editorLoading = true;
-          if (editor) {
-            const pos = editor.getPosition();
-            editor.setValue(code);
-            if (pos) editor.setPosition(pos);
-          }
+          // not setValue(): that would wipe the undo stack (Ctrl+Z must undo the formatting too)
+          edReplaceUndoable(code);
           _editorLoading = false;
           setStatus("✓ Formatted", "ok");
         } else {

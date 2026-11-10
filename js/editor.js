@@ -116,7 +116,7 @@
           if (!_editorLoading) playType();
         });
         if (curTask && !_editorLoading) {
-          editor.setValue(solCode);
+          edShow(`ed:${curCat().id}/${curTask.id}`, solCode);
           editor.updateOptions({ readOnly: false });
         }
         // Init font size + strict UI
@@ -134,6 +134,44 @@
           { passive: false },
         );
       });
+
+      // ═══════════ EDITOR MODELS (keep Ctrl+Z alive) ═══════════
+      // editor.setValue() wipes the undo stack, so the editor text is never replaced that way.
+      // Every task gets its own Monaco model per tab ("ed" = the player's code, "sp" = the spec):
+      // switching a tab / a task only swaps the model, and the undo history of each one stays.
+      const _edModels = {};
+      function edModel(id, text) {
+        let m = _edModels[id];
+        if (!m) {
+          m = _edModels[id] = monaco.editor.createModel(text, "javascript");
+        } else if (m.getValue() !== text) {
+          // the text changed from outside (reset, import…): an undoable edit, not setValue
+          m.pushEditOperations(
+            [],
+            [{ range: m.getFullModelRange(), text }],
+            () => null,
+          );
+        }
+        return m;
+      }
+      // show `text` in the editor under the model `id`; the content event does not fire
+      function edShow(id, text) {
+        if (!editor) return;
+        const m = edModel(id, text);
+        if (editor.getModel() !== m) editor.setModel(m);
+      }
+      // replace the whole text as ONE undoable step (the formatter): Ctrl+Z brings the old text back
+      function edReplaceUndoable(text) {
+        if (!editor || editor.getValue() === text) return;
+        const m = editor.getModel();
+        const pos = editor.getPosition();
+        editor.pushUndoStop();
+        editor.executeEdits("format", [
+          { range: m.getFullModelRange(), text },
+        ]);
+        editor.pushUndoStop();
+        if (pos) editor.setPosition(pos);
+      }
 
       // ═══════════ PRETTIER ═══════════
       function fmt(code) {

@@ -32,7 +32,7 @@
         showView("task");
         _editorLoading = true;
         if (editor) {
-          editor.setValue("// Loading…");
+          edShow("loading", "// Loading…");
           editor.updateOptions({ readOnly: true });
         }
         demoOpen(task); // the DEMO window of the task (if it has one)
@@ -41,7 +41,9 @@
         const key = `${cat.id}/${task.id}`;
         solCode = CODE[key] !== undefined ? CODE[key] : files.code;
         if (editor) {
-          editor.setValue(solCode);
+          _editorLoading = true; // a text sync from outside is not a player's edit
+          edShow(`ed:${key}`, solCode);
+          _editorLoading = false;
           editor.updateOptions({ readOnly: false });
           editor.focus();
         }
@@ -60,12 +62,13 @@
         if (!editor || !curTask) return;
         const files = FILECACHE[`${curCat().id}/${curTask.id}`];
         _editorLoading = true;
+        const key = `${curCat().id}/${curTask.id}`;
         if (t === "ed") {
-          editor.setValue(solCode);
+          edShow(`ed:${key}`, solCode);
           editor.updateOptions({ readOnly: false });
           editor.focus();
         } else if (files) {
-          editor.setValue(files.spec || "// spec not loaded");
+          edShow(`sp:${key}`, files.spec || "// spec not loaded");
           editor.updateOptions({ readOnly: true });
         }
         _editorLoading = false;
