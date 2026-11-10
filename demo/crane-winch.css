@@ -176,56 +176,49 @@
   animation-direction: reverse;
 }
 @keyframes roller-turn { to { transform: rotate(360deg); } }
-/* —— the winch, thick: a big drum between two tall flanges, the line is wound on it in bands —— */
-.crane-trolley { width: 84px; padding: 5px 8px 7px; }
+/* —— the winch, front view: one big sheave with spokes on an axle bar bolted into the trolley —— */
+.crane-trolley { width: 84px; padding: 5px 8px 6px; }
 .crane-winch {
-  gap: 0;
-  height: 26px;
-  align-items: stretch;
-  justify-content: stretch;
+  position: relative;
+  display: block;
+  height: 30px;
+  margin-top: 1px;
 }
 .crane-winch span:nth-child(1),
-.crane-winch span:nth-child(3) {
-  flex: 0 0 7px;
-  height: auto;
-  transform: none;
-  background:
-    linear-gradient(180deg, transparent 0 4px, var(--ink) 4px calc(100% - 4px), transparent calc(100% - 4px)),
-    linear-gradient(90deg, #00ffff 0 1px, var(--fill) 1px calc(100% - 1px), #00ffff calc(100% - 1px));
-  border: 1px solid #00ffff;
-  border-radius: 0;
-}
-.crane-winch span:nth-child(1) { margin-right: -1px; }
-.crane-winch span:nth-child(3) { margin-left: -1px; }
-/* the drum: bands of the wound line; they slide down while the line is paid out (up when hauled in) */
-.crane-winch span:nth-child(2) {
-  flex: 1;
-  height: auto;
-  margin: 4px 0;
-  border: 2px solid #00ffff;
-  border-left: 0;
-  border-right: 0;
-  border-radius: 0;
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 30%, transparent 65%, rgba(0, 0, 0, 0.45)),
-    repeating-linear-gradient(180deg, rgba(0, 255, 255, 0.85) 0 2px, var(--fill) 2px 5px);
-  background-size: 100% 100%, 100% 5px;
-  transform: none;
-}
-.crane.is-winding .crane-winch span:nth-child(2) { animation: drum-roll 0.3s linear infinite; }
-.crane.is-winding.is-up .crane-winch span:nth-child(2) { animation-direction: reverse; }
-@keyframes drum-roll {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 0, 0 5px; }
-}
-/* the base plate the winch sits on */
-.crane-winch { position: relative; }
-.crane-winch::after {
+.crane-winch span:nth-child(3) { display: none; }
+/* the axle bar with two bolts */
+.crane-winch::before {
   content: "";
   position: absolute;
-  left: -3px;
-  right: -3px;
-  bottom: -4px;
-  height: 2px;
-  background: var(--ln);
+  left: -5px;
+  right: -5px;
+  top: 14px;
+  height: 3px;
+  background:
+    radial-gradient(circle at 3px 50%, #b58900 0 1.5px, transparent 2px),
+    radial-gradient(circle at calc(100% - 3px) 50%, #b58900 0 1.5px, transparent 2px),
+    var(--ink);
+  border-top: 1px solid var(--ln);
+  border-bottom: 1px solid var(--ln);
 }
+/* the sheave: a thick ring, six spokes, a hub */
+.crane-winch span:nth-child(2) {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  border-radius: 50%;
+  border: 3px solid #00ffff;
+  box-shadow: inset 0 0 0 1px var(--ink), 0 0 0 1px var(--ink);
+  background:
+    radial-gradient(circle, #b58900 0 2px, var(--ink) 2.5px 5px, transparent 5.5px),
+    repeating-conic-gradient(from 0deg, rgba(0, 255, 255, 0.9) 0 7deg, var(--fill) 7deg 60deg);
+  transform: none;
+  z-index: 1;
+}
+.crane.is-winding .crane-winch span:nth-child(2) { animation: reel-turn 0.6s linear infinite; }
+.crane.is-winding.is-up .crane-winch span:nth-child(2) { animation-direction: reverse; }
+.crane-winch::after { display: none; }
