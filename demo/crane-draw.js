@@ -42,6 +42,14 @@ Scene.prototype.draw = function (frame, target, speedMs) {
 
   // the crane rides along the rail
   q.crane.style.left = `${((frame.craneIndex + 0.5) * 100) / Math.max(n, 1)}%`;
+  // the rollers of the trolley turn while it rides, in the direction of the ride
+  if (this.craneShown !== undefined && this.craneShown !== frame.craneIndex) {
+    q.crane.classList.add("is-riding");
+    q.crane.classList.toggle("is-left", frame.craneIndex < this.craneShown);
+    clearTimeout(this.rideTimer);
+    this.rideTimer = setTimeout(() => q.crane.classList.remove("is-riding"), moveMs);
+  }
+  this.craneShown = frame.craneIndex;
   q.crane.classList.toggle("is-scanning", scanning);
   q.crane.classList.toggle("is-working", busy);
 

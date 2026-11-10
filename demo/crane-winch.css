@@ -151,3 +151,28 @@
   border: 1px solid #00ffff;
   box-shadow: 0 0 8px #00ffff;
 }
+/* —— the rollers of the trolley: two wheels on the rail, they turn while the crane rides left / right —— */
+.crane-trolley::before,
+.crane-trolley::after {
+  top: 14px;
+  width: 11px;
+  height: 11px;
+  border: 1px solid #00ffff;
+  border-radius: 50%;
+  transform: none;
+  background:
+    radial-gradient(circle, #00ffff 0 1px, var(--ink) 1.5px 2.5px, transparent 3px),
+    repeating-conic-gradient(from 0deg, rgba(0, 255, 255, 0.75) 0 14deg, var(--ink) 14deg 60deg);
+  z-index: 2;
+}
+.crane-trolley::before { left: -7px; }
+.crane-trolley::after { right: -7px; }
+.crane.is-riding .crane-trolley::before,
+.crane.is-riding .crane-trolley::after {
+  animation: roller-turn 0.45s linear infinite;
+}
+.crane.is-riding.is-left .crane-trolley::before,
+.crane.is-riding.is-left .crane-trolley::after {
+  animation-direction: reverse;
+}
+@keyframes roller-turn { to { transform: rotate(360deg); } }
