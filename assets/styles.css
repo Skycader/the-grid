@@ -2980,11 +2980,13 @@
 
       .editor-area {
         flex: 1;
+        min-width: 0;
         display: flex;
         overflow: hidden;
       }
       .ed-panel {
-        flex: 3;
+        flex: 1 1 0;
+        min-width: 0;
         position: relative;
         border-right: 1px solid var(--bd);
       }
@@ -3060,7 +3062,8 @@
 
       /* results */
       .res-panel {
-        flex: 2;
+        flex: 0 0 var(--res-w, 40%);
+        min-width: 0;
         display: flex;
         flex-direction: column;
         background: #001d26;
@@ -3166,10 +3169,45 @@
         color: #eee8d5;
         font-size: 0.62rem;
       }
+      /* the draggable borders: editor | right column, and DEMO / test results */
+      .splitter {
+        flex: 0 0 5px;
+        position: relative;
+        z-index: 6;
+        background: transparent;
+        transition: background 0.12s;
+      }
+      .splitter-v {
+        cursor: col-resize;
+        margin: 0 -2px 0 -3px;
+      }
+      .splitter-h {
+        cursor: row-resize;
+        margin: -3px 0 -2px;
+      }
+      .splitter:hover,
+      .splitter.drag {
+        background: rgba(42, 161, 152, 0.55);
+      }
+      .demo-pane[hidden] + .splitter-h {
+        display: none;
+      }
+      body.split-drag {
+        user-select: none;
+      }
+      body.split-drag iframe,
+      body.split-drag #monaco {
+        pointer-events: none;
+      }
+      @media (max-width: 680px) {
+        .splitter {
+          display: none;
+        }
+      }
       /* DEMO above the test results: the upper part of the right column (the code on the left stays whole) */
       .demo-pane {
-        flex: 0 0 42%;
-        min-height: 150px;
+        flex: 0 0 var(--demo-h, 42%);
+        min-height: 60px;
         border-bottom: 1px solid var(--bd);
         background: #001d26;
       }
