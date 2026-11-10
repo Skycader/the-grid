@@ -3166,6 +3166,22 @@
         color: #eee8d5;
         font-size: 0.62rem;
       }
+      /* DEMO above the test results: the upper part of the right column (the code on the left stays whole) */
+      .demo-pane {
+        flex: 0 0 42%;
+        min-height: 150px;
+        border-bottom: 1px solid var(--bd);
+        background: #001d26;
+      }
+      .demo-pane[hidden] {
+        display: none;
+      }
+      .demo-pane iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
       .res-hdr {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.67rem;

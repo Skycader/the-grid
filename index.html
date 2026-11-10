@@ -531,6 +531,10 @@
             </div>
           </div>
           <div class="res-panel" id="res-panel">
+            <!-- DEMO: a page of its own (demo/*.html) that plays the run of the player's code; only for tasks with a demo -->
+            <div class="demo-pane" id="demo-pane" hidden>
+              <iframe id="demo-frame" title="DEMO" tabindex="-1"></iframe>
+            </div>
             <div class="res-hdr">
               <span>TEST RESULTS</span>
               <div class="res-sum" id="res-sum"></div>
@@ -1474,6 +1478,7 @@
     <script src="js/modal-drag.js"></script>
     <script src="js/home.js"></script>
     <script src="js/category.js"></script>
+    <script src="js/demo.js"></script>
     <script src="js/task-view.js"></script>
     <script src="js/editor.js"></script>
     <script src="js/worker-client.js"></script>

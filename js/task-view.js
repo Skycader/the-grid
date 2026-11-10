@@ -35,6 +35,7 @@
           editor.setValue("// Loading…");
           editor.updateOptions({ readOnly: true });
         }
+        demoOpen(task); // the DEMO window of the task (if it has one)
         const files = await loadTask(cat, task);
         _editorLoading = false;
         const key = `${cat.id}/${task.id}`;

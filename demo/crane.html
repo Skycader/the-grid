@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>DEMO: the crane</title>
+    <link rel="stylesheet" href="crane.css" />
+  </head>
+  <body>
+    <div class="bar">
+      <span class="ttl">DEMO · CRANE</span>
+      <button id="b-back" title="One frame back">⏮</button>
+      <button id="b-play" title="Play / pause">▶</button>
+      <button id="b-step" title="One frame forward">⏭</button>
+      <button id="b-restart" title="From the start">⟲</button>
+      <input id="speed" type="range" min="40" max="800" step="20" value="620" title="Speed" />
+    </div>
+    <div id="stage"></div>
+    <div id="stat">
+      <span>scan <b id="n-scan">0</b></span>
+      <span>grab <b id="n-grab">0</b></span>
+      <span>put <b id="n-put">0</b></span>
+      <span id="n-frame"></span>
+      <span id="msg"></span>
+    </div>
+    <script src="crane-timeline.js"></script>
+    <script src="crane-scene.js"></script>
+    <script src="crane-draw.js"></script>
+    <script src="crane-ui.js"></script>
+  </body>
+</html>

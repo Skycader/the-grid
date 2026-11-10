@@ -62,6 +62,7 @@
         btn.classList.remove("go");
         btn.textContent = "▶ RUN";
         renderResults(r, benchData);
+        demoRun(code); // the DEMO window (only tasks with a demo) plays what the code does
         if (!r.error) {
           const all = Object.values(r.suites).flat();
           const st =

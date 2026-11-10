@@ -41,6 +41,14 @@ window.CFG_algo = [
         desc: "Implement selection sort using only the provided API",
         file: "selection-sort",
       },
+      {
+        id: "selection_sort_crane",
+        title: "Selection Sort with a Crane",
+        diff: 4,
+        desc: "Sort the containers of a quay with a magnet crane that holds two at a time",
+        file: "selection-sort-crane",
+        demo: "crane", // the DEMO window (demo/crane.html) opens above the test results
+      },
     ],
   },
   {
