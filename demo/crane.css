@@ -26,7 +26,7 @@ body { display: flex; flex-direction: column; }
 
 /* the scene has a fixed design size; crane-ui.js scales it to the window */
 #stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-#stage .scene { position: absolute; left: 0; top: 0; width: 720px; height: 420px; min-height: 0; flex: none; transform-origin: 0 0; }
+#stage .scene { position: absolute; left: 0; top: 0; width: 560px; height: 380px; box-sizing: border-box; min-height: 0; flex: none; transform-origin: 0 0; }
 /* —— Scene —— */
 .scene {
   position: relative;
@@ -808,3 +808,9 @@ body { display: flex; flex-direction: column; }
 #stat b { color: var(--fg-bright); font-weight: 400; }
 #stat #msg { margin-left: auto; color: var(--fg-bright); }
 #stat #msg.err { color: var(--danger); }
+/* the badge is outside of the scaled scene: a fixed, readable size */
+#stage .op-badge { top: 6px; left: 8px; font-size: 14px; padding: 4px 10px; z-index: 10; }
+#stage .op-detail { font-size: 15px; }
+.bar { font-size: 12px; }
+.bar button { font-size: 14px; }
+#stat { font-size: 12px; }

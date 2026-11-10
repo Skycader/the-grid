@@ -2,8 +2,8 @@
 // The scene has a fixed design size (SCENE_W x SCENE_H); the stage scales it to the window, so the pixel
 // values of the CSS (the magnet, the containers) stay as they were drawn.
 
-const SCENE_W = 720;
-const SCENE_H = 420;
+const SCENE_W = 560; // the least design size: the scene is never drawn smaller (it scales to the window and fills it)
+const SCENE_H = 380;
 const ARM_RAISED = 16;
 const ARM_RAISED_STACK = 8;
 
@@ -43,9 +43,11 @@ class Scene {
       `<div class="laser-gun"><span class="laser-gun-body"></span><span class="laser-gun-barrel"></span><span class="laser-gun-lens"></span></div>` +
       `</div></div></div></div>` +
       `<div class="crane-laser" hidden><span class="crane-laser-core"></span><span class="crane-laser-glow"></span><span class="crane-laser-spot"></span></div>` +
-      `<div class="deck"><div class="deck-hull"></div><div class="deck-slots" style="--n:${n}"></div><div class="deck-water"></div></div>` +
-      `<div class="op-badge"><span class="op-kind"></span><span class="op-detail"></span></div>`;
+      `<div class="deck"><div class="deck-hull"></div><div class="deck-slots" style="--n:${n}"></div><div class="deck-water"></div></div>`;
     this.stage.appendChild(s);
+    // the status badge lives outside the scaled scene, so its text keeps a readable size at any window size
+    const badge = el("op-badge", `<span class="op-kind"></span><span class="op-detail"></span>`);
+    this.stage.appendChild(badge);
     this.root = s;
     const q = (c) => s.querySelector(c);
     this.q = {
@@ -59,8 +61,8 @@ class Scene {
       lens: q(".laser-gun-lens"),
       laser: q(".crane-laser"),
       slots: q(".deck-slots"),
-      kind: q(".op-kind"),
-      detail: q(".op-detail"),
+      kind: badge.querySelector(".op-kind"),
+      detail: badge.querySelector(".op-detail"),
     };
     this.slotEls = [];
     for (let i = 0; i < n; i++) {
@@ -80,12 +82,13 @@ class Scene {
   // scale the design size to the stage
   fit() {
     if (!this.root) return;
-    const w = this.stage.clientWidth,
-      h = this.stage.clientHeight;
-    this.scale = Math.max(0.2, Math.min(w / SCENE_W, h / SCENE_H));
-    const x = (w - SCENE_W * this.scale) / 2,
-      y = (h - SCENE_H * this.scale) / 2;
-    this.root.style.transform = `translate(${x}px, ${y}px) scale(${this.scale})`;
+    const w = Math.max(1, this.stage.clientWidth),
+      h = Math.max(1, this.stage.clientHeight);
+    // one scale for both axes; the scene is stretched along the other one, so no empty bands remain
+    this.scale = Math.min(2, Math.max(0.2, Math.min(w / SCENE_W, h / SCENE_H)));
+    this.root.style.width = w / this.scale + "px";
+    this.root.style.height = h / this.scale + "px";
+    this.root.style.transform = `scale(${this.scale})`;
   }
 
   // a size on the screen → the size in the design pixels of the scene
