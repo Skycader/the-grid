@@ -99,6 +99,14 @@ Scene.prototype.draw = function (frame, target, speedMs) {
     const next = Math.max(8, needed);
     if (Math.abs(this.armDrop - next) > 2) this.armDrop = next;
   }
+  // the winch drum turns while the chain is paid out or hauled in
+  if (this.armShown !== undefined && this.armShown !== this.armDrop) {
+    q.crane.classList.add("is-winding");
+    q.crane.classList.toggle("is-up", this.armDrop < this.armShown);
+    clearTimeout(this.windTimer);
+    this.windTimer = setTimeout(() => q.crane.classList.remove("is-winding"), armMs);
+  }
+  this.armShown = this.armDrop;
   q.crane.style.setProperty("--arm", this.armDrop + "px");
 
   // the laser: from the lens down to the container that is read

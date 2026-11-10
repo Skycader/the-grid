@@ -39,7 +39,7 @@ class Scene {
       `<div class="crane-spreader"><div class="spreader-beam"><em></em><em></em></div>` +
       `<div class="magnet"><div class="magnet-yoke"><span></span><span></span></div>` +
       `<div class="magnet-core"><i class="magnet-coil"></i><i class="magnet-coil"></i><i class="magnet-coil"></i><b class="magnet-face"></b></div>` +
-      `<div class="magnet-rack"></div><div class="magnet-bay"></div>` +
+      `<div class="magnet-aura"></div><div class="magnet-rack"></div><div class="magnet-bay"></div>` +
       `<div class="laser-gun"><span class="laser-gun-body"></span><span class="laser-gun-barrel"></span><span class="laser-gun-lens"></span></div>` +
       `</div></div></div></div>` +
       `<div class="crane-laser" hidden><span class="crane-laser-core"></span><span class="crane-laser-glow"></span><span class="crane-laser-spot"></span></div>` +
