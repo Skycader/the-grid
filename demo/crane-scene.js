@@ -34,7 +34,7 @@ class Scene {
       `<div class="scene-sky"></div><div class="scene-grid"></div>` +
       `<div class="gantry"><div class="gantry-rail"></div>` +
       `<div class="crane"><div class="crane-trolley"><div class="crane-cabin"></div>` +
-      `<div class="crane-winch"><span></span><span></span><span></span></div></div>` +
+      `<div class="crane-winch"><span></span><span></span><span></span><span></span></div></div>` +
       `<div class="crane-cable"></div>` +
       `<div class="crane-spreader"><div class="spreader-beam"><em></em><em></em></div>` +
       `<div class="magnet"><div class="magnet-yoke"><span></span><span></span></div>` +
