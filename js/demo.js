@@ -31,6 +31,12 @@
         demoSend(code);
       }
 
+      // the code the player has open right now (Play in the demo asks for it; tests are not required)
+      function demoPlayerCode() {
+        if (typeof editor !== "undefined" && editor) return editor.getValue();
+        return typeof solCode !== "undefined" ? solCode : "";
+      }
+
       function demoSend(code) {
         if (!code) return;
         if (!_demoReady) {
@@ -50,4 +56,6 @@
             demoSend(c);
           }
         }
+        // Play in the demo: the editor, never the reference solution
+        if (e.data && e.data.type === "crane-want") demoSend(demoPlayerCode());
       });

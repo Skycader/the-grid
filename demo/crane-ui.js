@@ -1,22 +1,13 @@
 // DEMO: the crane. The controls (play / step / restart / speed) and the talk with the app.
 //
 // The app puts this page in an iframe above the test results and talks to it with postMessage:
-//   app → demo:  { type: "crane-run", code }   play this solution (sent after every RUN)
+//   app → demo:  { type: "crane-run", code }   play this solution (the player's code only)
 //   demo → app:  { type: "crane-ready" }       the page is loaded, the app may send the code
-// Opened alone, the page plays the reference solution.
+//   demo → app:  { type: "crane-want" }        Play was pressed: send the code that is in the editor now
 // The player's code is run by a worker (crane-rec.js) on a recording crane: it posts the events, the timeline
 // (crane-timeline.js) turns them into frames, and the scene (crane-scene.js, crane-draw.js) draws one frame.
 
 const ROW = [5, 3, 8, 1, 9, 2, 7, 4];
-const REF = `const f = (crane) => {
-  const n = crane.getLength();
-  for (let i = 0; i < n - 1; i++) {
-    let m = i, min = crane.scan(i);
-    for (let j = i + 1; j < n; j++) { const v = crane.scan(j); if (v < min) { min = v; m = j; } }
-    if (m !== i) { crane.grab(i); crane.grab(m); crane.put(i); crane.put(m); }
-  }
-};
-module.exports = f;`;
 
 const $ = (id) => document.getElementById(id);
 const scene = new Scene($("stage"));
@@ -66,13 +57,13 @@ function tick() {
 }
 
 function play() {
-  // no recording yet (the tests were not run, or the code never moved a container): play the reference,
-  // so the button works at any time
-  if (frames.length <= 1) {
-    if (!recording) load(REF);
+  // nothing recorded yet, or the show is over: ask the app for the code in the editor and play that.
+  // a paused show resumes. the reference solution is never used.
+  if (!recording && (frames.length <= 1 || index >= frames.length - 1)) {
+    if (window.parent !== window) parent.postMessage({ type: "crane-want" }, "*");
+    else say("nothing to play", true);
     return;
   }
-  if (index >= frames.length - 1) index = 0;
   say("");
   playing = true;
   show();
@@ -138,4 +129,3 @@ window.addEventListener("message", (e) => {
 scene.build(ROW.length);
 show();
 if (window.parent !== window) parent.postMessage({ type: "crane-ready" }, "*");
-else load(REF);

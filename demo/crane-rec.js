@@ -45,8 +45,14 @@ self.onmessage = (e) => {
   let error = null;
   try {
     const mod = { exports: {} };
-    new Function("module", "exports", "require", code)(mod, mod.exports, () => mod.exports);
-    mod.exports(crane);
+    const fn = new Function(
+      "module",
+      "exports",
+      "require",
+      code + "\n;return typeof module.exports === 'function' ? module.exports : typeof f === 'function' ? f : null;",
+    )(mod, mod.exports, () => mod.exports);
+    if (typeof fn !== "function") throw new Error("the code does not export f");
+    fn(crane);
     if (hand.length) error = "the magnet is not empty at the end";
     else if (cells.some((c) => c === null)) error = "a cell is empty at the end";
   } catch (err) {
