@@ -303,19 +303,6 @@ body { display: flex; flex-direction: column; }
 
 .magnet.has-upper .magnet-rack {
   height: 50px;
-  border-left: 1px solid rgba(42, 161, 152, 0.4);
-  border-right: 1px solid rgba(42, 161, 152, 0.4);
-}
-
-.magnet.has-upper .magnet-rack::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  bottom: 0;
-  height: 2px;
-  background: var(--c-cyan);
-  box-shadow: 0 0 6px var(--glow-cyan);
 }
 
 .magnet-item-upper {

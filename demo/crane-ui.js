@@ -26,6 +26,7 @@ let frames = [initialFrame(ROW)],
   recErr = null,
   index = 0,
   playing = false,
+  recording = false,
   timer = 0;
 
 const speed = () => 840 - Number($("speed").value); // ms of one frame, as in main-frame
@@ -65,7 +66,12 @@ function tick() {
 }
 
 function play() {
-  if (frames.length <= 1) return;
+  // no recording yet (the tests were not run, or the code never moved a container): play the reference,
+  // so the button works at any time
+  if (frames.length <= 1) {
+    if (!recording) load(REF);
+    return;
+  }
   if (index >= frames.length - 1) index = 0;
   say("");
   playing = true;
@@ -101,15 +107,19 @@ function record(code) {
 }
 
 async function load(code) {
+  if (recording) return;
+  recording = true;
   pause();
   say("recording…");
   const r = await record(code);
+  recording = false;
   recErr = r.error;
   frames = [initialFrame(ROW), ...compileTimeline(ROW, r.events)];
   index = 0;
   scene.build(ROW.length);
   say("");
-  play();
+  if (frames.length > 1) play();
+  else say(recErr ? "ACCIDENT: " + recErr : "nothing to play", true);
 }
 
 $("b-play").onclick = () => (playing ? pause() : play());
